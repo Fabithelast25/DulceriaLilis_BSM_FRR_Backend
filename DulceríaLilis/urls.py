@@ -23,5 +23,7 @@ urlpatterns = [
 
     path('rrss/', views.redes, name="redes"),
     path('mision/', views.mision, name="mision"),
+    path('historia-empresa/',views.historia_empresa, name="historia-empresa"),
+    path('catalogo/',views.catalogo, name="catalogo")
 ]
 

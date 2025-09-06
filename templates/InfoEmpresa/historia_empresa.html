@@ -1,0 +1,67 @@
+{% extends 'navbar.html' %}
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historia de la Empresa</title>
+    {% block extra_css %}
+    <link rel="stylesheet" href="{% static 'CSS/historia-empresa.css' %}">
+    {% endblock %}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+</head>
+<body>
+    
+    
+    {% block cuerpo %}
+    <div class="seccion">
+    <h2><strong>LILIS</strong> – Mantenemos el espíritu de las recetas familiares</h2>
+    <p>
+      En el año 2017, la familia Maier-Foitzick fundó DULCERIA LILI’S con la apasionante visión de crear su propio negocio,
+      uno que les permitiera combinar sus pasiones y gustos. De este modo, dotaron de identidad y valor a las antiguas recetas
+      familiares de origen alemán, dando inicio a una emocionante travesía que transformó un simple emprendimiento en un auténtico
+      proyecto de vida. A lo largo de este viaje, la innovación, la creatividad, la búsqueda constante de calidad y la contribución
+      humana han sido los pilares fundamentales que han dado vida a esta magnífica iniciativa.
+    </p>
+    </div>
+
+    <div class="contenedor">
+    <img src="{% static 'images/Foto1HistoriaEmpresa.jpg' %}" alt="Foto1HistoriaEmpresa" class="imagen" />
+    <div class="texto">
+        <p>En DULCERIA LILI’S, nos esforzamos por utilizar únicamente las más finas materias primas, y nuestros colaboradores, con su humildad, dedicación y pasión por su labor, cuidan cada minucioso detalle que distingue a nuestras recetas como verdaderamente excepcionales y las convierte en las más exquisitas del mercado.</p>
+        <p>En el presente, DULCERIA LILI’S ha desarrollado tres líneas de proceso que se concentran en la elaboración de chocolates, galletas y confitería. Gracias a la incorporación de productos regionales e innovadores, hemos logrado forjar una línea de exportación que nos permite llevar nuestros nuevos y emocionantes proyectos a todos los rincones del mundo.</p>
+    </div>
+    </div>
+
+    <section class="contenedor">
+        <div class="texto">
+            <h2 class="titulo">Misión</h2>
+            <p>
+                Continuar haciendo lo que amamos a lo largo de nuestra historia, seguir innovando y 
+                desarrollando mágicas recetas con sus presentaciones y mantener siempre esta estrecha relación 
+                que hoy nos mueve con nuestros clientes y empleados.
+            </p>
+            <p>
+                No solo queremos crecer, también queremos aportar a nuestra sociedad con ayuda social, cuidar 
+                nuestro medio ambiente, crear fuentes de trabajo para las mujeres de nuestro País y con llevar 
+                todo ese cariño y compromiso que nos hace ser quien hoy día somos.
+            </p>
+
+            <h2 class="titulo">Visión</h2>
+            <p>
+                Ser una empresa Líder en elaboración de productos de calidad pero nunca perder la esencia de lo 
+                artesanal y no solo llegar a cada hogar de nuestro País sino también a distintos lugares del 
+                mundo llevando un atractivo producto a cada una de las familias que nos prefieren cada día más.
+            </p>
+        </div>
+
+        <div class="imagen">
+            <img src="{% static 'images/Foto2HistoriaEmpresa.jpeg' %}" alt="Foto2HistoriaEmpresa" class="imagen" />
+        </div>
+    </section>
+  
+  {% endblock cuerpo %}
+</body>
+</html>
