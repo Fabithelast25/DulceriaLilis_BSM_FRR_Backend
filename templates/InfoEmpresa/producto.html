@@ -1,0 +1,29 @@
+{% extends 'navbar.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'CSS/catalogo.css' %}">
+{% endblock %}
+
+
+{% block cuerpo %}
+
+<div class="container d-flex mt-5 mb-4">
+    <div class="me-5">
+        <img src="{% static 'images/Subcatalogo_'|add:producto.nombre|add:'.jpg' %}" 
+            alt="{{ producto }}" class="m-auto" style="width: 500px; height: 400px;"/>
+    </div>
+    <div class="m-auto">
+        <h2 class="mb-5">Nombre: {{ categoria }} {{ producto.nombre }}</h2>
+        <p style="font-size: 140%;"><strong>Descripción:</strong> {{ producto.descripción }}</p>
+        <p style="font-size: 140%;"><strong>Ingredientes:</strong> {{ producto.ingredientes_principales }}</p>
+        <p style="font-size: 140%;"><strong>Tiempo de producción:</strong> {{ producto.tiempo_de_producción_empaque }}</p>
+    </div>
+</div>
+<div class="d-flex justify-content-center my-3">
+    <a href="{% url 'subcatalogo' categoria %}" class="btn btn-danger" style="font-size: large;">
+        Volver
+    </a>
+</div>
+{% endblock cuerpo %}
+    
