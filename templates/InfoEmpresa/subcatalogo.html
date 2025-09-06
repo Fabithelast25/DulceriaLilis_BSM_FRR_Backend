@@ -1,0 +1,30 @@
+{% extends 'navbar.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'CSS/catalogo.css' %}">
+{% endblock %}
+
+
+{% block cuerpo %}
+<div class="container my-5">
+<h2 class="mt-4 mb-4">{{ categoria }}</h2>
+<div class="row row-cols-1 row-cols-md-3 g-4">
+  {% for producto in productos %}
+  <div class="col-md-4">
+    <div class="card" style="width: 18rem; border: thick solid red ;">
+        <img src="{% static 'images/Subcatalogo_'|add:producto.nombre|add:'.jpg' %}" 
+            alt="{{ producto }}" class="imagen_card m-auto"/>
+        <div class="card-body" style="border-top: solid red; background-color: red;">
+            <h5 class="card-title" style="color: white;">{{ producto.nombre }}</h5>
+            <p style="color: white;">{{ producto.descripción|truncatewords:15 }}</p>
+            <a href="{% url 'detalle_producto' categoria producto.nombre %}" 
+            class="btn btn-primary">Ver detalle</a>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+</div>
+
+{% endblock cuerpo %}
