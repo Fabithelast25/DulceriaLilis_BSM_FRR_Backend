@@ -21,7 +21,7 @@ productos = {
         {"nombre": "nuez", "descripción": "Alfajores rellenos de dulce de leche y decorados con nueces.", "ingredientes_principales": "Harina, nuez, dulce de leche, manteca", "tiempo_de_producción_empaque": "3 días"},
         {"nombre": "chocolate negro", "descripción": "Alfajores cubiertos con chocolate amargo y rellenos de dulce de leche.", "ingredientes_principales": "Harina, cacao, dulce de leche, chocolate amargo", "tiempo_de_producción_empaque": "3-4 días"},
         {"nombre": "sin azúcar", "descripción": "Alfajores aptos para personas con restricciones de azúcar, elaborados con edulcorantes.", "ingredientes_principales": "Harina, edulcorante, mantequilla, dulce de leche sin azúcar", "tiempo_de_producción_empaque": "3-4 días"},
-        {"nombre": "veganos", "descripción": "Alfajores sin ingredientes de origen animal, con relleno de dulce de leche vegano.", "ingredientes_principales": "Harina, azúcar, aceite vegetal, dulce de leche vegano", "tiempo_de_producción_empaque": "3-4 días"}
+        {"nombre": "para veganos", "descripción": "Alfajores sin ingredientes de origen animal, con relleno de dulce de leche vegano.", "ingredientes_principales": "Harina, azúcar, aceite vegetal, dulce de leche vegano", "tiempo_de_producción_empaque": "3-4 días"}
     ],
     "Confitería": [
         {"nombre": "calugas de manjar de cabra", "descripción": "Dulces de manjar de cabra, suaves y cremosos, cubiertos con azúcar.", "ingredientes_principales": "Manjar de cabra, azúcar, leche", "tiempo_de_producción_empaque": "1-2 días"},
@@ -38,3 +38,4 @@ productos = {
         {"nombre": "chocolate blanco relleno", "descripción": "Bombones de chocolate blanco rellenos de cremas suaves o frutas.", "ingredientes_principales": "Manteca de cacao, leche, azúcar, frutas", "tiempo_de_producción_empaque": "2-3 días"}
     ]
 }
+
