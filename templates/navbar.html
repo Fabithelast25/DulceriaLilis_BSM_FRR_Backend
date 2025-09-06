@@ -2,12 +2,20 @@
 {% load static %}
 <html lang="es">
 <head>
+    <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <!-- Título que también puede ser modificado por plantillas hijas -->
+    <title>{% block title %}Document{% endblock %}</title>
+    {% load static %}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+    <!-- CSS base del navbar -->
     <link rel="stylesheet" href="{% static 'CSS/navbar.css' %}">
+    <!-- Bloque para que otras plantillas puedan añadir más CSS -->
+    {% block extra_css %}{% endblock %}
+</head>
+
 </head>
 <body>
     <nav class="navbar navbar-expand-lg p-4" id="barraNavegacion">
@@ -21,9 +29,9 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNavAltMarkup">   
                 <div class="navbar-nav">
+                    <a class="nav-link" href="{% url 'historia-empresa' %}">Historia de la Empresa</a>
                     <a class="nav-link" href="{% url 'mision' %}">Misión</a>
-                    <a class="nav-link" href="#">Prueba</a>
-                    <a class="nav-link" href="#">Prueba</a>
+                    <a class="nav-link" href="{% url 'catalogo' %}">Catalogo</a>
                     <a class="nav-link" href="#">Prueba</a>
                     <a class="nav-link" href="#">Prueba</a>
                     <a class="nav-link" href="#">Prueba</a>
