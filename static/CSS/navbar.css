@@ -14,3 +14,40 @@
 .nav-link{
     color: white;
 }
+
+html, body {
+    height: 100%;          /* El body ocupa toda la pantalla */
+    margin: 0;             /* Quita márgenes */
+    display: flex;         
+    flex-direction: column;
+}
+
+main {
+    flex: 1; /* Se estira para empujar el footer hacia abajo */
+}
+
+footer{
+    margin-top: auto;
+}
+
+h5 {
+    color: rgb(223, 219, 219);
+}
+
+#info p, #info p a {
+    color: rgb(160, 153, 153) !important;
+    text-decoration: none !important;
+}
+
+#interes ul {
+    list-style-type: none;
+    padding-left: 0;
+    margin-left: 0;     
+    color: rgb(160, 153, 153) !important;
+    display: block; 
+}
+
+#interes ul li a{
+    text-decoration: none;
+    color: rgb(160, 153, 153) !important;
+}

@@ -23,7 +23,7 @@ urlpatterns = [
 
     path('historia-empresa/',views.historia_empresa, name="historia-empresa"),
     path('rrss/', views.rrss, name='rrss'),
-    path('catalogo/',views.catalogo, name="catalogo"),
+    path('',views.catalogo, name="catalogo"),
     path('catalogo/<str:categoria>/',views.subcatalogo, name="subcatalogo"),
     path('catalogo/<str:categoria>/<str:nombreProducto>/',views.detalle, name="detalle_producto"),
     

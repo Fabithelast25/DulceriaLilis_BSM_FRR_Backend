@@ -15,8 +15,6 @@
     <!-- Bloque para que otras plantillas puedan añadir más CSS -->
     {% block extra_css %}{% endblock %}
 </head>
-
-</head>
 <body>
     <nav class="navbar navbar-expand-lg p-4" id="barraNavegacion">
         <div class="container-fluid">
@@ -37,10 +35,35 @@
         </div>
     </nav>
     
-    
-    {% block cuerpo %}
-        
-    {% endblock cuerpo %}
-        
+    <main>
+        {% block cuerpo %}
+            
+        {% endblock cuerpo %}
+    </main>
+    <footer style="background-color: rgb(53, 21, 0);">
+        <div class="container p-2">
+            <div class="row mt-3">
+                <div class="col-md-3 col-sm-6">
+                    <img src="{% static 'images/logo_lilis_footer.png' %}" alt="">
+                </div>
+                <div class="col-md-3 col-sm-6" id="info">
+                    <h5>Info de Contacto</h3>
+                    <p>Móvil: <a href="#">+569 6226 1712</a></p>
+                    <p>E-Mail: <a href="#">ventas@lilis.cl</a></p>
+
+                    <p>Ubicanos en: <strong>Paseo San Ramón</strong> Waldo Alcalde 401, local 8, San Ramón, Coquimbo</p>
+                </div>
+                <div class="col-md-3 col-sm-6" id="interes">
+                    <h5>Link de interes</h3>
+                        <ul>
+                            <li><a href="">Mi cuenta</a></li>
+                            <li><a href="">Contacto</a></li>
+                            <li><a href="">Política de Privacidad</a></li>
+                            <li><a href="">Términos y condiciones</a></li>
+                        </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
 </body>
 </html>
