@@ -22,3 +22,6 @@ def detalle(request, categoria, nombreProducto):
         'producto' : producto,
         'categoria' : categoria
     })
+
+def rrss(request):
+    return render(request, 'InfoEmpresa/rrss.html')

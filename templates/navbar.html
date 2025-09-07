@@ -20,7 +20,7 @@
 <body>
     <nav class="navbar navbar-expand-lg p-4" id="barraNavegacion">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">
+            <a class="navbar-brand fw-bold" href="{% url 'catalogo' %}">
                 <img src="{% static 'images/logo_lilis.png' %}" alt="Logo Dulceria Lilis" id="logo">
                 Dulceria Lilis
             </a>
@@ -29,11 +29,9 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNavAltMarkup">   
                 <div class="navbar-nav">
-                    <a class="nav-link" href="{% url 'historia-empresa' %}">Historia de la Empresa</a>
-                    <a class="nav-link" href="{% url 'catalogo' %}">Catalogo</a>
-                    <a class="nav-link" href="#">Prueba</a>
-                    <a class="nav-link" href="#">Prueba</a>
-                    <a class="nav-link" href="#">Prueba</a>
+                    <a class="nav-link fw-bold" href="{% url 'historia-empresa' %}">Historia de la Empresa</a>
+                    <a class="nav-link fw-bold" href="{% url 'catalogo' %}">Catalogo</a>
+                    <a class="nav-link fw-bold" href="{% url 'rrss' %}">Contactos</a>
                 </div>
             </div>
         </div>

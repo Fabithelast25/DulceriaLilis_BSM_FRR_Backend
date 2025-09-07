@@ -1,13 +1,57 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-</head>
-<body>
-    {% extends "navbar.html" %}
+{% extends 'navbar.html' %}
+{% load static %}
+
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'CSS/rrss.css' %}">
+{% endblock extra_css %}
     
-</body>
-</html>
+
+{% block cuerpo %}
+    
+<div class="container mt-5">
+    <div class="row g-2">
+        <div class="col-6 col-md-4 d-flex justify-content-center">
+            <img  src="{% static 'images/logo_lilis_rrss.png' %}" alt="" >
+        </div>
+        <div class="col-sm-6 col-md-8">
+            <h2 class="mb-4">Nuestros Valores</h1>
+            <p>
+                En Dulcería Lili’s creemos que cada dulce debe compartirse con cariño. 
+                Por eso nos guiamos por el respeto, la puntualidad, la honestidad y la honradez, 
+                valores que nos acompañan en cada entrega y en la forma en que tratamos a 
+                nuestros clientes, colaboradores y proveedores.
+            </p>
+        </div>
+        <div class="row mt-5">
+            <div class="col-sm-4 d-flex justify-content-center">
+                <a href="#">
+                    <img src="{% static 'images/logo_facebook.png' %}" alt="" id="logo_redes">
+                </a>
+                <a href="#">
+                    <img src="{% static 'images/logo_instagram.png' %}" alt="" id="logo_redes">
+                </a>
+                <a href="#">
+                    <img src="{% static 'images/logo_whatsapp.png' %}" alt="" id="logo_redes">
+                </a>
+            </div>
+            <div class="col-sm-6 col-md-5">
+                <h2 class="mb-4">Contactos</h1>
+                <p>
+                    Móvil: <a href="#" style="color: red; text-decoration: none;">+569 6226 1712</a>
+                </p>
+                <p>
+                    E-Mail: <a href="#">ventas@lilis.cl</a>
+                </p>
+            </div>
+            <div class="col">
+                TODOS LOS DÍAS
+                <p>11:00 a 14:00</p>
+                <p>15:00 a 21:00</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock cuerpo %}
+    
