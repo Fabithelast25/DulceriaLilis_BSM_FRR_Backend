@@ -21,9 +21,11 @@ from Dulceria import views
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    path('rrss/', views.redes, name="redes"),
-    path('mision/', views.mision, name="mision"),
     path('historia-empresa/',views.historia_empresa, name="historia-empresa"),
-    path('catalogo/',views.catalogo, name="catalogo")
+    path('rrss/', views.rrss, name='rrss'),
+    path('',views.catalogo, name="catalogo"),
+    path('catalogo/<str:categoria>/',views.subcatalogo, name="subcatalogo"),
+    path('catalogo/<str:categoria>/<str:nombreProducto>/',views.detalle, name="detalle_producto"),
+    
 ]
 

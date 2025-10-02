@@ -1,74 +1,36 @@
 {% extends 'navbar.html' %}
 {% load static %}
 
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catalogo</title>
-    {% block extra_css %}
-    <link rel="stylesheet" href="{% static 'CSS/historia-empresa.css' %}">
-    <link rel="stylesheet" href="{% static 'CSS/catalogo.css' %}">
-    {% endblock %}
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-</head>
-<body >
-    {% block cuerpo %}
-    <div class="container my-5">
-        <div class="row row-cols-1 row-cols-md-3 g-4">
-    <div class="col" >
-        <div class="card" style="width: 18rem;">
-        <img src="{% static 'images/Catalogo_Alfajores.jpg' %}" alt="Catalogo_Alfajores" class="imagen_card" />
-        <div class="card-body">
-            <h5 class="card-title">Alfajores</h5>
-            <a href="#" class="btn btn-danger">Seleccionar Opciones</a>
-        </div>
-        </div>
-    </div>
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'CSS/historia-empresa.css' %}">
+<link rel="stylesheet" href="{% static 'CSS/catalogo.css' %}">
+{% endblock %}
 
-    <div class="col">
-        <div class="card" style="width: 18rem;">
-        <img src="{% static 'images/Catalogo_Bomboneria.jpg' %}" alt="Catalogo_Bomboneria" class="imagen_card" />
-        <div class="card-body">
-            <h5 class="card-title">Bombonería</h5>
-            <a href="#" class="btn btn-danger">Seleccionar Opciones</a>
+{% block title %}
+    Catalogo
+{% endblock title %}
+    
+{% block cuerpo %}
+<div class="container my-5">
+    <div class="row row-cols-1 row-cols-md-3 g-4 justify-content-center">
+        {% for categoria in categorias %}
+        <div class="col d-flex justify-content-center">
+            <div class="card" style="width: 18rem;">
+                <img src="{% static 'images/Catalogo_'|add:categoria|add:'.jpg' %}" 
+                     alt="{{ categoria }}" 
+                     class="imagen_card d-block mx-auto" />
+                <div class="card-body text-center">
+                    <h5 class="card-title">{{ categoria }}</h5>
+                    <a href="{% url 'subcatalogo' categoria %}" class="btn btn-danger">
+                        Seleccionar Opciones
+                    </a>
+                </div>
+            </div>
         </div>
-        </div>
+        {% empty %}
+        <p>No hay categorías disponibles.</p>
+        {% endfor %}
     </div>
+</div>
 
-    <div class="col">
-        <div class="card" style="width: 18rem;">
-        <img src="{% static 'images/Catalogo_Chocolate.jpg' %}" alt="Catalogo_Chocolate" class="imagen_card" />
-        <div class="card-body">
-            <h5 class="card-title">Chocolate</h5>
-            <a href="#" class="btn btn-danger">Seleccionar Opciones</a>
-        </div>
-        </div>
-    </div>
-
-    <div class="col">
-        <div class="card" style="width: 18rem;">
-        <img src="{% static 'images/Catalogo_Confiteria.jpg' %}" alt="Catalogo_Confiteria" class="imagen_card" />
-        <div class="card-body">
-            <h5 class="card-title">Confitería</h5>
-            <a href="#" class="btn btn-danger">Seleccionar Opciones</a>
-        </div>
-        </div>
-    </div>
-
-    <div class="col">
-        <div class="card" style="width: 18rem;">
-        <img src="{% static 'images/Catalogo_Galletas.jpg' %}" alt="Catalogo_Galletas" class="imagen_card" />
-        <div class="card-body">
-            <h5 class="card-title">Galletas</h5>
-            <a href="#" class="btn btn-danger">Seleccionar Opciones</a>
-        </div>
-        </div>
-    </div>
-    </div>
-    </div>
-  
-    {% endblock cuerpo %}
-</body>
-</html>
+{% endblock cuerpo %}
