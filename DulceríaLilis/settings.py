@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'Dulceria',
-    'Panel_Usuarios'
+    'Panel_Usuarios',
+    'Panel_Productos'
 ]
 
 MIDDLEWARE = [
