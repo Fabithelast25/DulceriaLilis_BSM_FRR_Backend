@@ -4,11 +4,24 @@ categorias = (
     ("AL", "Alfajores"),
     ("CO", "Confitería"),
     ("BO", "Bombonería"),
+    ("CA", "Caramelos"),
+    ("GO", "Gomitas"),
+    ("PA", "Paletas"),
+    ("MA", "Masmelos"),
+    ("SA", "Snacks dulces")
 )
 
 unidades_medidas = (
     ("UN", "Unidad"),
     ("CAJA", "Caja"),
-    ("KG", "Kilogramos")
+    ("KG", "Kilogramos"),
+    ("PAQ", "Paquete"),
+    ("BOL", "Bolsa"),
+    ("DOC", "Docena"),
+    ("BAN", "Bandeja"),
+    ("LT", "Litro"),
+    ("GR", "Gramos"),
+    ("DIS", "Display"),
+    ("PRO","UM Profe")
 )
 
