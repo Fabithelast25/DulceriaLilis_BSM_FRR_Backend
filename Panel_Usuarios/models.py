@@ -57,7 +57,7 @@ class Usuario(models.Model):
     #Estado y acceso
     rol = models.ForeignKey(Rol, on_delete=models.RESTRICT)
     estado = models.CharField(max_length=1, choices=estados, default="A")
-    mfa_habilitado = models.BooleanField(default=True, verbose_name="MFA_Habilitado")
+    mfa_habilitado = models.BooleanField(default=False, verbose_name="MFA_Habilitado")
     ultimo_acceso = models.DateField(default=timezone.now)
     sesiones_activas = models.PositiveIntegerField(default=0)
 

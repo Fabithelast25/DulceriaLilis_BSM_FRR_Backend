@@ -18,6 +18,9 @@ from django.contrib import admin
 from django.urls import path
 from Dulceria import views 
 
+#Importaciones Usuario
+from Panel_Usuarios import views as vista
+
 urlpatterns = [
     path('admin/', admin.site.urls),
 
@@ -26,6 +29,9 @@ urlpatterns = [
     path('',views.catalogo, name="catalogo"),
     path('catalogo/<str:categoria>/',views.subcatalogo, name="subcatalogo"),
     path('catalogo/<str:categoria>/<str:nombreProducto>/',views.detalle, name="detalle_producto"),
+    
+    #Rutas Usuario
+    path('usuarioAdd/', vista.usuarioAdd, name="usuarioAdd"),
     
 ]
 
