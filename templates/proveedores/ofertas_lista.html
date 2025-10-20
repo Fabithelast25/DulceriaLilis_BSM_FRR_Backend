@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Ofertas de Proveedores</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <style>
+    body{ background-color:azure; margin:0; font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif; }
+    .container{ background:#fff; max-width:1100px; margin:18px auto; padding:16px; border-radius:10px; box-shadow:0 6px 14px rgba(0,0,0,.08); border:1px solid #e8e8e8; }
+    .title{ font-size:1.4rem; font-weight:700; margin:8px 0 14px; color:#333; }
+    .toolbar{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:12px; }
+    .grow{ flex:1; min-width:220px; }
+    .form-control,.form-select{ border:1px solid #dedede; border-radius:6px; padding:8px 10px; }
+    .btn{ border:none; border-radius:6px; padding:8px 12px; font-weight:600; cursor:pointer; }
+    .btn-warning{ background-color:rgb(117,117,243); color:rgb(4,26,99); border:1px solid rgba(45,45,255,.61); }
+    .btn-warning:hover{ background-color:rgb(51,51,212); }
+    table{ width:100%; border-collapse:collapse; }
+    th,td{ border:1px solid #000; padding:8px; }
+    thead th{ background-color: rgba(138, 43, 226, 0.13); }
+    .pagination{ display:flex; gap:6px; justify-content:flex-end; margin-top:12px; }
+    .pagination a,.pagination span{ padding:6px 10px; border:1px solid #ddd; border-radius:6px; background:#fff; text-decoration:none; color:#333; }
+    .pagination .active{ background: rgb(138,43,226); color:#fff; border-color: rgb(138,43,226); }
+    .navbar{ background-color: rgb(138, 43, 226); }
+    .navbar-brand{
+      color: aliceblue; font-style: oblique; font-weight: bold; font-size: x-large; text-decoration:none;
+    }
+    .navbar-brand:hover{ color: aliceblue; }
+    .nav-link{ color: aliceblue; text-decoration:none; }
+  </style>
+</head>
+<body>
+
+  {% include "proveedores/navbarProveedores.html" %}
+
+  <div class="container">
+    <div class="title">Ofertas de Proveedores</div>
+
+    <form method="get" class="toolbar">
+      <input class="form-control grow" type="text" name="q" value="{{ q }}" placeholder="Buscar por producto, proveedor…">
+      <select class="form-select" name="preferente">
+        <option value="">Preferente: todos</option>
+        <option value="1" {% if preferente == '1' %}selected{% endif %}>Sí</option>
+        <option value="0" {% if preferente == '0' %}selected{% endif %}>No</option>
+      </select>
+      <button class="btn btn-warning" type="submit">Filtrar</button>
+      <a class="btn btn-warning" href="{% url 'agregar_oferta' %}">Añadir Oferta</a>
+    </form>
+
+    <div style="overflow:auto">
+      <table>
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>Proveedor</th>
+            <th>Costo</th>
+            <th>Lead (días)</th>
+            <th>Mín. lote</th>
+            <th>Desc. (%)</th>
+            <th>Preferente</th>
+            <th style="width:160px">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for o in page_obj %}
+            <tr>
+              <td>{{ o.producto }}</td>
+              <td>{{ o.proveedor.razon_social }}</td>
+              <td>{{ o.costo }}</td>
+              <td>{{ o.lead_time_dias }}</td>
+              <td>{{ o.min_lote }}</td>
+              <td>{{ o.descuento_pct|default:"—" }}</td>
+              <td>{{ o.preferente|yesno:"Sí,No" }}</td>
+              <td>
+                <a class="btn btn-warning" href="{% url 'editar_oferta' o.id %}">Editar</a>
+                <a class="btn btn-warning" style="background:#e74c3c;color:#fff;border-color:#e74c3c" href="{% url 'eliminar_oferta' o.id %}">Eliminar</a>
+              </td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="8">No se encontraron ofertas.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {% if page_obj.paginator.num_pages > 1 %}
+      <div class="pagination">
+        {% if page_obj.has_previous %}
+          <a href="?q={{ q }}&preferente={{ preferente }}&page={{ page_obj.previous_page_number }}">«</a>
+        {% else %}<span>«</span>{% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+          {% if num == page_obj.number %}
+            <span class="active">{{ num }}</span>
+          {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <a href="?q={{ q }}&preferente={{ preferente }}&page={{ num }}">{{ num }}</a>
+          {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+          <a href="?q={{ q }}&preferente={{ preferente }}&page={{ page_obj.next_page_number }}">»</a>
+        {% else %}<span>»</span>{% endif %}
+      </div>
+    {% endif %}
+  </div>
+
+</body>
+</html>

@@ -1,51 +1,49 @@
-"""
-URL configuration for DulceríaLilis project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/5.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
 from django.contrib import admin
 from django.urls import path
 from Dulceria import views 
 
-#Importaciones Usuario
+# Importaciones Usuario
 from Panel_Usuarios import views as vista
+
+# Importaciones Proveedores
+from Panel_Proveedores import views as vista_proveedores
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    path('historia-empresa/',views.historia_empresa, name="historia-empresa"),
+    path('historia-empresa/', views.historia_empresa, name="historia-empresa"),
     path('rrss/', views.rrss, name='rrss'),
-    path('',views.catalogo, name="catalogo"),
-    path('catalogo/<str:categoria>/',views.subcatalogo, name="subcatalogo"),
-    path('catalogo/<str:categoria>/<str:nombreProducto>/',views.detalle, name="detalle_producto"),
+    path('', views.catalogo, name="catalogo"),
+    path('catalogo/<str:categoria>/', views.subcatalogo, name="subcatalogo"),
+    path('catalogo/<str:categoria>/<str:nombreProducto>/', views.detalle, name="detalle_producto"),
     
-    #Rutas Usuario
+    # Rutas Usuario
     path('usuarioAdd/', vista.usuarioAdd, name="usuarioAdd"),
     path('usuarioLista/', vista.usuarioLista, name='usuarioLista'),
     path('usuarioLista/delete/<int:id>/', vista.usuarioDelete, name='usuarioDelete'),
     path('usuarioUpdate/<int:id>/', vista.usuarioUpdate, name='usuarioUpdate'),
     
-    #Rutas Roles
+    # Rutas Roles
     path('rolLista/', vista.rolLista, name="rolLista"),
     path('rolAdd/', vista.rolAdd, name='rolAdd'),
     path('rolLista/delete/<int:id>/', vista.rolDelete, name='rolDelete'),
     path('rolUpdate/<int:id>/', vista.rolUpdate, name='rolUpdate'),
     
-    #Rutas Areas
+    # Rutas Areas
     path('areaLista/', vista.areaLista, name="areaLista"),
     path('areaAdd/', vista.areaAdd, name='areaAdd'),
     path('areaLista/delete/<int:id>/', vista.areaDelete, name='areaDelete'),
     path('areaUpdate/<int:id>/', vista.areaUpdate, name='areaUpdate'),
-]
 
+    # Rutas Proveedores
+    path('proveedores/', vista_proveedores.lista_proveedores, name='lista_proveedores'),
+    path('proveedores/agregar/', vista_proveedores.agregar_proveedor, name='agregar_proveedor'),
+    path('proveedores/editar/<int:pk>/', vista_proveedores.editar_proveedor, name='editar_proveedor'),
+    path('proveedores/eliminar/<int:pk>/', vista_proveedores.eliminar_proveedor, name='eliminar_proveedor'),
+
+    # Rutas Ofertas de Proveedores
+    path('ofertas/', vista_proveedores.lista_ofertas, name='lista_ofertas'),
+    path('ofertas/agregar/', vista_proveedores.agregar_oferta, name='agregar_oferta'),
+    path('ofertas/editar/<int:pk>/', vista_proveedores.editar_oferta, name='editar_oferta'),
+    path('ofertas/eliminar/<int:pk>/', vista_proveedores.eliminar_oferta, name='eliminar_oferta'),
+]
