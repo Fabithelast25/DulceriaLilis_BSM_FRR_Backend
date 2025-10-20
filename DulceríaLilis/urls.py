@@ -18,6 +18,9 @@ from django.contrib import admin
 from django.urls import path
 from Dulceria import views 
 
+#Importaciones Usuario
+from Panel_Usuarios import views as vista
+
 urlpatterns = [
     path('admin/', admin.site.urls),
 
@@ -27,5 +30,22 @@ urlpatterns = [
     path('catalogo/<str:categoria>/',views.subcatalogo, name="subcatalogo"),
     path('catalogo/<str:categoria>/<str:nombreProducto>/',views.detalle, name="detalle_producto"),
     
+    #Rutas Usuario
+    path('usuarioAdd/', vista.usuarioAdd, name="usuarioAdd"),
+    path('usuarioLista/', vista.usuarioLista, name='usuarioLista'),
+    path('usuarioLista/delete/<int:id>/', vista.usuarioDelete, name='usuarioDelete'),
+    path('usuarioUpdate/<int:id>/', vista.usuarioUpdate, name='usuarioUpdate'),
+    
+    #Rutas Roles
+    path('rolLista/', vista.rolLista, name="rolLista"),
+    path('rolAdd/', vista.rolAdd, name='rolAdd'),
+    path('rolLista/delete/<int:id>/', vista.rolDelete, name='rolDelete'),
+    path('rolUpdate/<int:id>/', vista.rolUpdate, name='rolUpdate'),
+    
+    #Rutas Areas
+    path('areaLista/', vista.areaLista, name="areaLista"),
+    path('areaAdd/', vista.areaAdd, name='areaAdd'),
+    path('areaLista/delete/<int:id>/', vista.areaDelete, name='areaDelete'),
+    path('areaUpdate/<int:id>/', vista.areaUpdate, name='areaUpdate'),
 ]
 

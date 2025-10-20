@@ -23,7 +23,7 @@ Modelo:
 '''
 class Rol(models.Model):
     nombre = models.CharField(max_length=20, verbose_name="Rol")
-    creado = models.DateTimeField(default=timezone.now)
+    creado = models.DateTimeField(auto_now_add=True)
     descripcion = models.TextField(max_length=200, verbose_name="Descripcion", blank=True)
 
     def __str__(self):
@@ -36,7 +36,7 @@ class Rol(models.Model):
 
 class Area(models.Model):
     nombre = models.CharField(max_length=20, verbose_name="Area")
-    creado = models.DateTimeField(default=timezone.now)
+    creado = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.nombre}"
@@ -57,13 +57,13 @@ class Usuario(models.Model):
     #Estado y acceso
     rol = models.ForeignKey(Rol, on_delete=models.RESTRICT)
     estado = models.CharField(max_length=1, choices=estados, default="A")
-    mfa_habilitado = models.BooleanField(default=True, verbose_name="MFA_Habilitado")
+    mfa_habilitado = models.BooleanField(default=False, verbose_name="MFA_Habilitado")
     ultimo_acceso = models.DateField(default=timezone.now)
     sesiones_activas = models.PositiveIntegerField(default=0)
 
     #Metadatos
     area = models.ForeignKey(Area, on_delete=models.RESTRICT)
-    observaciones = models.TextField(max_length=200, verbose_name="Observaciones", blank=True)
+    observaciones = models.TextField(max_length=500, verbose_name="Observaciones", blank=True)
     
     class Meta:
         db_table = "usuario" #Nombre de la tabla cuando se cree

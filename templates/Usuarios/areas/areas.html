@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Areas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'CSS/usuario.css' %}">
+</head>
+<body>
+    {% include 'Usuarios/navbarUsuarios.html' %}
+    <div class="container mt-4 mb-4">
+        <h3 class="mb-3">Areas</h3>
+          <!-- 🔹 FORMULARIO DE FILTROS -->
+           <form method="get" class="row g-2 mb-4">
+                <div class="col-md-2">
+                    <label for="fecha_inicio">Fecha Inicio</label>
+                    <input type="date" name="fecha_inicio" class="form-control" value="{{ fecha_inicio }}">
+                </div>
+                <div class="col-md-2">
+                    <label for="fecha_fin">Fecha Fin</label>
+                    <input type="date" name="fecha_fin" class="form-control" value="{{ fecha_fin }}" placeholder="Fecha fin">
+                </div>
+                <div class="col-md-1">
+                    <button type="submit" class="btn btn-primary w-100" style="margin-top: 23px;">Filtrar</button>
+                </div>
+            </form>
+        <div>
+            <a class="btn btn-primary mb-3" href="{% url 'areaAdd' %}">Añadir Area</a>
+        </div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Creado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for a in areas %}
+                <tr>
+                    <td>{{ a.nombre }}</td>
+                    <td>{{ a.creado }}</td>
+                    <td>
+                        <ul style="list-style: none;">
+                            <li><a href="{% url 'areaUpdate' a.id %}" class="btn btn-sm btn-warning mb-2">Editar</a></li>
+                            <li><a href="{% url 'areaDelete' a.id %}" class="btn btn-sm btn-danger">Eliminar</a></li>
+                        </ul>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+</body>
+</html>
