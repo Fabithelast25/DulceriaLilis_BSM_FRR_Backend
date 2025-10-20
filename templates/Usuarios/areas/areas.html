@@ -4,14 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lista de Roles</title>
+    <title>Lista de Areas</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <link rel="stylesheet" href="{% static 'CSS/usuario.css' %}">
 </head>
 <body>
     {% include 'Usuarios/navbarUsuarios.html' %}
     <div class="container mt-4 mb-4">
-        <h3 class="mb-3">Roles</h3>
+        <h3 class="mb-3">Areas</h3>
           <!-- 🔹 FORMULARIO DE FILTROS -->
            <form method="get" class="row g-2 mb-4">
                 <div class="col-md-2">
@@ -27,27 +27,25 @@
                 </div>
             </form>
         <div>
-            <a class="btn btn-primary mb-3" href="{% url 'rolAdd' %}">Añadir Rol</a>
+            <a class="btn btn-primary mb-3" href="{% url 'areaAdd' %}">Añadir Area</a>
         </div>
         <table class="table">
             <thead>
                 <tr>
                     <th>Nombre</th>
                     <th>Creado</th>
-                    <th>Descripción</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>
-                {% for r in roles %}
+                {% for a in areas %}
                 <tr>
-                    <td>{{ r.nombre }}</td>
-                    <td>{{ r.creado }}</td>
-                    <td>{{ r.descripcion }}</td>
+                    <td>{{ a.nombre }}</td>
+                    <td>{{ a.creado }}</td>
                     <td>
                         <ul style="list-style: none;">
-                            <li><a href="{% url 'rolUpdate' r.id %}" class="btn btn-sm btn-warning mb-2">Editar</a></li>
-                            <li><a href="{% url 'rolDelete' r.id %}" class="btn btn-sm btn-danger">Eliminar</a></li>
+                            <li><a href="{% url 'areaUpdate' a.id %}" class="btn btn-sm btn-warning mb-2">Editar</a></li>
+                            <li><a href="{% url 'areaDelete' a.id %}" class="btn btn-sm btn-danger">Eliminar</a></li>
                         </ul>
                     </td>
                 </tr>

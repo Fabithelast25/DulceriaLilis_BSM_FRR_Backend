@@ -50,5 +50,20 @@ class UsuarioForm(forms.ModelForm):
     class Meta:
         model = Usuario
         fields = '__all__'
+
+class RolForm(forms.ModelForm):
+    nombre = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control'}))
+    descripcion = forms.CharField(required=False, widget=forms.TextInput(attrs={'class':'form-control'}))
+    
+    class Meta:
+        model = Rol
+        fields = '__all__'
         
+class AreaForm(forms.ModelForm):
+    nombre = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control'}))
+    
+    class Meta:
+        model = Area
+        fields = '__all__'
+    
     

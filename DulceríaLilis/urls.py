@@ -35,5 +35,17 @@ urlpatterns = [
     path('usuarioLista/', vista.usuarioLista, name='usuarioLista'),
     path('usuarioLista/delete/<int:id>/', vista.usuarioDelete, name='usuarioDelete'),
     path('usuarioUpdate/<int:id>/', vista.usuarioUpdate, name='usuarioUpdate'),
+    
+    #Rutas Roles
+    path('rolLista/', vista.rolLista, name="rolLista"),
+    path('rolAdd/', vista.rolAdd, name='rolAdd'),
+    path('rolLista/delete/<int:id>/', vista.rolDelete, name='rolDelete'),
+    path('rolUpdate/<int:id>/', vista.rolUpdate, name='rolUpdate'),
+    
+    #Rutas Areas
+    path('areaLista/', vista.areaLista, name="areaLista"),
+    path('areaAdd/', vista.areaAdd, name='areaAdd'),
+    path('areaLista/delete/<int:id>/', vista.areaDelete, name='areaDelete'),
+    path('areaUpdate/<int:id>/', vista.areaUpdate, name='areaUpdate'),
 ]
 

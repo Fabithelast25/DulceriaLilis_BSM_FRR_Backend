@@ -23,7 +23,7 @@ Modelo:
 '''
 class Rol(models.Model):
     nombre = models.CharField(max_length=20, verbose_name="Rol")
-    creado = models.DateTimeField(default=timezone.now)
+    creado = models.DateTimeField(auto_now_add=True)
     descripcion = models.TextField(max_length=200, verbose_name="Descripcion", blank=True)
 
     def __str__(self):
@@ -36,7 +36,7 @@ class Rol(models.Model):
 
 class Area(models.Model):
     nombre = models.CharField(max_length=20, verbose_name="Area")
-    creado = models.DateTimeField(default=timezone.now)
+    creado = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.nombre}"
