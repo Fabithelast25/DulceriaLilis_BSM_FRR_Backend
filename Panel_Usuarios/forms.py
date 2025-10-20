@@ -25,7 +25,7 @@ class UsuarioForm(forms.ModelForm):
     email = forms.CharField(widget=forms.EmailInput(attrs={'class':'form-control'}))
     nombres = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control'}))
     apellidos = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control'}))
-    telefono = forms.CharField(required=False,widget=forms.TextInput(attrs={'class':'form-control'}))
+    telefono = forms.CharField(required=False,widget=forms.NumberInput(attrs={'class':'form-control'}))
     
     #Estado y acceso
     rol = forms.ModelChoiceField(
@@ -35,8 +35,8 @@ class UsuarioForm(forms.ModelForm):
     )
     estado = forms.CharField(widget=forms.Select(choices=estados, attrs={'class':'form-select'}))
     mfa_habilitado = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={'class':'form-check-input'}))
-    ultimo_acceso = forms.DateField(initial=timezone.now, required=False, widget=forms.DateInput(attrs={'class':'form-control', 'placeholder':'--------', 'readonly': True}))
-    sesiones_activas = forms.CharField(required=False, empty_value=0, widget=forms.NumberInput(attrs={'class':'form_control', 'readonly':True}))
+    ultimo_acceso = forms.DateField(initial=timezone.now, widget=forms.DateInput(attrs={'class':'form-control', 'placeholder':'--------', 'readonly': True}))
+    sesiones_activas = forms.CharField(required=False, empty_value=0, widget=forms.NumberInput(attrs={'class':'form_control', 'readonly':True, 'placeholder':'0'}))
     
     #Metadatos
     area = forms.ModelChoiceField(
@@ -45,7 +45,7 @@ class UsuarioForm(forms.ModelForm):
         empty_label="Seleccione un área",
         widget=forms.Select(attrs={'class':'form-control'})
     )
-    observaciones= forms.CharField(required=False, widget=forms.Textarea(attrs={'class':'form-control'}))
+    observaciones= forms.CharField(required=False, widget=forms.Textarea(attrs={'class':'form-control', 'placeholder':'(Max: 500 carácteres)'}), max_length=500)
     
     class Meta:
         model = Usuario

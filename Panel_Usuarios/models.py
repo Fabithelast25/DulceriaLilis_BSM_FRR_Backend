@@ -63,7 +63,7 @@ class Usuario(models.Model):
 
     #Metadatos
     area = models.ForeignKey(Area, on_delete=models.RESTRICT)
-    observaciones = models.TextField(max_length=200, verbose_name="Observaciones", blank=True)
+    observaciones = models.TextField(max_length=500, verbose_name="Observaciones", blank=True)
     
     class Meta:
         db_table = "usuario" #Nombre de la tabla cuando se cree

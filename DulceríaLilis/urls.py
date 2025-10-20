@@ -32,6 +32,8 @@ urlpatterns = [
     
     #Rutas Usuario
     path('usuarioAdd/', vista.usuarioAdd, name="usuarioAdd"),
-    
+    path('usuarioLista/', vista.usuarioLista, name='usuarioLista'),
+    path('usuarioLista/delete/<int:id>/', vista.usuarioDelete, name='usuarioDelete'),
+    path('usuarioUpdate/<int:id>/', vista.usuarioUpdate, name='usuarioUpdate'),
 ]
 

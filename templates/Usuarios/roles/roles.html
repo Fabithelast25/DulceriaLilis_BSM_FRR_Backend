@@ -1,0 +1,101 @@
+
+<!DOCTYPE html>
+{% load static %}
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Roles</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'CSS/usuario.css' %}">
+</head>
+<body>
+    {% include 'Usuarios/navbarUsuarios.html' %}
+    <div class="container mt-4 mb-4">
+        <h3 class="mb-3">Usuarios</h3>
+          <!-- 🔹 FORMULARIO DE FILTROS -->
+        <form method="get" class="row g-2 mb-4">
+            <div class="col-md-3">
+                <input type="text" name="nombres" class="form-control" placeholder="Buscar por nombre" value="{{ nombres }}">
+            </div>
+
+            <div class="col-md-2">
+                <select name="estado" class="form-select">
+                    <option value="None">Todos los estados</option>
+                    {% for id, estado in estados %}
+                    <option value="{{ id }}" {% if estado == id %}selected{% endif %}>{{ estado }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <select name="rol" class="form-select">
+                    <option value="">Todos los roles</option>
+                    {% for r in roles %}
+                    <option value="{{ r.id }}" {% if r.id|stringformat:"s" == rol %}selected{% endif %}>{{ r.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <select name="area" class="form-select">
+                    <option value="">Todas las áreas</option>
+                    {% for a in areas %}
+                    <option value="{{ a.id }}" {% if a.id|stringformat:"s" == area %}selected{% endif %}>{{ a.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-1">
+                <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+            </div>
+        </form>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Nombre</th>
+                    <th>Email</th>
+                    <th>Telefono</th>
+                    <th>Rol</th>
+                    <th>Estado</th>
+                    <th>MFA</th>
+                    <th>Último Acceso</th>
+                    <th>Sesiones Activas</th>
+                    <th>Área</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in usuarios %}
+                <tr>
+                    <td>{{ u.username }}</td>
+                    <td>{{ u.nombres }} {{ u.apellidos }}</td>
+                    <td>{{ u.email }}</td>
+                    <td>{{ u.telefono }}</td>
+                    <td>{{ u.rol }}</td>
+                    <td>
+                    {% if u.estado == 'A' %}
+                        <span class="estado activo">Activo</span>
+                    {% elif u.estado == 'I' %}
+                        <span class="estado inactivo">Inactivo</span>
+                    {% elif u.estado == 'B' %}
+                        <span class="estado bloqueado">Bloqueado</span>
+                    {% endif %}
+                    </td>
+                    <td>{% if u.mfa_habilitado == False %} No {% else %} Si {% endif %}</td>
+                    <td>{{ u.ultimo_acceso}}</td>
+                    <td>{{ u.sesiones_activas }}</td>
+                    <td>{{ u.area }}</td>
+                    <td>
+                        <a href="{% url 'usuarioUpdate' u.id %}" class="btn btn-sm btn-warning mb-2">Editar</a>
+                        <a href="{% url 'usuarioDelete' u.id %}" class="btn btn-sm btn-danger">Eliminar</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+</body>
+</html>
