@@ -1,0 +1,28 @@
+{% extends 'navbar.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'CSS/login.css' %}">
+{% endblock %}
+
+{% block title %}
+    Recuperar Contraseña
+{% endblock title %}
+
+{% block cuerpo %}
+<div class="container mt-4 w-25 " id="contenedor_login">
+    <h4 class="text-center">Recuperar Contraseña</h4>
+    <div class="d-flex justify-content-center mt-4">
+        <img src="{% static 'images/logo_lilis.png' %}" alt="">
+    </div>
+    <form action="{% url 'crearContraseña' %}">
+        <p class="mt-4">Ingrese su corre o usuario asociado. Se le enviara un correo con las instrucciones para recuperar su contraseña</p>
+        <input type="text" name="usuario" class="form-control" placeholder="username@correo.cl">
+        <div class="d-flex mt-4">
+            <button type="submit" class="btn btn-primary flex-fill">Enviar correo</button>
+        </div>
+    </form>
+    <a class="d-flex justify-content-center mt-3" href="{% url 'login' %}">Volver al Inicio de Sesión</a>
+</div>
+
+{% endblock cuerpo %}

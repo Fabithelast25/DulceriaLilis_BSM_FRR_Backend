@@ -1,0 +1,7 @@
+#contenedor_login{
+    background-color: aliceblue;
+    box-shadow: 5px 5px 10px rgb(97, 97, 97);
+    border-radius: 5px;
+    padding: 10px;
+    overflow-x: auto;
+}

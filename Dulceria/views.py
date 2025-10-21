@@ -25,3 +25,12 @@ def detalle(request, categoria, nombreProducto):
 
 def rrss(request):
     return render(request, 'InfoEmpresa/rrss.html')
+
+def login(request):
+    return render(request, "login.html")
+
+def recuperarContraseña(request):
+    return render(request, 'recuperarContraseña.html')
+
+def crearContraseña(request):
+    return render(request, 'crearContraseña.html')

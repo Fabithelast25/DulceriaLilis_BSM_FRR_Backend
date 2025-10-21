@@ -1,0 +1,31 @@
+{% extends 'navbar.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'CSS/login.css' %}">
+{% endblock %}
+
+{% block title %}
+    Crear nueva contraseña
+{% endblock title %}
+
+{% block cuerpo %}
+<div class="container mt-4 w-25 " id="contenedor_login">
+    <h4 class="text-center">Crear nueva contraseña</h4>
+    <div class="d-flex justify-content-center mt-4">
+        <img src="{% static 'images/logo_lilis.png' %}" alt="">
+    </div>
+    <form action="{% url 'login' %}">
+        <label for="nuevaContrasenia" class="mt-4">Nueva contraseña</label>
+        <input type="text" name="nuevaContrasenia" class="form-control" placeholder="Min. 8 carácteres">
+
+        <label for="confirmarContrasenia" class="mt-3">Confirmar nueva contraseña</label>
+        <input type="text" name="confirmarContrasenia" class="form-control" placeholder="Repita su contraseña">
+        <div class="d-flex mt-4">
+            <button type="submit" class="btn btn-primary flex-fill">Cambiar Contraseña</button>
+        </div>
+    </form>
+    <a class="d-flex justify-content-center mt-3" href="{% url 'login' %}">Volver al Inicio de Sesión</a>
+</div>
+
+{% endblock cuerpo %}

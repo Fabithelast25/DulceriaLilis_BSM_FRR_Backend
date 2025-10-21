@@ -17,6 +17,9 @@ urlpatterns = [
     path('', views.catalogo, name="catalogo"),
     path('catalogo/<str:categoria>/', views.subcatalogo, name="subcatalogo"),
     path('catalogo/<str:categoria>/<str:nombreProducto>/', views.detalle, name="detalle_producto"),
+    path('login/', views.login, name="login"),
+    path('recuperarContraseña/', views.recuperarContraseña, name="recuperarContraseña"),
+    path('crearContraseña/', views.crearContraseña, name="crearContraseña"),
     
     # Rutas Usuario
     path('usuarioAdd/', vista.usuarioAdd, name="usuarioAdd"),
