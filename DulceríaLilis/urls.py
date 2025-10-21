@@ -46,4 +46,23 @@ urlpatterns = [
     path('ofertas/agregar/', vista_proveedores.agregar_oferta, name='agregar_oferta'),
     path('ofertas/editar/<int:pk>/', vista_proveedores.editar_oferta, name='editar_oferta'),
     path('ofertas/eliminar/<int:pk>/', vista_proveedores.eliminar_oferta, name='eliminar_oferta'),
+
+    #Rutas Productos
+    path('gestion-producto/',productosAdd,name="gestion-producto"),
+    path('productos/',mostrarProductos,name="productos"),
+    path('producto-load/<int:producto_id>',cargarProductos,name='producto-load'),
+    path('producto-modificado/<int:producto_id>',modificarProductos,name='producto-modificado'),
+
+    #Rutas Categorías
+    path('gestion-categoria/',categoriasAdd,name="gestion-categoria"),
+    path('categorias/',mostrarCategorias,name="categorias"),
+    path('categoria-load/<int:categoria_id>',cargarCategorias,name='categoria-load'),
+    path('categoria-modificada/<int:categoria_id>',modificarCategorias,name='categoria-modificada'),
+
+    #Rutas Unidades de Medida
+    path('gestion-unidad-medida/',unidadesAdd,name="gestion-unidad-medida"),
+    path('unidades-medidas/',mostrarUnidades,name="unidades-medida"),
+    path('unidad-medida-load/<int:unidad_medida_id>',cargarUnidades,name='unidad-medida-load'),
+    path('unidad-medida-modificada/<int:unidad_medida_id>',modificarUnidades,name='unidad-medida-modificada'),
 ]
+
