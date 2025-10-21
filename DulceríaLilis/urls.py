@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.urls import path
-from Dulceria import views 
+from Dulceria import views
+from Panel_Productos.views import productosAdd,categoriasAdd,unidadesAdd,mostrarCategorias,cargarCategorias,modificarCategorias,mostrarUnidades,cargarUnidades,modificarUnidades,mostrarProductos,cargarProductos,modificarProductos
 
 # Importaciones Usuario
 from Panel_Usuarios import views as vista

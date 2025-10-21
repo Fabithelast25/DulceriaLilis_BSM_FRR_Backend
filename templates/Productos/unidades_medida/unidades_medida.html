@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Unidades de Medida</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <style>
+    /* ===== CSS integrado (basado en usuarios.css) ===== */
+
+    /* Navbar */
+    .navbar{ background-color: rgb(138, 43, 226); }
+    .navbar-brand{
+      color: aliceblue; font-style: oblique; font-weight: bold; font-size: x-large; text-decoration:none;
+    }
+    .navbar-brand:hover{ color: aliceblue; }
+    .nav-link{ color: aliceblue; text-decoration:none; }
+
+    /* Contenido */
+    body{ background-color: azure; margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+    .container{
+      max-width:1100px; margin:18px auto; background-color: aliceblue;
+      box-shadow: 5px 5px 10px rgb(97,97,97); border-radius: 5px; padding: 10px;
+      overflow-x: auto;
+    }
+
+    table, th, td{ border-collapse: collapse; border: 1px solid black; }
+    table{ width:100%; }
+    th{ background-color: rgba(138, 43, 226, 0.13) !important; padding:10px 8px; text-align:left; }
+    td{ background:#fff; padding:10px 8px; vertical-align:middle; }
+    tr{ background-color: white; }
+
+    /* Badges de estado */
+    .estado{
+      display:inline-block; padding:5px 10px; border-radius:15px; font-weight:500; font-size:15px;
+      border:none; box-shadow:0 1px 2px rgba(0,0,0,.1);
+    }
+    .activo{ background:#9be78c; color:#154b05; }
+    .inactivo{ background:#eaec75; color:#505204; }
+    .bloqueado{ background:#df7f73; color:#661e08; }
+
+    /* Botones */
+    .btn{ border:none; border-radius:6px; padding:8px 12px; font-weight:700; cursor:pointer; }
+    .btn-warning{
+      background-color: rgb(117,117,243); color: rgb(4,26,99); border:1px solid rgba(45,45,255,.61);
+    }
+    .btn-warning:hover{
+      background-color: rgb(51,51,212); color: rgb(4,26,99); border-color: rgba(45,45,255,.61);
+    }
+    .btn-danger{
+      background-color: rgb(243,117,117); color: rgb(99,4,4); border:1px solid rgba(255,45,45,.61);
+    }
+    .btn-danger:hover{
+      background-color: rgb(212,51,51); color: rgb(99,4,4); border-color: rgba(255,45,45,.61);
+    }
+
+    /* Toolbar filtros */
+    .toolbar{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:12px; }
+    .grow{ flex:1; min-width:220px; }
+    .form-control, .form-select{
+      border:1px solid #ccc; border-radius:5px; padding:6px 10px; background:#fff;
+    }
+
+    /* Paginación */
+    .pagination{ display:flex; gap:6px; justify-content:flex-end; margin-top:12px; }
+    .pagination a, .pagination span{
+      padding:6px 10px; border:1px solid #ddd; border-radius:6px; background:#fff; text-decoration:none; color:#333;
+    }
+    .pagination .active{ background: rgb(138,43,226); color:#fff; border-color: rgb(138,43,226); }
+
+    /* Encabezados simples */
+    .title{ font-size:1.4rem; font-weight:700; margin:8px 0 14px; color:#333; }
+
+    /* Navbar mínima local */
+    .navbar{ padding:8px 16px; }
+    .container-fluid{ display:flex; align-items:center; justify-content:space-between; }
+  </style>
+</head>
+<body>
+    {% include 'Productos/navbar_productos.html' %}
+    <div class="container mt-4 mb-4">
+        <h3 class="mb-3">Unidades de Medida</h3>
+        <div>
+            <a class="btn btn-primary mb-3" href="{% url 'gestion-unidad-medida' %}">Añadir Unidad de Medida</a>
+        </div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                    <th>Creado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in unidades %}
+                <tr>
+                    <td>{{ u.nombre }}</td>
+                    <td>{{ u.descripcion }}</td>
+                    <td>{{ u.creado }}</td>
+                    <td>
+                        <ul style="list-style: none;">
+                            <li><a href="{% url 'unidad-medida-load' u.id %}" class="btn btn-sm btn-warning mb-2">Editar</a></li>
+                            <a href="" class="btn btn-danger btn-sm">Eliminar</a>
+                        </ul>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+</body>
+</html>

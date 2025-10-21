@@ -38,7 +38,7 @@ Derivados / solo lectura en vistas
 
 class Categoria(models.Model):
     nombre = models.CharField(max_length=3, choices=categorias, default="CH", unique=True)
-    creado = models.DateTimeField(default=timezone.now)
+    creado = models.DateTimeField(auto_now_add=True)
     descripcion = models.TextField(max_length=200, verbose_name="Descripción", blank=True)
 
     def __str__(self):
@@ -51,7 +51,7 @@ class Categoria(models.Model):
 
 class UnidadMedida(models.Model):
     nombre = models.CharField(max_length=4, choices=unidades_medidas, default="UN", unique=True)
-    creado = models.DateTimeField(default=timezone.now)
+    creado = models.DateTimeField(auto_now_add=True)
     descripcion = models.TextField(max_length=200, verbose_name="Descripción", blank=True)
 
     def __str__(self):
@@ -77,6 +77,7 @@ class Producto(models.Model):
     uom_venta = models.ForeignKey(UnidadMedida, on_delete= models.RESTRICT, related_name='productos_venta')
     factor_conversion = models.PositiveIntegerField(verbose_name="Factor de Conversión", default=1)
     costo_estandar = models.PositiveIntegerField(verbose_name="Costo Estandar", blank=True)
+    costo_promedio = models.PositiveIntegerField(verbose_name="Costo Promedio", blank=True)
     precio_venta = models.PositiveIntegerField(verbose_name="Precio de Venta", blank=True)
     impuesto_iva = models.PositiveSmallIntegerField(verbose_name="Porcentaje de Iva (%)", default=19)
 
@@ -98,7 +99,7 @@ class Producto(models.Model):
     alerta_por_vencer = models.CharField(max_length=2, verbose_name= "Alerta de Vencimiento")
 
     #Fecha de creación
-    creado = models.DateTimeField(default=timezone.now)
+    creado = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = "producto" #Nombre de la tabla cuando se cree
