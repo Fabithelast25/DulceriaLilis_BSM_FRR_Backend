@@ -21,7 +21,6 @@ unidades_medidas = (
     ("BAN", "Bandeja"),
     ("LT", "Litro"),
     ("GR", "Gramos"),
-    ("DIS", "Display"),
-    ("PRO","UM Profe")
+    ("DIS", "Display")
 )
 

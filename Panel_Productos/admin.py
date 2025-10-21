@@ -22,6 +22,7 @@ class ProductoAdmin(admin.ModelAdmin):
         "uom_venta",
         "factor_conversion",
         "costo_estandar",
+        "costo_promedio",
         "precio_venta",
         "impuesto_iva",
         "stock_minimo",
