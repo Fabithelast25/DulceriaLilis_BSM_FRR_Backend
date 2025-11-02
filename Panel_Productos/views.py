@@ -7,12 +7,15 @@ from Panel_Productos.models import Producto,Categoria,UnidadMedida
 
 #MANEJO DE PRODUCTOS
 def productosAdd(request):
+    form = ProductoForm(request.POST)
     if request.method == 'POST':
         form = ProductoForm(request.POST)
         if form.is_valid():
             form.save()
             messages.success(request, 'Producto creado correctamente.')
-            return redirect('gestion-producto')  # o a donde quieras redirigir
+            return redirect('productos')  # o a donde quieras redirigir
+        else:
+            print(form.errors)
         messages.error(request, 'Revisa los campos del formulario.')
     else:
         form = ProductoForm()
@@ -53,7 +56,9 @@ def categoriasAdd(request):
         if form.is_valid():
             form.save()
             messages.success(request, 'Categoria creada correctamente.')
-            return redirect('gestion-categoria')  # o a donde quieras redirigir
+            return redirect('categorias')  # o a donde quieras redirigir
+        else:
+            print(form.errors)
         messages.error(request, 'Revisa los campos del formulario.')
     else:
         form = CategoriaForm()
@@ -82,7 +87,7 @@ def modificarCategorias(request,categoria_id):
             form.save()
             return redirect('/categorias/')
     else:
-        form = CategoriaForm()
+        form = CategoriaForm(instance=categoria)
 
     return render(request,'Productos/categorias/categorias_add.html',{'form':form})
 
@@ -94,7 +99,7 @@ def unidadesAdd(request):
         if form.is_valid():
             form.save()
             messages.success(request, 'Unidad de medida creada correctamente.')
-            return redirect('gestion-unidad-medida')  # o a donde quieras redirigir
+            return redirect('unidades-medida')  # o a donde quieras redirigir
         messages.error(request, 'Revisa los campos del formulario.')
     else:
         form = UnidadMedidaForm()

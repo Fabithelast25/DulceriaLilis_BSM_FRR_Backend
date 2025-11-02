@@ -79,13 +79,6 @@ class ProductoForm(forms.ModelForm):
             raise forms.ValidationError("El SKU solo puede contener letras mayúsculas, números y guiones")
         return sku
 
-    # Validación de EAN/UPC
-    def clean_ean_upc(self):
-        ean = self.cleaned_data.get('ean_upc')
-        if len(str(ean)) not in [12, 13]:
-            raise forms.ValidationError("El EAN/UPC debe tener 12 o 13 dígitos")
-        return ean
-
     # Validación de nombre
     def clean_nombre(self):
         nombre = self.cleaned_data.get('nombre')
@@ -179,42 +172,48 @@ class ProductoForm(forms.ModelForm):
         return url
 
 class CategoriaForm(forms.ModelForm):
-    nombre_categoria = forms.ModelChoiceField(
-        queryset=Categoria.objects.all(),
-        empty_label="Seleccione...",
+    nombre = forms.ChoiceField(
+        choices=categorias,
         widget=forms.Select(attrs={'class':'form-control'})
     )
-    descripcion_categoria = forms.CharField(required=False, widget=forms.Textarea(attrs={'class':'form-control','rows':3,'placeholder':'Descripción del producto'}))
+    descripcion = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={
+            'class':'form-control',
+            'rows':3,
+            'placeholder':'Descripción del producto'
+        })
+    )
+
     class Meta:
         model = Categoria
         fields = '__all__'
         widgets = {
-            'nombre_categoria': forms.TextInput(attrs={'class': 'form-control'}),
             'descripcion_categoria': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
         }
 
-    def clean_nombre(self):
+    def clean_nombre_categoria(self):
         nombre = self.cleaned_data.get('nombre_categoria')
         if nombre and not all(c.isalpha() or c.isspace() for c in nombre):
             raise forms.ValidationError("El nombre solo puede contener letras y espacios")
         return nombre
 
+
 class UnidadMedidaForm(forms.ModelForm):
-    nombre_unidad = forms.ModelChoiceField(
-        queryset=UnidadMedida.objects.all(),
-        empty_label="Seleccione...",
+    nombre = forms.ChoiceField(
+        choices=unidades_medidas,
         widget=forms.Select(attrs={'class':'form-control'})
     )
-    descripcion_unidad = forms.CharField(required=False, widget=forms.Textarea(attrs={'class':'form-control','rows':3,'placeholder':'Descripción del producto'}))
+    descripcion = forms.CharField(required=False, widget=forms.Textarea(attrs={'class':'form-control','rows':3,'placeholder':'Descripción del producto'}))
     class Meta:
         model = UnidadMedida
         fields = '__all__'
         widgets = {
-            'nombre_unidad': forms.TextInput(attrs={'class': 'form-control'}),
-            'descripcion_unidad': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
+            'nombre': forms.TextInput(attrs={'class': 'form-control'}),
+            'descripcion': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
         }
     def clean_nombre(self):
-        nombre = self.cleaned_data.get('nombre_unidad')
+        nombre = self.cleaned_data.get('nombre')
         if nombre and not all(c.isalpha() or c.isspace() for c in nombre):
             raise forms.ValidationError("El nombre solo puede contener letras y espacios")
         return nombre
