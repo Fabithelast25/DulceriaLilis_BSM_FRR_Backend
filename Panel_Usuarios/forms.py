@@ -2,6 +2,7 @@ from django import forms
 from Panel_Usuarios.choices import estados
 from Panel_Usuarios.models import Area, Rol, Usuario
 from django.utils import timezone
+from .validators import validar_telefono_chileno
 """    #Identificación
     username = models.CharField(max_length=50, verbose_name="Username", unique=True)
     email = models.EmailField(max_length=70, verbose_name="Email", unique=True)
@@ -21,11 +22,11 @@ from django.utils import timezone
     observaciones = models.TextField(max_length=200, verbose_name="Observaciones", blank=True)"""
 class UsuarioForm(forms.ModelForm):
     #Identificación
-    username = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control'}))
-    email = forms.CharField(widget=forms.EmailInput(attrs={'class':'form-control'}))
-    nombres = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control'}))
+    username = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control', 'required':'required'}))
+    email = forms.CharField(widget=forms.EmailInput(attrs={'class':'form-control', 'required':'required'}))
+    nombres = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control required'}))
     apellidos = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control'}))
-    telefono = forms.CharField(required=False,widget=forms.NumberInput(attrs={'class':'form-control'}))
+    telefono = forms.CharField(required=False,max_length=11,validators=[validar_telefono_chileno],widget=forms.NumberInput(attrs={'class':'form-control'}))
     
     #Estado y acceso
     rol = forms.ModelChoiceField(

@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
 from Panel_Usuarios.forms import UsuarioForm, RolForm, AreaForm
 from Panel_Usuarios.models import Usuario, Area, Rol
 from Panel_Usuarios.choices import estados
@@ -11,8 +12,9 @@ def usuarioAdd(request):
         form = UsuarioForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('usuarioLista')
+            messages.success(request, "Usuario creado correctamente")
         else:
+            messages.error(request, "Error al crear el usuario. Verifique que todos los campos se hayan ingresado correctamente")
             print(form.errors)
     else:
         form = UsuarioForm()

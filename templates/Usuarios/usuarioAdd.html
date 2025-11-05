@@ -1,5 +1,5 @@
-<!DOCTYPE html>
 {% load static %}
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -12,13 +12,13 @@
     {% include 'Usuarios/navbarUsuarios.html' %}
     <div class="container mt-4 mb-4">
     <!--Formulario Usuarios-->
-        <form method="POST">
+        <form method="POST" novalidate>
             {% csrf_token %}
             <!--Identificación-->
             <h4>Datos Usuario</h4>
             {{ form.non_field_errors }}
             <div class="mb-3">
-                <label for="username" class="form-label">Username</label>
+            <label for="username" class="form-label">Username</label>
                 {{ form.username }}
                 {{ form.username.errors }}
             </div>
@@ -40,7 +40,7 @@
                 </div>
             </div>
             <div class="mb-3">
-                <label for="telefono" class="form-label">Telefono</label>
+                <label for="telefono" class="form-label">Telefono (Opcional)</label>
                 {{ form.telefono }}
                 {{ form.telefono.errors }}
             </div>
@@ -64,24 +64,24 @@
                 {{ form.mfa_habilitado.errors }}
             </div>
             <div class="mb-3">
-                <label for="ultimo_acceso" class="form-label">Ultimo Acceso</label>
+                <label for="ultimo_acceso" class="form-label">Ultimo Acceso (Lectura)</label>
                 {{ form.ultimo_acceso }}
                 {{ form.ultimo_acceso.errors }}
             </div>
             <div class="mb-3">
-                <label for="sesiones_activas" class="form-label">Sesiones Activas</label>
+                <label for="sesiones_activas" class="form-label">Sesiones Activas (Lectura)</label>
                 {{ form.sesiones_activas }}
                 {{ form.sesiones_activas.errors }}
             </div>
             <!--Metadatos-->
             <h4>Opcional</h4>
             <div class="mb-3">
-                <label for="area" class="form-label">Area</label>
+                <label for="area" class="form-label">Area (Opcional)</label>
                 {{ form.area }}
                 {{ form.area.errors }}
             </div>
             <div class="mb-3">
-                <label for="observaciones" class="form-label  d-block">Observaciones</label>
+                <label for="observaciones" class="form-label  d-block">Observaciones (Opcional)</label>
                 {{ form.observaciones }}
                 {{ form.observaciones.errors }}
             </div>
@@ -92,6 +92,25 @@
     </div>
     <footer>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        {% if messages %}
+            {% for message in messages %}
+                <script>
+                
+                Swal.fire({
+                    icon: "{% if message.tags == 'success' %}success{% elif message.tags == 'error' %}error{% else %}info{% endif %}",
+                    title: "{% if message.tags == 'success' %}¡Exito!{% elif message.tags == 'error' %}¡Error!{% else %}Info{% endif %}",
+                    text: "{{ message|escapejs }}",
+                    showConfirmButton: false,
+                    timer: 2500
+                }).then(() => {
+                    {% if message.tags == 'success' %}
+                    window.location.href = {% url 'usuarioLista' %}
+                    {% endif %}
+                });
+                </script>   
+            {% endfor %}
+        {% endif %}
     </footer>
 </body>
 </html>

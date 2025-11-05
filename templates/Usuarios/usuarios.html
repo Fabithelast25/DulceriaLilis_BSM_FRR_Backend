@@ -89,9 +89,9 @@
                     <td>{% if u.mfa_habilitado == False %} No {% else %} Si {% endif %}</td>
                     <td>{{ u.ultimo_acceso}}</td>
                     <td>{{ u.sesiones_activas }}</td>
-                    <td>{{ u.area }}</td>
+                    <td>{% if u.area == None %} {% else %} {{ u.area}} {% endif %}</td>
                     <td>
-                        <a href="{% url 'usuarioUpdate' u.id %}" class="btn btn-sm btn-warning mb-2">Editar</a>
+                        <a href="{% url 'usuarioUpdate' u.id %}" class="btn btn-sm btn-warning">Editar</a>
                         <a href="{% url 'usuarioDelete' u.id %}" class="btn btn-sm btn-danger">Eliminar</a>
                     </td>
                 </tr>

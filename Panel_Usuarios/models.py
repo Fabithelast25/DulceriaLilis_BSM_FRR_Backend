@@ -52,7 +52,7 @@ class Usuario(models.Model):
     email = models.EmailField(max_length=70, verbose_name="Email", unique=True)
     nombres = models.CharField(max_length=50, verbose_name="Nombres")
     apellidos = models.CharField(max_length=60, verbose_name="Apellidos")
-    telefono = models.CharField(max_length=15, verbose_name="Telefono", blank=True)
+    telefono = models.CharField(max_length=12, verbose_name="Telefono", blank=True)
 
     #Estado y acceso
     rol = models.ForeignKey(Rol, on_delete=models.RESTRICT)
@@ -62,7 +62,7 @@ class Usuario(models.Model):
     sesiones_activas = models.PositiveIntegerField(default=0)
 
     #Metadatos
-    area = models.ForeignKey(Area, on_delete=models.RESTRICT)
+    area = models.ForeignKey(Area, on_delete=models.SET_NULL, blank=True, null=True)
     observaciones = models.TextField(max_length=500, verbose_name="Observaciones", blank=True)
     
     class Meta:
