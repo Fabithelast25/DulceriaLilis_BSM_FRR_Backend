@@ -18,7 +18,9 @@ urlpatterns = [
     path('catalogo/<str:categoria>/', views.subcatalogo, name="subcatalogo"),
     path('catalogo/<str:categoria>/<str:nombreProducto>/', views.detalle, name="detalle_producto"),
     path('login/', views.login, name="login"),
+    path('logout/', views.logout_view, name='logout'),
     path('recuperarContraseña/', views.recuperarContraseña, name="recuperarContraseña"),
+    path('verificarCodigo/', views.verificarCodigo, name="verificarCodigo"),
     path('crearContraseña/', views.crearContraseña, name="crearContraseña"),
     
     # Rutas Usuario

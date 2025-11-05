@@ -9,7 +9,3 @@ def validar_telefono_chileno(value):
     # 2️⃣ Verificamos que empiece con 569
     if not value.startswith('569'):
         raise ValidationError('El número de teléfono debe comenzar con 569.')
-
-    # 3️⃣ Validamos la longitud (ejemplo: 569XXXXXXXX tiene 11 caracteres)
-    if len(value) != 11:
-        raise ValidationError('El número de teléfono debe tener 11 dígitos (Ej: 569XXXXXXXX).')

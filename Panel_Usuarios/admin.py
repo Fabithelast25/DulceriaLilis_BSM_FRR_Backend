@@ -8,13 +8,13 @@ class RolAdmin(admin.ModelAdmin):
 class UsuarioAdmin(admin.ModelAdmin):
     list_display = ["username",
                     "email",
-                    "nombres",
-                    "apellidos",
+                    "first_name",
+                    "last_name",
                     "telefono",
                     "rol",
                     "estado",
                     "mfa_habilitado",
-                    "ultimo_acceso",
+                    "last_login",
                     "sesiones_activas",
                     "area",
                     "observaciones"]

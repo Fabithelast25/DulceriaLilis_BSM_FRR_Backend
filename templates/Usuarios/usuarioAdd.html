@@ -29,14 +29,14 @@
             </div>
             <div class="d-flex">
                 <div class="mb-3 me-3 flex-fill">
-                    <label for="nombres" class="form-label">Nombres</label>
-                    {{ form.nombres }}
-                    {{ form.nombres.errors }}
+                    <label for="first_name" class="form-label">Nombres</label>
+                    {{ form.first_name }}
+                    {{ form.first_name.errors }}
                 </div>
                 <div class="mb-3 flex-fill">
-                    <label for="apellidos" class="form-label">Apellidos</label>
-                    {{ form.apellidos }}
-                    {{ form.apellidos.errors }}
+                    <label for="last_name" class="form-label">Apellidos</label>
+                    {{ form.last_name }}
+                    {{ form.last_name.errors }}
                 </div>
             </div>
             <div class="mb-3">
@@ -65,8 +65,8 @@
             </div>
             <div class="mb-3">
                 <label for="ultimo_acceso" class="form-label">Ultimo Acceso (Lectura)</label>
-                {{ form.ultimo_acceso }}
-                {{ form.ultimo_acceso.errors }}
+                {{ form.last_login }}
+                {{ form.last_login.errors }}
             </div>
             <div class="mb-3">
                 <label for="sesiones_activas" class="form-label">Sesiones Activas (Lectura)</label>
@@ -93,10 +93,10 @@
     <footer>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <!--Mensaje de SweetAlert de exito o error según resultado del formulario-->
         {% if messages %}
             {% for message in messages %}
                 <script>
-                
                 Swal.fire({
                     icon: "{% if message.tags == 'success' %}success{% elif message.tags == 'error' %}error{% else %}info{% endif %}",
                     title: "{% if message.tags == 'success' %}¡Exito!{% elif message.tags == 'error' %}¡Error!{% else %}Info{% endif %}",
