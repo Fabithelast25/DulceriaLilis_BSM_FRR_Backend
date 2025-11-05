@@ -1,0 +1,33 @@
+{% extends 'navbar.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'CSS/login.css' %}">
+{% endblock %}
+
+{% block title %}Verificar Código{% endblock %}
+
+{% block cuerpo %}
+<div class="container mt-4 w-25 mb-4" id="contenedor_login">
+    <h4 class="text-center">Verificar Código</h4>
+
+
+    <form method="POST" action="{% url 'verificarCodigo' %}">
+        {% csrf_token %}
+        <p class="mt-4">Ingrese su correo y el código que recibió.</p>
+        <input type="email" name="email" class="form-control mb-3" placeholder="username@correo.cl" required>
+        <input type="text" name="codigo" class="form-control" placeholder="Código de recuperación" maxlength="6" required>
+        
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} mt-3">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+        <div class="d-flex mt-4">
+            <button type="submit" class="btn btn-primary flex-fill">Verificar código</button>
+        </div>
+    </form>
+
+    <a class="d-flex justify-content-center mt-3" href="{% url 'recuperarContraseña' %}">Volver</a>
+</div>
+{% endblock %}
