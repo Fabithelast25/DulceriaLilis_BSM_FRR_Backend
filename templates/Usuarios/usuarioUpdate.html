@@ -7,20 +7,127 @@
     <title>Editar Usuario</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <link rel="stylesheet" href="{% static 'CSS/usuario.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
     {% include 'Usuarios/navbarUsuarios.html' %}
     <div class="container mt-4 mb-4">
         <h2>Editar Usuario</h2>
-        <form method="post">
+        <form id="formEditarUsuario" method="post">
             {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="btn btn-primary">Guardar cambios</button>
+            <!--Identificación-->
+            <h4>Datos Usuario</h4>
+            {{ form.non_field_errors }}
+            <div class="mb-3">
+            <label for="username" class="form-label">Username</label>
+                {{ form.username }}
+                {{ form.username.errors }}
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                {{ form.email }}
+                {{ form.email.errors }}
+            </div>
+            <div class="d-flex">
+                <div class="mb-3 me-3 flex-fill">
+                    <label for="first_name" class="form-label">Nombres</label>
+                    {{ form.first_name }}
+                    {{ form.first_name.errors }}
+                </div>
+                <div class="mb-3 flex-fill">
+                    <label for="last_name" class="form-label">Apellidos</label>
+                    {{ form.last_name }}
+                    {{ form.last_name.errors }}
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="telefono" class="form-label">Telefono (Opcional)</label>
+                {{ form.telefono }}
+                {{ form.telefono.errors }}
+            </div>
+            <!--Estado y acceso-->
+            <h4>Estado y acceso</h4>
+            <div class="d-flex">
+                <div class="mb-3 me-3 flex-fill">
+                    <label for="rol" class="form-label">Rol</label>
+                    {{ form.rol }}
+                    {{ form.rol.errors }}
+                </div>
+                <div class="mb-3 flex-fill">
+                    <label for="estado" class="form-label">Estado</label>
+                    {{ form.estado }}
+                    {{ form.estado.errors }}
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="mfa_habilitado" class="form-label">MFA Habilitado</label>
+                {{ form.mfa_habilitado }}
+                {{ form.mfa_habilitado.errors }}
+            </div>
+            <div class="mb-3">
+                <label for="last_login" class="form-label">Ultimo Acceso (Lectura)</label>
+                {{ form.last_login }}
+                {{ form.last_login.errors }}
+            </div>
+            <div class="mb-3">
+                <label for="sesiones_activas" class="form-label">Sesiones Activas (Lectura)</label>
+                {{ form.sesiones_activas }}
+                {{ form.sesiones_activas.errors }}
+            </div>
+            <!--Metadatos-->
+            <h4>Opcional</h4>
+            <div class="mb-3">
+                <label for="area" class="form-label">Area (Opcional)</label>
+                {{ form.area }}
+                {{ form.area.errors }}
+            </div>
+            <div class="mb-3">
+                <label for="observaciones" class="form-label  d-block">Observaciones (Opcional)</label>
+                {{ form.observaciones }}
+                {{ form.observaciones.errors }}
+            </div>
+            <div>
+                <button type="button" id="btnGuardar" class="btn btn-primary mt-3">Guardar cambios</button>
+            </div>
         </form>
         <a href="{% url 'usuarioLista' %}" class="btn btn-secondary mt-2">Cancelar</a>
     </div>
     <footer>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
     </footer>
+
+     <script>
+        document.getElementById("btnGuardar").addEventListener("click", function () {
+            Swal.fire({
+                icon: "warning",
+                title: "¿Guardar cambios?",
+                text: "Se actualizará la información del usuario.",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Sí, guardar",
+                cancelButtonText: "Cancelar"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById("formEditarUsuario").submit();
+                }
+            });
+        });
+        {% if messages %}
+            {% for message in messages %}
+                Swal.fire({
+                    icon: "{% if message.tags == 'success' %}success{% elif message.tags == 'error' %}error{% else %}info{% endif %}",
+                    title: "{% if message.tags == 'success' %}¡Exito!{% elif message.tags == 'error' %}¡Error!{% else %}¡Info!{% endif %}",
+                    text: "{{ message }}",
+                    showConfirmButton: false,
+                    timer: 2000
+                }).then(() => {
+                    {% if message.tags == 'success' %}
+                    window.location.href = {% url 'usuarioLista' %}
+                    {% endif %}
+                });
+            {% endfor %}
+        {% endif %}
+    </script>
 </body>
 </html>

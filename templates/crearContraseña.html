@@ -5,27 +5,28 @@
 <link rel="stylesheet" href="{% static 'CSS/login.css' %}">
 {% endblock %}
 
-{% block title %}
-    Crear nueva contraseña
-{% endblock title %}
+{% block title %}Crear Nueva Contraseña{% endblock %}
 
 {% block cuerpo %}
 <div class="container mt-4 w-25 mb-4" id="contenedor_login">
-    <h4 class="text-center">Crear nueva contraseña</h4>
-    <div class="d-flex justify-content-center mt-4">
-        <img src="{% static 'images/logo_lilis.png' %}" alt="">
-    </div>
-    <form action="{% url 'login' %}">
-        <label for="nuevaContrasenia" class="mt-4">Nueva contraseña</label>
-        <input type="text" name="nuevaContrasenia" class="form-control" placeholder="Min. 8 carácteres">
+    <h4 class="text-center">Crear Nueva Contraseña</h4>
 
-        <label for="confirmarContrasenia" class="mt-3">Confirmar nueva contraseña</label>
-        <input type="text" name="confirmarContrasenia" class="form-control" placeholder="Repita su contraseña">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} mt-3">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="POST" action="{% url 'crearContraseña' %}">
+        {% csrf_token %}
+        <p class="mt-4">Ingrese su nueva contraseña:</p>
+        <input type="password" name="password" class="form-control mb-3" placeholder="Nueva contraseña" minlength="8" required>
+        <input type="password" name="confirmar" class="form-control" placeholder="Confirmar contraseña" minlength="8" required>
         <div class="d-flex mt-4">
-            <button type="submit" class="btn btn-primary flex-fill">Cambiar Contraseña</button>
+            <button type="submit" class="btn btn-success flex-fill">Actualizar contraseña</button>
         </div>
     </form>
-    <a class="d-flex justify-content-center mt-3" href="{% url 'login' %}">Volver al Inicio de Sesión</a>
-</div>
 
-{% endblock cuerpo %}
+    <a class="d-flex justify-content-center mt-3" href="{% url 'login' %}">Volver al Inicio</a>
+</div>
+{% endblock %}

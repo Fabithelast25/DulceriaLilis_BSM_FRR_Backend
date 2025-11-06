@@ -15,12 +15,13 @@
     <div class="d-flex justify-content-center mt-4">
         <img src="{% static 'images/logo_lilis.png' %}" alt="">
     </div>
-    <form action="{% url 'usuarioLista' %}">
-        <label for="usuario" class="form-label mt-4">Ingrese su Username o Correo</label>
-        <input type="text" name="usuario" class="form-control" placeholder="username@correo.cl">
+    <form method="POST">
+        {% csrf_token %}
+        <label for="username" class="form-label mt-4">Ingrese su Username o Correo</label>
+        <input type="text" name="username" required class="form-control" placeholder="username@correo.cl">
 
-        <label for="contrasenia" class="form-label mt-4">Ingrese su contraseña</label>
-        <input type="password" class="form-control" name="contrasenia" placeholder="**********">
+        <label for="password" class="form-label mt-4">Ingrese su contraseña</label>
+        <input type="password" class="form-control" required name="password" placeholder="**********">
 
         <div class="d-flex mt-4">
             <div>
@@ -35,6 +36,13 @@
         <div class="d-flex mt-4">
             <button type="submit" class="btn btn-primary flex-fill">Iniciar Sesión</button>
         </div>
+        {% if messages %}
+        <div class="alert alert-danger mt-3">
+            {% for msg in messages %}
+                {{ msg }}
+            {% endfor %}
+        </div>
+        {% endif %}
     </form>
 </div>
 
