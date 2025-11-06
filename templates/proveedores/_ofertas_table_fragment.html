@@ -1,0 +1,61 @@
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Producto</th>
+        <th>Proveedor</th>
+        <th>Costo</th>
+        <th>Lead (días)</th>
+        <th>Mín. lote</th>
+        <th>Desc. (%)</th>
+        <th>Preferente</th>
+        <th style="width:200px">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for o in page_obj %}
+        <tr>
+          <td>{{ o.producto }}</td>
+          <td>{{ o.proveedor.razon_social }}</td>
+          <td>{{ o.costo }}</td>
+          <td>{{ o.lead_time_dias }}</td>
+          <td>{{ o.min_lote }}</td>
+          <td>{{ o.descuento_pct|default:"—" }}</td>
+          <td>
+            {% if o.preferente %}
+              <span class="pill pill-yes">Sí</span>
+            {% else %}
+              <span class="pill pill-no">No</span>
+            {% endif %}
+          </td>
+          <td class="actions">
+            <a class="btn btn-gold" href="{% url 'editar_oferta' o.id %}">Editar</a>
+            <a class="btn btn-red" href="{% url 'eliminar_oferta' o.id %}">Eliminar</a>
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="8">No se encontraron ofertas.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% if page_obj.paginator.num_pages > 1 %}
+  <div class="pagination">
+    {% if page_obj.has_previous %}
+      <a href="?q={{ q }}&preferente={{ preferente }}&page={{ page_obj.previous_page_number }}">«</a>
+    {% else %}<span>«</span>{% endif %}
+
+    {% for num in page_obj.paginator.page_range %}
+      {% if num == page_obj.number %}
+        <span class="active">{{ num }}</span>
+      {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+        <a href="?q={{ q }}&preferente={{ preferente }}&page={{ num }}">{{ num }}</a>
+      {% endif %}
+    {% endfor %}
+
+    {% if page_obj.has_next %}
+      <a href="?q={{ q }}&preferente={{ preferente }}&page={{ page_obj.next_page_number }}">»</a>
+    {% else %}<span>»</span>{% endif %}
+  </div>
+{% endif %}

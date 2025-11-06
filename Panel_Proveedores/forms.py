@@ -1,7 +1,9 @@
 # Panel_Proveedores/forms.py
 from django import forms
-from .models import Proveedor, MONEDA_CHOICES, ESTADO_PROVEEDOR, CONDICIONES_PAGO_CHOICES, OfertaProveedor
+from django.db.models import Avg
+from .models import Proveedor, MONEDA_CHOICES, ESTADO_PROVEEDOR, CONDICIONES_PAGO_CHOICES, OfertaProveedor, Producto
 from .validators import normalize_rut, RUT_PATTERN, _rut_dv
+
 
 class ProveedorForm(forms.ModelForm):
     class Meta:
@@ -33,24 +35,9 @@ class ProveedorForm(forms.ModelForm):
             "observaciones": forms.Textarea(attrs={"class": "form-control", "rows": 3}),
         }
 
-class OfertaProveedorForm(forms.ModelForm):
-    class Meta:
-        model = OfertaProveedor
-        fields = ["producto", "proveedor", "costo", "lead_time_dias", "min_lote", "descuento_pct", "preferente"]
-        widgets = {
-            "producto": forms.Select(attrs={"class": "form-select"}),
-            "proveedor": forms.Select(attrs={"class": "form-select"}),
-            "costo": forms.NumberInput(attrs={"class": "form-control", "min": "0", "step": "0.01"}),
-            "lead_time_dias": forms.NumberInput(attrs={"class": "form-control", "min": "0", "step": "1"}),
-            "min_lote": forms.NumberInput(attrs={"class": "form-control", "min": "0.01", "step": "0.01"}),
-            "descuento_pct": forms.NumberInput(attrs={"class": "form-control", "min": "0", "max": "100", "step": "0.01"}),
-            "preferente": forms.CheckboxInput(attrs={"class": "form-check-input"}),
-        }
-
-    # --- Limpiezas & validaciones de campo ---
+    # ====== Estas validaciones pertenecen a ProveedorForm ======
     def clean_rut_nif(self):
         v = normalize_rut(self.cleaned_data.get("rut_nif"))
-        # Si cumple formato RUT chileno, verificar DV aquí también (doble capa con el model)
         if RUT_PATTERN.match(v):
             num, dv = v.split("-")
             if _rut_dv(num) != dv:
@@ -65,7 +52,6 @@ class OfertaProveedorForm(forms.ModelForm):
 
     def clean_email(self):
         v = (self.cleaned_data.get("email") or "").strip().lower()
-        # bloquea dominios obviamente inválidos
         if v.endswith("@example.com"):
             raise forms.ValidationError("Usa un email real, no dominios de ejemplo.")
         return v
@@ -76,15 +62,66 @@ class OfertaProveedorForm(forms.ModelForm):
             raise forms.ValidationError("La URL debe comenzar con http:// o https://")
         return v
 
-    # --- Validación cruzada ---
     def clean(self):
         cleaned = super().clean()
         nombre = cleaned.get("contacto_principal_nombre")
         email = cleaned.get("contacto_principal_email")
         tel = cleaned.get("contacto_principal_telefono")
-
         if nombre and not (email or tel):
             raise forms.ValidationError(
                 "Si indicas un nombre de contacto, debes ingresar email o teléfono del contacto."
             )
         return cleaned
+
+
+class OfertaProveedorForm(forms.ModelForm):
+    class Meta:
+        model = OfertaProveedor
+        fields = ["producto", "proveedor", "costo", "lead_time_dias", "min_lote", "descuento_pct", "preferente"]
+        widgets = {
+            "producto": forms.Select(attrs={"class": "form-select"}),
+            "proveedor": forms.Select(attrs={"class": "form-select"}),
+            "costo": forms.NumberInput(attrs={"class": "form-control", "min": "0", "step": "0.01"}),
+            "lead_time_dias": forms.NumberInput(attrs={"class": "form-control", "min": "0", "step": "1"}),
+            "min_lote": forms.NumberInput(attrs={"class": "form-control", "min": "0.01", "step": "0.01"}),
+            "descuento_pct": forms.NumberInput(attrs={"class": "form-control", "min": "0", "max": "100", "step": "0.01"}),
+            "preferente": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Evita referenciar producto.costo_promedio (no existe).
+        # Anota el promedio desde OfertaProveedor. Si NO tienes related_name en el FK,
+        # el camino por defecto es 'ofertaproveedor__costo'.
+        self.fields["producto"].queryset = (
+            Producto.objects
+            .annotate(costo_promedio_calc=Avg("ofertas_proveedor__costo"))  # cambia a "ofertas__costo" si tu FK tiene related_name='ofertas'
+            .order_by("nombre")  # o "-costo_promedio_calc" si quieres ordenar por el promedio
+        )
+        self.fields["producto"].empty_label = "— Selecciona un producto —"
+
+    # Validaciones específicas de oferta (opcionales pero útiles)
+    def clean_costo(self):
+        v = self.cleaned_data.get("costo")
+        if v is not None and v < 0:
+            raise forms.ValidationError("El costo no puede ser negativo.")
+        return v
+
+    def clean_lead_time_dias(self):
+        v = self.cleaned_data.get("lead_time_dias")
+        if v is not None and v < 0:
+            raise forms.ValidationError("El lead time no puede ser negativo.")
+        return v
+
+    def clean_min_lote(self):
+        v = self.cleaned_data.get("min_lote")
+        if v is not None and v <= 0:
+            raise forms.ValidationError("El mínimo de lote debe ser mayor que 0.")
+        return v
+
+    def clean_descuento_pct(self):
+        v = self.cleaned_data.get("descuento_pct")
+        if v is not None and (v < 0 or v > 100):
+            raise forms.ValidationError("El descuento debe estar entre 0 y 100.")
+        return v

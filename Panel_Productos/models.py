@@ -77,7 +77,7 @@ class Producto(models.Model):
     uom_venta = models.ForeignKey(UnidadMedida, on_delete= models.RESTRICT, related_name='productos_venta')
     factor_conversion = models.PositiveIntegerField(verbose_name="Factor de Conversión", default=1)
     costo_estandar = models.PositiveIntegerField(verbose_name="Costo Estandar", blank=True)
-    costo_promedio = models.PositiveIntegerField(verbose_name="Costo Promedio", blank=True)
+    costo_promedio = models.PositiveIntegerField(verbose_name="Costo Promedio", null=True, blank=True)
     precio_venta = models.PositiveIntegerField(verbose_name="Precio de Venta", blank=True)
     impuesto_iva = models.PositiveSmallIntegerField(verbose_name="Porcentaje de Iva (%)", default=19)
 

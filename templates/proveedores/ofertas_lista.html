@@ -6,104 +6,145 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
   <style>
-    body{ background-color:azure; margin:0; font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif; }
-    .container{ background:#fff; max-width:1100px; margin:18px auto; padding:16px; border-radius:10px; box-shadow:0 6px 14px rgba(0,0,0,.08); border:1px solid #e8e8e8; }
-    .title{ font-size:1.4rem; font-weight:700; margin:8px 0 14px; color:#333; }
-    .toolbar{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:12px; }
-    .grow{ flex:1; min-width:220px; }
-    .form-control,.form-select{ border:1px solid #dedede; border-radius:6px; padding:8px 10px; }
-    .btn{ border:none; border-radius:6px; padding:8px 12px; font-weight:600; cursor:pointer; }
-    .btn-warning{ background-color:rgb(117,117,243); color:rgb(4,26,99); border:1px solid rgba(45,45,255,.61); }
-    .btn-warning:hover{ background-color:rgb(51,51,212); }
-    table{ width:100%; border-collapse:collapse; }
-    th,td{ border:1px solid #000; padding:8px; }
-    thead th{ background-color: rgba(138, 43, 226, 0.13); }
-    .pagination{ display:flex; gap:6px; justify-content:flex-end; margin-top:12px; }
-    .pagination a,.pagination span{ padding:6px 10px; border:1px solid #ddd; border-radius:6px; background:#fff; text-decoration:none; color:#333; }
-    .pagination .active{ background: rgb(138,43,226); color:#fff; border-color: rgb(138,43,226); }
-    .navbar{ background-color: rgb(138, 43, 226); }
-    .navbar-brand{
-      color: aliceblue; font-style: oblique; font-weight: bold; font-size: x-large; text-decoration:none;
+    :root{
+      --brand-red:#c8102e; --brand-red-700:#a40d25; --brand-red-50:#fff5f7;
+      --brand-gold:#d4af37; --brand-gold-700:#b89617; --brand-gold-100:#fcf6e6;
+      --ink:#1c1d22; --muted:#6b7280; --border:#e8e8e8; --bg:#fff; --page:#fafafa;
+      --shadow:0 10px 24px rgba(0,0,0,.08); --radius:14px;
     }
-    .navbar-brand:hover{ color: aliceblue; }
-    .nav-link{ color: aliceblue; text-decoration:none; }
+    html,body{height:100%}
+    body{background:linear-gradient(180deg,var(--page),#fff);margin:0;font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink)}
+    .container-card{background:var(--bg);max-width:1100px;margin:20px auto;padding:18px;border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--border)}
+    .navbar{background:var(--brand-red)!important;box-shadow:0 8px 18px rgba(200,16,46,.18)}
+    .navbar-brand{color:#fff!important;font-weight:800;letter-spacing:.3px}
+    .nav-link{color:#fff!important;opacity:.95}.nav-link:hover{opacity:1;text-decoration:underline;text-underline-offset:4px}
+    .title{font-size:1.5rem;font-weight:800;margin:6px 0 16px;color:var(--ink);display:flex;align-items:center;gap:10px}
+    .title:before{content:"";width:10px;height:24px;border-radius:8px;background:linear-gradient(180deg,var(--brand-gold),var(--brand-gold-700));box-shadow:0 4px 10px rgba(212,175,55,.25)}
+    .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+    .grow{flex:1;min-width:220px}
+    .form-control,.form-select{border:1px solid var(--border);border-radius:10px;padding:10px 12px}
+    .form-control:focus,.form-select:focus{border-color:var(--brand-gold);box-shadow:0 0 0 .2rem rgba(212,175,55,.18)}
+    .btn-gold{background:linear-gradient(180deg,var(--brand-gold),var(--brand-gold-700));color:#1a1a1a;border:none;border-radius:10px;padding:10px 14px;font-weight:700}
+    .btn-outline-gold{background:#fff;color:var(--brand-gold-700);border:2px solid var(--brand-gold-700);border-radius:10px;padding:9px 14px;font-weight:700}
+    .btn-outline-gold:hover{background:var(--brand-gold-100)}
+    .btn-red{background:var(--brand-red);color:#fff;border:none;border-radius:10px;padding:10px 14px;font-weight:700}
+    .btn-red:hover{background:var(--brand-red-700)}
+    /* tabla */
+    .table-wrap{overflow:auto;border-radius:12px;border:1px solid var(--border)}
+    table{width:100%;border-collapse:collapse}
+    thead th{position:sticky;top:0;z-index:1;padding:12px;font-weight:800;text-transform:uppercase;font-size:.78rem;letter-spacing:.6px;background:linear-gradient(180deg,#fff,var(--brand-gold-100));border-bottom:2px solid var(--brand-gold);color:#3a3a3a}
+    td{padding:12px;border-top:1px solid var(--border);vertical-align:middle}
+    tbody tr:nth-child(even){background:#fafafa}
+    tbody tr:hover{background:var(--brand-red-50)}
+    .pill{display:inline-block;padding:.28rem .6rem;border-radius:999px;font-size:.78rem;font-weight:700;border:1px solid transparent}
+    .pill-yes{background:rgba(212,175,55,.12);color:var(--brand-gold-700);border-color:rgba(212,175,55,.45)}
+    .pill-no{background:rgba(200,16,46,.10);color:#8f0c1f;border-color:rgba(200,16,46,.35)}
+    .pagination{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
+    .pagination a,.pagination span{padding:6px 12px;border:1px solid var(--border);border-radius:10px;background:#fff;text-decoration:none;color:var(--ink);font-weight:600}
+    .pagination .active{background:var(--brand-red);color:#fff;border-color:var(--brand-red)}
+    /* overlay de carga */
+    #results.is-loading{position:relative}
+    #results.is-loading::after{content:"Cargando…";position:absolute;inset:0;display:grid;place-items:center;font-weight:800;background:rgba(255,255,255,.6);border-radius:12px;backdrop-filter:saturate(120%) blur(2px)}
+    @media (max-width:576px){
+      .title{font-size:1.25rem}
+      thead th:nth-child(4), thead th:nth-child(5){display:none}
+      tbody td:nth-child(4), tbody td:nth-child(5){display:none}
+    }
   </style>
 </head>
 <body>
 
   {% include "proveedores/navbarProveedores.html" %}
 
-  <div class="container">
+  <div class="container-card">
     <div class="title">Ofertas de Proveedores</div>
 
-    <form method="get" class="toolbar">
+    <form method="get" class="toolbar" role="search">
       <input class="form-control grow" type="text" name="q" value="{{ q }}" placeholder="Buscar por producto, proveedor…">
-      <select class="form-select" name="preferente">
+      <select class="form-select" name="preferente" aria-label="Filtrar por preferente">
         <option value="">Preferente: todos</option>
         <option value="1" {% if preferente == '1' %}selected{% endif %}>Sí</option>
         <option value="0" {% if preferente == '0' %}selected{% endif %}>No</option>
       </select>
-      <button class="btn btn-warning" type="submit">Filtrar</button>
-      <a class="btn btn-warning" href="{% url 'agregar_oferta' %}">Añadir Oferta</a>
+      <a class="btn btn-outline-gold" href="{% url 'agregar_oferta' %}">Añadir Oferta</a>
     </form>
 
-    <div style="overflow:auto">
-      <table>
-        <thead>
-          <tr>
-            <th>Producto</th>
-            <th>Proveedor</th>
-            <th>Costo</th>
-            <th>Lead (días)</th>
-            <th>Mín. lote</th>
-            <th>Desc. (%)</th>
-            <th>Preferente</th>
-            <th style="width:160px">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for o in page_obj %}
-            <tr>
-              <td>{{ o.producto }}</td>
-              <td>{{ o.proveedor.razon_social }}</td>
-              <td>{{ o.costo }}</td>
-              <td>{{ o.lead_time_dias }}</td>
-              <td>{{ o.min_lote }}</td>
-              <td>{{ o.descuento_pct|default:"—" }}</td>
-              <td>{{ o.preferente|yesno:"Sí,No" }}</td>
-              <td>
-                <a class="btn btn-warning" href="{% url 'editar_oferta' o.id %}">Editar</a>
-                <a class="btn btn-warning" style="background:#e74c3c;color:#fff;border-color:#e74c3c" href="{% url 'eliminar_oferta' o.id %}">Eliminar</a>
-              </td>
-            </tr>
-          {% empty %}
-            <tr><td colspan="8">No se encontraron ofertas.</td></tr>
-          {% endfor %}
-        </tbody>
-      </table>
+    <!-- 👇 SOLO un include: tabla + paginación van en el fragmento -->
+    <div id="results">
+      {% include "proveedores/_ofertas_table_fragment.html" %}
     </div>
-
-    {% if page_obj.paginator.num_pages > 1 %}
-      <div class="pagination">
-        {% if page_obj.has_previous %}
-          <a href="?q={{ q }}&preferente={{ preferente }}&page={{ page_obj.previous_page_number }}">«</a>
-        {% else %}<span>«</span>{% endif %}
-
-        {% for num in page_obj.paginator.page_range %}
-          {% if num == page_obj.number %}
-            <span class="active">{{ num }}</span>
-          {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-            <a href="?q={{ q }}&preferente={{ preferente }}&page={{ num }}">{{ num }}</a>
-          {% endif %}
-        {% endfor %}
-
-        {% if page_obj.has_next %}
-          <a href="?q={{ q }}&preferente={{ preferente }}&page={{ page_obj.next_page_number }}">»</a>
-        {% else %}<span>»</span>{% endif %}
-      </div>
-    {% endif %}
   </div>
+
+  <script>
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.querySelector(".toolbar");
+  const results = document.getElementById("results");
+  const search = form.querySelector("input[name='q']");
+  const selects = form.querySelectorAll("select[name]");
+  let ctrl, typingTimer;
+  const DEBOUNCE = 500;
+  const MIN_CHARS = 2;
+
+  const setLoading = (on) => results.classList.toggle("is-loading", !!on);
+  const qs = () => new URLSearchParams(new FormData(form)).toString();
+
+  const fetchFragment = async (url) => {
+    try {
+      if (ctrl) ctrl.abort();
+      ctrl = new AbortController();
+      setLoading(true);
+      const res = await fetch(url, { signal: ctrl.signal });
+      const html = await res.text();
+      results.innerHTML = html;
+      setLoading(false);
+      attachPaginationHandlers();
+    } catch (err) {
+      if (err.name !== "AbortError") {
+        setLoading(false);
+        console.error(err);
+      }
+    }
+  };
+
+  const trigger = () => {
+    const query = qs();
+    // 👇 pide SIEMPRE el fragmento
+    const fragUrl = "{% url 'lista_ofertas_fragment' %}?" + query;
+    // 👇 actualiza la URL visible a la página completa
+    history.replaceState(null, "", "{% url 'lista_ofertas' %}?" + query);
+    fetchFragment(fragUrl);
+  };
+
+  const attachPaginationHandlers = () => {
+    results.querySelectorAll(".pagination a").forEach(a => {
+      a.addEventListener("click", (e) => {
+        e.preventDefault();
+        const href = a.getAttribute("href"); // viene como "?q=...&page=2"
+        const fragUrl = "{% url 'lista_ofertas_fragment' %}" + (href.startsWith("?") ? href : ("?" + href));
+        const pageUrl = "{% url 'lista_ofertas' %}" + (href.startsWith("?") ? href : ("?" + href));
+        history.replaceState(null, "", pageUrl);
+        fetchFragment(fragUrl);
+      });
+    });
+  };
+
+  const onType = () => {
+    clearTimeout(typingTimer);
+    const val = (search.value || "").trim();
+    if (val.length === 0) { typingTimer = setTimeout(trigger, 200); return; }
+    if (val.length < MIN_CHARS) return;
+    typingTimer = setTimeout(trigger, DEBOUNCE);
+  };
+
+  if (search) search.addEventListener("input", onType);
+  selects.forEach(s => s.addEventListener("change", trigger));
+
+  attachPaginationHandlers();
+});
+</script>
+
 
 </body>
 </html>

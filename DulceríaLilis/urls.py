@@ -2,7 +2,8 @@ from django.contrib import admin
 from django.urls import path
 from Dulceria import views
 from Panel_Productos.views import productosAdd,categoriasAdd,unidadesAdd,mostrarCategorias,cargarCategorias,modificarCategorias,mostrarUnidades,cargarUnidades,modificarUnidades,mostrarProductos,cargarProductos,modificarProductos
-
+from django.contrib import admin
+from django.urls import path, include
 # Importaciones Usuario
 from Panel_Usuarios import views as vista
 
@@ -44,12 +45,16 @@ urlpatterns = [
     path('proveedores/agregar/', vista_proveedores.agregar_proveedor, name='agregar_proveedor'),
     path('proveedores/editar/<int:pk>/', vista_proveedores.editar_proveedor, name='editar_proveedor'),
     path('proveedores/eliminar/<int:pk>/', vista_proveedores.eliminar_proveedor, name='eliminar_proveedor'),
+    path('admin/', admin.site.urls),
+    path('proveedores/', include('Panel_Proveedores.urls')),
 
     # Rutas Ofertas de Proveedores
     path('ofertas/', vista_proveedores.lista_ofertas, name='lista_ofertas'),
     path('ofertas/agregar/', vista_proveedores.agregar_oferta, name='agregar_oferta'),
     path('ofertas/editar/<int:pk>/', vista_proveedores.editar_oferta, name='editar_oferta'),
     path('ofertas/eliminar/<int:pk>/', vista_proveedores.eliminar_oferta, name='eliminar_oferta'),
+    path('ofertas/fragment/', vista_proveedores.lista_ofertas_fragment, name='lista_ofertas_fragment'),
+
 
     #Rutas Productos
     path('gestion-producto/',productosAdd,name="gestion-producto"),
