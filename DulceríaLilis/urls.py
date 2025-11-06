@@ -47,7 +47,6 @@ urlpatterns = [
     path('proveedores/agregar/', vista_proveedores.agregar_proveedor, name='agregar_proveedor'),
     path('proveedores/editar/<int:pk>/', vista_proveedores.editar_proveedor, name='editar_proveedor'),
     path('proveedores/eliminar/<int:pk>/', vista_proveedores.eliminar_proveedor, name='eliminar_proveedor'),
-    path('admin/', admin.site.urls),
     path('proveedores/', include('Panel_Proveedores.urls')),
 
     # Rutas Ofertas de Proveedores
