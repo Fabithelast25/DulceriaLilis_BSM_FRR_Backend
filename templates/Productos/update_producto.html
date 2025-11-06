@@ -142,12 +142,12 @@
 </head>
 <body>
     {% include 'Productos/navbar_productos.html' %}
-    <div class="container mt-4 mb-4" id="form_editar_producto">
+    <div class="container mt-4 mb-4">
         <h2>Editar Producto</h2>
-        <form method="POST">
+        <form method="POST" id="form_editar_producto">
             {% csrf_token %}
             {{ form.as_p }}
-            <button type="submit" class="btn btn-primary" id="btn-guardar">Guardar cambios</button>
+            <button type="button" class="btn btn-primary" id="btn-guardar">Guardar cambios</button>
         </form>
         <a href="{% url 'productos' %}" class="btn btn-secondary mt-2">Cancelar</a>
     </div>
@@ -168,6 +168,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     document.getElementById("form_editar_producto").submit();
+                    
                 }
             });
         });

@@ -2,10 +2,11 @@ from django.shortcuts import render, redirect, get_object_or_404
 from Panel_Productos.forms import ProductoForm,CategoriaForm,UnidadMedidaForm
 from django.contrib import messages
 from Panel_Productos.models import Producto,Categoria,UnidadMedida
-
+from django.contrib.auth.decorators import login_required
 # Create your views here.
 
 #MANEJO DE PRODUCTOS
+@login_required(login_url='login')
 def productosAdd(request):
     form = ProductoForm(request.POST)
     if request.method == 'POST':
@@ -23,6 +24,7 @@ def productosAdd(request):
         form = ProductoForm()
     return render(request, 'Productos/productos_add.html', {'form': form})
 
+@login_required(login_url='login')
 def mostrarProductos(request):
     productos = Producto.objects.all()
     for producto in productos:
@@ -36,12 +38,14 @@ def mostrarProductos(request):
 
     return render(request,'Productos/productos.html',data)
 
+@login_required(login_url='login')
 def cargarProductos(request,producto_id):
     producto = get_object_or_404(Producto,id=producto_id)
     form = ProductoForm(instance=producto)
 
     return render(request,'Productos/update_producto.html',{'form':form,'categoria':producto})
 
+@login_required(login_url='login')
 def modificarProductos(request, id):
     producto = get_object_or_404(Producto, id=id)
     if request.method == 'POST':
@@ -63,6 +67,7 @@ def productoDelete(request, producto_id):
     producto.delete()
     return redirect('productos')
 
+@login_required(login_url='login')
 #MANEJO DE CATEGORÍAS
 def categoriasAdd(request):
     if request.method == 'POST':
@@ -77,6 +82,7 @@ def categoriasAdd(request):
         form = CategoriaForm()
     return render(request, 'Productos/categorias/categorias_add.html', {'form': form})
 
+@login_required(login_url='login')
 def mostrarCategorias(request):
     categorias = Categoria.objects.all()
     data = {
@@ -85,12 +91,14 @@ def mostrarCategorias(request):
 
     return render(request,'Productos/categorias/categorias.html',data)
 
+@login_required(login_url='login')
 def cargarCategorias(request,categoria_id):
     categoria = get_object_or_404(Categoria,id=categoria_id)
     form = CategoriaForm(instance=categoria)
 
     return render(request,'Productos/categorias/update_categoria.html',{'form':form,'categoria':categoria})
 
+@login_required(login_url='login')
 def modificarCategorias(request,id):
     categoria = get_object_or_404(Categoria, id=id)
     if request.method == 'POST':
@@ -113,6 +121,7 @@ def categoriaDelete(request, categoria_id):
     return redirect('categorias')
 
 #MANEJO DE UNIDADES DE MEDIDA
+@login_required(login_url='login')
 def unidadesAdd(request):
     if request.method == 'POST':
         form = UnidadMedidaForm(request.POST)
@@ -126,6 +135,7 @@ def unidadesAdd(request):
         form = UnidadMedidaForm()
     return render(request, 'Productos/unidades_medida/unidad_medida_add.html', {'form': form})
 
+@login_required(login_url='login')
 def mostrarUnidades(request):
     unidades = UnidadMedida.objects.all()
     data = {
@@ -134,12 +144,14 @@ def mostrarUnidades(request):
 
     return render(request,'Productos/unidades_medida/unidades_medida.html',data)
 
+@login_required(login_url='login')
 def cargarUnidades(request,unidad_medida_id):
     unidad_medida = get_object_or_404(UnidadMedida,id=unidad_medida_id)
     form = UnidadMedidaForm(instance=unidad_medida)
 
     return render(request,'Productos/unidades_medida/update_unidad_medida.html',{'form':form,'unidad_medida':unidad_medida})
 
+@login_required(login_url='login')
 def modificarUnidades(request,id):
     unidad_medida = get_object_or_404(UnidadMedida, id=id)
     if request.method == 'POST':
