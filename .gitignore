@@ -20,3 +20,21 @@ db.sqlite3
 .vscode/
 .idea/
 .DS_Store
+# === Python / Django ===
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+.eggs/
+db.sqlite3
+
+# === Entornos / IDE ===
+venv/
+.env
+.env.*
+.vscode/
+
+# === Django estáticos opcional (si se collectstatic en deploy) ===
+staticfiles/
+media/
