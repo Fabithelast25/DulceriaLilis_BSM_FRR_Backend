@@ -87,7 +87,8 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>Nombre</th>
+                    <th>Nombre Abreviado</th>
+                    <th>Nombre Completo</th>
                     <th>Descripción</th>
                     <th>Creado</th>
                     <th>Acciones</th>
@@ -96,13 +97,15 @@
             <tbody>
                 {% for u in unidades %}
                 <tr>
-                    <td>{{ u.nombre }}</td>
+                    <td>{{ u.nombre_abreviado }}</td>
+                    <td>{{ u.nombre_completo }}</td>
                     <td>{{ u.descripcion }}</td>
                     <td>{{ u.creado }}</td>
                     <td>
                         <ul style="list-style: none;">
-                            <li><a href="{% url 'unidad-medida-load' u.id %}" class="btn btn-sm btn-warning mb-2">Editar</a></li>
-                            <a href="" class="btn btn-danger btn-sm">Eliminar</a>
+                            <li><a href="{% url 'unidad-medida-modificada' u.id %}" class="btn btn-sm btn-warning mb-2">Editar</a></li>
+                            <a href="{% url 'unidad-medida-eliminada' u.id %}" class="btn btn-danger btn-sm" 
+                               data-url="{% url 'unidad-medida-eliminada' u.id %}" onclick="confirmarEliminacion(event, this)">Eliminar</a>
                         </ul>
                     </td>
                 </tr>
@@ -110,6 +113,41 @@
             </tbody>
         </table>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+
+    <!-- Cargar la librería de SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        // Función para confirmar la eliminación
+        function confirmarEliminacion(event, btn) {
+            event.preventDefault();  // Evita que el enlace se siga inmediatamente
+
+            const url = btn.getAttribute('data-url');  // Obtener la URL de data-url
+            Swal.fire({
+                icon: 'warning',
+                title: '¿Estás seguro?',
+                text: "Esta acción eliminará la unidad de medida de forma permanente.",
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        icon: "success",
+                        title: "¡Éxito!",
+                        text: "Unidad de medida eliminada de la base de datos",
+                        showConfirmButton: false,
+                        timer: 2500
+                    }).then(() => {
+                        window.location.href = url;  // Redirige a la URL de eliminación
+                    });
+                }
+            });
+        }
+    </script>
+    
 </body>
+
 </html>

@@ -4,10 +4,10 @@ from django.contrib import admin
 from Panel_Productos.models import Producto, UnidadMedida, Categoria
 
 class CategoriaAdmin(admin.ModelAdmin):
-    list_display = ["id","nombre","creado","descripcion"]
+    list_display = ["id","nombre_abreviado","nombre_completo","creado","descripcion"]
 
 class UnidadMedidaAdmin(admin.ModelAdmin):
-    list_display = ["id","nombre","creado","descripcion"]
+    list_display = ["id","nombre_abreviado","nombre_completo","creado","descripcion"]
 
 class ProductoAdmin(admin.ModelAdmin):
     list_display = [

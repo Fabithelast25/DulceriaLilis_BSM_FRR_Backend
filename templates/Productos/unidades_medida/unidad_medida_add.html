@@ -71,27 +71,70 @@
 </head>
 <body>
     {% include 'Productos/navbar_productos.html' %}
-    <div class="container mt-4 mb-4">
+    <div class="container mt-4 mb-4" id="form_unidad_medida">
     <!--Formulario Rol-->
         <form method="POST">
             {% csrf_token %}
             <h4>Datos Categoria</h4>
             {{ form.non_field_errors }}
             <div class="mb-3">
-                <label for="nombre" class="form-label">Seleccione Unidad de Medida</label>
-                {{ form.nombre }}
-                {{ form.nombre.errors }}
+                <label for="nombre_abreviado" class="form-label">Nombre Abreviado de la Unidad de Medida</label>
+                {{ form.nombre_abreviado }}
+                {{ form.nombre_abreviado.errors }}
+            </div>
+            <div class="mb-3">
+                <label for="nombre_completo" class="form-label">Nombre Completo de la Unidad de Medida</label>
+                {{ form.nombre_completo }}
+                {{ form.nombre_completo.errors }}
             </div>
             <div class="mb-3">
                 <label for="descripcion" class="form-label">Descripción de la Categoría</label>
                 {{ form.descripcion }}
                 {{ form.descripcion.errors }}
             </div>
-            <button type="submit" class="btn btn-primary mt-3">Guardar Unidad de Medida</button>
+            <div class="row">
+                <div class="col">
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                    <button type="button" class="btn btn-light" id="limpiar-btn">Limpiar</button>
+                </div>
+            </div>
         </form>
     </div>
     <footer>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                function clearForm() {
+                    const form = document.getElementById('form_unidad_medida');
+                    if (form) {  
+                        form.reset();  
+                    }
+                }
+                const clearButton = document.getElementById('limpiar-btn')
+                if (clearButton) {
+                    clearButton.addEventListener("click", clearForm);
+                }
+            });
+        </script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <!--Mensaje de SweetAlert de exito o error según resultado del formulario-->
+        {% if messages %}
+            {% for message in messages %}
+                <script>
+                Swal.fire({
+                    icon: "{% if message.tags == 'success' %}success{% elif message.tags == 'error' %}error{% else %}info{% endif %}",
+                    title: "{% if message.tags == 'success' %}¡Exito!{% elif message.tags == 'error' %}¡Error!{% else %}Info{% endif %}",
+                    text: "{{ message|escapejs }}",
+                    showConfirmButton: false,
+                    timer: 2500
+                }).then(() => {
+                    {% if message.tags == 'success' %}
+                    window.location.href = {% url 'unidades-medida' %}
+                    {% endif %}
+                });
+                </script>   
+            {% endfor %}
+        {% endif %}
     </footer>
 </body>
 </html>

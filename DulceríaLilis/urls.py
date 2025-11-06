@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import path
 from Dulceria import views
-from Panel_Productos.views import productosAdd,categoriasAdd,unidadesAdd,mostrarCategorias,cargarCategorias,modificarCategorias,mostrarUnidades,cargarUnidades,modificarUnidades,mostrarProductos,cargarProductos,modificarProductos
+from Panel_Productos.views import productosAdd,categoriasAdd,unidadesAdd,mostrarCategorias,cargarCategorias,modificarCategorias,mostrarUnidades,cargarUnidades,modificarUnidades,mostrarProductos,cargarProductos,modificarProductos,productoDelete,categoriaDelete,unidadesDelete
 from django.contrib import admin
 from django.urls import path, include
 # Importaciones Usuario
@@ -61,18 +61,21 @@ urlpatterns = [
     path('gestion-producto/',productosAdd,name="gestion-producto"),
     path('productos/',mostrarProductos,name="productos"),
     path('producto-load/<int:producto_id>',cargarProductos,name='producto-load'),
-    path('producto-modificado/<int:producto_id>',modificarProductos,name='producto-modificado'),
+    path('producto-eliminado/<int:producto_id>', productoDelete, name='producto-eliminado'),
+    path('producto-modificado/<int:id>/',modificarProductos,name='producto-modificado'),
 
     #Rutas Categorías
     path('gestion-categoria/',categoriasAdd,name="gestion-categoria"),
     path('categorias/',mostrarCategorias,name="categorias"),
     path('categoria-load/<int:categoria_id>',cargarCategorias,name='categoria-load'),
-    path('categoria-modificada/<int:categoria_id>',modificarCategorias,name='categoria-modificada'),
+    path('categoria-eliminada/<int:categoria_id>', categoriaDelete, name='categoria-eliminada'),
+    path('categoria-modificada/<int:id>/',modificarCategorias,name='categoria-modificada'),
 
     #Rutas Unidades de Medida
     path('gestion-unidad-medida/',unidadesAdd,name="gestion-unidad-medida"),
     path('unidades-medidas/',mostrarUnidades,name="unidades-medida"),
     path('unidad-medida-load/<int:unidad_medida_id>',cargarUnidades,name='unidad-medida-load'),
-    path('unidad-medida-modificada/<int:unidad_medida_id>',modificarUnidades,name='unidad-medida-modificada'),
+    path('unidad-medida-eliminada/<int:unidad_medida_id>', unidadesDelete, name='unidad-medida-eliminada'),
+    path('unidad-medida-modificada/<int:id>/',modificarUnidades,name='unidad-medida-modificada'),
 ]
 
