@@ -79,7 +79,7 @@
                 <button type="button" class="btn btn-primary" onclick="mostrarSeccion('formulario1')">1. Identificación y precios</button>
                 <button type="button" class="btn btn-primary" onclick="mostrarSeccion('formulario2')">2. Stock y control</button>
                 <button type="button" class="btn btn-primary" onclick="mostrarSeccion('formulario3')">3. Relaciones y derivados</button>
-                <form method="POST">
+                <form method="POST" id="form_producto">
                     {% csrf_token %}
 
                     {% if errors %}
@@ -97,74 +97,74 @@
                         <div id="formulario1" class="form-section">
                             <h2>Indentificación</h2>
                             <div class="mb-3">
-                                <label for="sku">sku (requerido, único)</label>
+                                <label for="sku">SKU</label>
                                 {{ form.sku }}
                                 {{ form.sku.errors }}
                             </div>
                             <div class="mb-3">
-                                <label for="ean_upc">ean_upc (opcional, único si se usa)</label>
+                                <label for="ean_upc">EAN/UPC</label>
                                 {{ form.ean_upc }}
                                 {{ form.ean_upc.errors }}
                             </div>
                             <div class="mb-3">
-                                <label for="nombre">nombre (requerido)</label>
+                                <label for="nombre">Nombre</label>
                                 {{ form.nombre }}
                                 {{ form.nombre.errors }}
                             </div>
                             <div class="mb-3">
-                                <label for="descripcion">descripcion (opcional)</label>
+                                <label for="descripcion">Descripción</label>
                                 {{ form.descripcion }}
                                 {{ form.descripcion.errors }}
                             </div>
                             <div class="mb-3">
-                                <label for="categoria">categoria (requerido)</label>
+                                <label for="categoria">Categoría</label>
                                 {{ form.categoria }}
                                 {{ form.categoria.errors }}
                             </div>
                             <div class="mb-3">
-                                <label for="marca">marca (opcional)</label>
+                                <label for="marca">Marca</label>
                                 {{ form.marca }}
                                 {{ form.marca.errors }}
                             </div>
                             <div class="mb-3">
-                                <label for="modelo">modelo (opcional)</label>
+                                <label for="modelo">Modelo</label>
                                 {{ form.modelo }}
                                 {{ form.modelo.errors }}
                             </div>
                             <h3>Unidades y precios</h3>
                             <div class="row">
                                 <div class="col-4 mb-3">
-                                <label for="uom_compra">uom_compra (requerido)</label>
+                                <label for="uom_compra">Unidad de Medida (Compra)</label>
                                 {{ form.uom_compra }}
                                 {{ form.uom_compra.errors }}
                                 </div>
                                 <div class="col-4 mb-3">
-                                    <label for="uom_venta">uom_venta (requerido)</label>
+                                    <label for="uom_venta">Unidad de Medida (Venta)</label>
                                     {{ form.uom_venta }}
                                     {{ form.uom_venta.errors }}
                                 </div>
                                 <div class="col-4 mb-3">
-                                    <label for="factor_conversion">factor_conversion (requerido; default 1)</label>
+                                    <label for="factor_conversion">Factor de Conversión</label>
                                     {{ form.factor_conversion }}
                                     {{ form.factor_conversion.errors }}
                                 </div>
                                 <div class="col-3 mb-3">
-                                    <label for="costo_estandar">costo_estandar (opcional)</label>
+                                    <label for="costo_estandar">Costo Estandar</label>
                                     {{ form.costo_estandar }}
                                     {{ form.costo_estandar.errors }}
                                 </div>
                                 <div class="col-3 mb-3">
-                                    <label for="costo_promedio">costo_promedio (solo lectura)</label>
+                                    <label for="costo_promedio">Costo Promedio</label>
                                     {{ form.costo_promedio }}
                                     {{ form.costo_promedio.errors }}
                                 </div>
                                 <div class="col-3 mb-3">
-                                    <label for="precio_venta">precio_venta (opcional)</label>
+                                    <label for="precio_venta">Precio de Venta</label>
                                     {{ form.precio_venta }}
                                     {{ form.precio_venta.errors }}
                                 </div>
                                 <div class="col-3 mb-3">
-                                    <label for="impuesto_iva">impuesto_iva (requerido; ej. 19%)</label>
+                                    <label for="impuesto_iva">Valor Agregado (IVA)</label>
                                     {{ form.impuesto_iva }}
                                     {{ form.impuesto_iva.errors }}
                                 </div>
@@ -175,32 +175,32 @@
                             <div class="row">
                                 <h3>Stock y control</h3>
                                 <div class="col-4 mb-3">
-                                    <label for="stock_minimo">stock_minimo (requerido; default 0)</label>
+                                    <label for="stock_minimo">Stock Mínimo</label>
                                     {{ form.stock_minimo }}
                                     {{ form.stock_minimo.errors }}
                                 </div>
                                 <div class="col-4 mb-3">
-                                    <label for="stock_maximo">stock_maximo (opcional)</label>
+                                    <label for="stock_maximo">Stock Máximo</label>
                                     {{ form.stock_maximo }}
                                     {{ form.stock_maximo.errors }}
                                 </div>
                                 <div class="col-4 mb-3">
-                                    <label for="punto_reorden">stock_maximo (opcional; si no usar mínimo)</label>
+                                    <label for="punto_reorden">Punto de Reorden</label>
                                     {{ form.punto_reorden }}
                                     {{ form.punto_reorden.errors }}
                                 </div>
                                 <div class="col-4 mb-3">
-                                    <label for="perishable">perishable (requerido; default 0)</label>
+                                    <label for="perishable">Perecible</label>
                                     {{ form.perishable }}
                                     {{ form.persishable.errors }}
                                 </div>
                                 <div class="col-4 mb-3">
-                                    <label for="control_por_lote">control_por_lote (requerido; default 0)</label>
+                                    <label for="control_por_lote">Control por Lote</label>
                                     {{ form.control_por_lote }}
                                     {{ form.control_por_lote.errors }}
                                 </div>
                                 <div class="col-4 mb-3">
-                                    <label for="control_por_serie">control_por_serie (requerido; default 0)</label>
+                                    <label for="control_por_serie">Control por Serie</label>
                                     {{ form.control_por_serie }}
                                     {{ form.control_por_serie.errors }}
                                 </div>
@@ -210,28 +210,28 @@
                             <div class="row">
                                 <h3>Relaciones y soporte</h3>
                             <div class="col-6 mb-4">
-                                <label for="url">imagen_url (opcional)</label>
+                                <label for="url">Imagen URL</label>
                                 {{ form.url }}
                                 {{ form.url.errors }}
                             </div>
                             <div class="col-6 mb-4">
-                                <label for="ficha_tecnica_url">ficha_tecnica_url (opcional)</label>
+                                <label for="ficha_tecnica_url">Ficha Técnica URL</label>
                                 {{ form.ficha_tecnica_url }}
-                                {{ form.url.errors }}
+                                {{ form.ficha_tecnica_url.errors }}
                             </div>
                             <h3>Derivados (solo lectura)</h3>
                             <div class="col-4 mb-3">
-                                <label for="stock_actual">stock_actual</label>
+                                <label for="stock_actual">Stock Actual</label>
                                 {{ form.stock_actual }}
                                 {{ form.stock_actual.errors }}
                             </div>
                             <div class="col-4 mb-3">
-                                <label for="alerta_bajo_stock">alerta_bajo_stock</label>
+                                <label for="alerta_bajo_stock">Alerta de Bajo Stock</label>
                                 {{ form.alerta_bajo_stock }}
                                 {{ form.alerta_bajo_stock.errors }}
                             </div>
                             <div class="col-4 mb-3">
-                                <label for="alerta_por_vencer">alerta_por_vencer</label>
+                                <label for="alerta_por_vencer">Alerta de Vencimiento</label>
                                 {{ form.alerta_por_vencer }}
                                 {{ form.alerta_por_vencer.errors }}
                             </div>
@@ -242,7 +242,7 @@
                     <div class="row">
                         <div class="col">
                             <button type="submit" class="btn btn-primary">Guardar</button>
-                            <button type="button" class="btn btn-light">Limpiar</button>
+                            <button type="button" class="btn btn-light" id="limpiar-btn">Limpiar</button>
                         </div>
                     </div>
                 </form>
@@ -266,7 +266,32 @@
             }
             // Al cargar la página, mostrar la primera sección
             mostrarSeccion('formulario1');
+            // Limpiar todos los campos del formulario
+            document.getElementById('limpiar-btn').addEventListener('click', function() {
+                const form = document.getElementById('form_producto');
+                form.reset();
+                mostrarSeccion('formulario1');  // Vuelve a la primera sección
+            });
         </script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <!--Mensaje de SweetAlert de exito o error según resultado del formulario-->
+        {% if messages %}
+            {% for message in messages %}
+                <script>
+                Swal.fire({
+                    icon: "{% if message.tags == 'success' %}success{% elif message.tags == 'error' %}error{% else %}info{% endif %}",
+                    title: "{% if message.tags == 'success' %}¡Exito!{% elif message.tags == 'error' %}¡Error!{% else %}Info{% endif %}",
+                    text: "{{ message|escapejs }}",
+                    showConfirmButton: false,
+                    timer: 2500
+                }).then(() => {
+                    {% if message.tags == 'success' %}
+                    window.location.href = {% url 'productos' %}
+                    {% endif %}
+                });
+                </script>   
+            {% endfor %}
+        {% endif %}
     </footer>
     
 </body>

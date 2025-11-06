@@ -142,17 +142,51 @@
 </head>
 <body>
     {% include 'Productos/navbar_productos.html' %}
-    <div class="container mt-4 mb-4">
+    <div class="container mt-4 mb-4" id="form_editar_categoria">
         <h2>Editar Categoria</h2>
         <form method="post">
             {% csrf_token %}
             {{ form.as_p }}
-            <button type="submit" class="btn btn-primary">Guardar cambios</button>
+            <button type="submit" class="btn btn-primary" id="btn-guardar">Guardar cambios</button>
         </form>
         <a href="{% url 'categorias' %}" class="btn btn-secondary mt-2">Cancelar</a>
     </div>
     <footer>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
+        document.getElementById("btn-guardar").addEventListener("click", function () {
+            Swal.fire({
+                icon: "warning",
+                title: "¿Guardar cambios?",
+                text: "Se actualizará la información del usuario.",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Sí, guardar",
+                cancelButtonText: "Cancelar"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById("form_editar_categoria").submit();
+                }
+            });
+        });
+        {% if messages %}
+            {% for message in messages %}
+                Swal.fire({
+                    icon: "{% if message.tags == 'success' %}success{% elif message.tags == 'error' %}error{% else %}info{% endif %}",
+                    title: "{% if message.tags == 'success' %}¡Exito!{% elif message.tags == 'error' %}¡Error!{% else %}¡Info!{% endif %}",
+                    text: "{{ message }}",
+                    showConfirmButton: false,
+                    timer: 2000
+                }).then(() => {
+                    {% if message.tags == 'success' %}
+                    window.location.href = {% url 'categorias' %}
+                    {% endif %}
+                });
+            {% endfor %}
+        {% endif %}
+    </script>
     </footer>
 </body>
 </html>

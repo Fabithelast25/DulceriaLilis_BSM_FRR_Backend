@@ -80,14 +80,15 @@
 <body>
     {% include 'Productos/navbar_productos.html' %}
     <div class="container mt-4 mb-4">
-        <h3 class="mb-3">Categorias</h3>
+        <h3 class="mb-3">Categorías</h3>
         <div>
             <a class="btn btn-primary mb-3" href="{% url 'gestion-categoria' %}">Añadir Categoria</a>
         </div>
         <table class="table">
             <thead>
                 <tr>
-                    <th>Nombre</th>
+                    <th>Nombre Abreviado</th>
+                    <th>Nombre Completo</th>
                     <th>Descripción</th>
                     <th>Creado</th>
                     <th>Acciones</th>
@@ -96,13 +97,15 @@
             <tbody>
                 {% for c in categorias %}
                 <tr>
-                    <td>{{ c.nombre }}</td>
+                    <td>{{ c.nombre_abreviado }}</td>
+                    <td>{{ c.nombre_completo }}</td>
                     <td>{{ c.descripcion }}</td>
                     <td>{{ c.creado }}</td>
                     <td>
                         <ul style="list-style: none;">
-                            <li><a href="{% url 'categoria-load' c.id %}" class="btn btn-sm btn-warning mb-2">Editar</a></li>
-                            <a href="" class="btn btn-danger btn-sm">Eliminar</a>
+                            <li><a href="{% url 'categoria-modificada' c.id %}" class="btn btn-sm btn-warning mb-2">Editar</a></li>
+                            <a href="{% url 'categoria-eliminada' c.id %}" class="btn btn-danger btn-sm" 
+                               data-url="{% url 'categoria-eliminada' c.id %}" onclick="confirmarEliminacion(event, this)">Eliminar</a>
                         </ul>
                     </td>
                 </tr>
@@ -111,5 +114,36 @@
         </table>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function confirmarEliminacion(event, btn) {
+            event.preventDefault();  // Evita que el enlace se siga antes de la confirmación
+
+            const url = btn.getAttribute('data-url');
+            Swal.fire({
+                icon: 'warning',
+                title: '¿Estás seguro?',
+                text: "Esta acción eliminará la categoría de forma permanente.",
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        icon: "success",
+                        title: "¡Éxito!",
+                        text: "Categoría eliminada de la base de datos",
+                        showConfirmButton: false,
+                        timer: 2500
+                    }).then(() => {
+                        window.location.href = url;  // Redirige a la URL de eliminación
+                    });
+                }
+            });
+        }
+    </script>
 </body>
+
 </html>
