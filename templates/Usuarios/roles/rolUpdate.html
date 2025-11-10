@@ -2,25 +2,209 @@
 {% load static %}
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editar Rol</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-    <link rel="stylesheet" href="{% static 'CSS/usuario.css' %}">
+  <meta charset="UTF-8" />
+  <title>Editar Rol</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <style>
+    /* ===== Paleta y layout consistente ===== */
+    :root{
+      --brand-red:#c8102e; --brand-red-700:#a40d25; --brand-red-50:#fff5f7;
+      --brand-gold:#d4af37; --brand-gold-700:#b89617; --brand-gold-100:#fcf6e6;
+      --ink:#1c1d22; --muted:#6b7280; --border:#e8e8e8; --bg:#ffffff; --page:#fafafa;
+      --shadow:0 10px 24px rgba(0,0,0,.08); --radius:14px;
+    }
+    html,body{height:100%}
+    body{ background:linear-gradient(180deg,var(--page),#fff); margin:0; font-family:system-ui, Segoe UI, Roboto, Arial, sans-serif; color:var(--ink); }
+
+    .navbar{ background:var(--brand-red)!important; box-shadow:0 8px 18px rgba(200,16,46,.18); }
+    .navbar-brand{ color:#fff!important; font-weight:800; letter-spacing:.3px; }
+    .nav-link{ color:#fff!important; opacity:.95; }
+    .nav-link:hover{ opacity:1; text-decoration:underline; text-underline-offset:4px; }
+
+    .page-wrap{ padding:24px 12px; }
+    .card{
+      max-width:900px; margin:0 auto; background:var(--bg); border-radius:var(--radius);
+      border:1px solid var(--border); box-shadow:var(--shadow); overflow:hidden;
+    }
+    .card-header{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      background:linear-gradient(180deg,#fff,var(--brand-gold-100));
+      border-bottom:2px solid var(--brand-gold);
+      padding:14px 18px; font-weight:800; font-size:1.1rem;
+    }
+    .card-header .mark{
+      width:10px; height:22px; border-radius:8px; margin-right:6px;
+      background:linear-gradient(180deg,var(--brand-gold),var(--brand-gold-700));
+      box-shadow:0 4px 10px rgba(212,175,55,.25);
+    }
+    .body{ padding:18px; }
+
+    .form-label{ font-weight:700; }
+    .form-text{ color:var(--muted)!important; }
+    .counter{ font-size:.85rem; color:var(--muted); }
+    .is-invalid + .invalid-feedback{ display:block; }
+
+    .btn-gold{
+      background:linear-gradient(180deg,var(--brand-gold),var(--brand-gold-700));
+      color:#1a1a1a; border:none; border-radius:10px; padding:10px 14px; font-weight:800;
+    }
+    .btn-gold:hover{ filter:brightness(.95); color:#111; }
+    .btn-outline{
+      background:#fff; color:var(--brand-red); border:2px solid var(--brand-red); border-radius:10px; padding:9px 14px; font-weight:800;
+    }
+    .btn-outline:hover{ background:var(--brand-red-50); }
+
+    @media (max-width:640px){ .card-header{ flex-direction:column; align-items:flex-start; gap:8px; } }
+  </style>
 </head>
 <body>
-    {% include 'Usuarios/navbarUsuarios.html' %}
-    <div class="container mt-4 mb-4">
-        <h2>Editar Rol</h2>
-        <form method="post">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="btn btn-primary">Guardar cambios</button>
+
+  {% include 'Usuarios/navbarUsuarios.html' %}
+
+  <div class="page-wrap">
+    <div class="card">
+      <div class="card-header">
+        <div class="d-flex align-items-center">
+          <span class="mark"></span>
+          <span>Editar Rol</span>
+        </div>
+      </div>
+
+      <div class="body">
+        <form method="post" id="formRol" novalidate>
+          {% csrf_token %}
+
+          {% if form.non_field_errors %}
+            <div class="alert alert-warning border-0">{{ form.non_field_errors }}</div>
+          {% endif %}
+
+          <!-- Nombre -->
+          <div class="mb-3">
+            <label for="id_nombre" class="form-label">Nombre del rol</label>
+            {{ form.nombre }}
+            {% if form.nombre.errors %}<div class="invalid-feedback d-block">{{ form.nombre.errors|striptags }}</div>{% endif %}
+            <div class="form-text">3–40 caracteres. Letras, números, espacios y “- / .”.</div>
+          </div>
+
+          <!-- Descripción -->
+          <div class="mb-3">
+            <label for="id_descripcion" class="form-label">Descripción (opcional)</label>
+            {{ form.descripcion }}
+            {% if form.descripcion.errors %}<div class="invalid-feedback d-block">{{ form.descripcion.errors|striptags }}</div>{% endif %}
+            <div class="form-text">Máximo 240 caracteres. <span id="count_desc" class="counter">0/240</span></div>
+          </div>
+
+          <div class="d-flex gap-2 justify-content-end">
+            <a href="{% url 'rolLista' %}" class="btn btn-outline">Cancelar</a>
+            <button type="submit" class="btn btn-gold" id="btnGuardar">Guardar cambios</button>
+          </div>
         </form>
-        <a href="{% url 'rolLista' %}" class="btn btn-secondary mt-2">Cancelar</a>
+      </div>
     </div>
-    <footer>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
-    </footer>
+  </div>
+
+  <script>
+    (function(){
+      const form = document.getElementById('formRol');
+      const btn  = document.getElementById('btnGuardar');
+
+      const nombre = document.getElementById('id_nombre');
+      const desc   = document.getElementById('id_descripcion');
+      const cDesc  = document.getElementById('count_desc');
+
+      const normalizeSpaces = v => (v || '').replace(/\s+/g,' ').trim();
+      const titleCase = s => normalizeSpaces(s).toLowerCase().replace(/(^|\s)\S/g, c => c.toUpperCase());
+      const updateCounter = () => { if (desc && cDesc) cDesc.textContent = `${(desc.value||'').length}/240`; };
+
+      // Atributos mínimos por si el form no los trae
+      function ensureAttrs(){
+        if (nombre){
+          nombre.classList.add('form-control');
+          nombre.setAttribute('required','');
+          nombre.setAttribute('minlength','3');
+          nombre.setAttribute('maxlength','40');
+          nombre.setAttribute('pattern','^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ0-9 /.\\-]{3,40}$');
+          nombre.setAttribute('placeholder','Ej.: Administrador, Ventas, Bodega');
+        }
+        if (desc){
+          desc.classList.add('form-control');
+          if (desc.tagName.toLowerCase()==='textarea') desc.setAttribute('rows','3');
+          desc.setAttribute('maxlength','240');
+        }
+      }
+      ensureAttrs();
+      updateCounter();
+
+      // Validación en vivo
+      if (nombre){
+        nombre.addEventListener('input', ()=>{
+          const v = normalizeSpaces(nombre.value);
+          if (!/^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ0-9 /.\\-]{3,40}$/.test(v)){
+            nombre.setCustomValidity('Nombre inválido (3–40, letras/números/espacios - /. )');
+          } else { nombre.setCustomValidity(''); }
+        });
+        nombre.addEventListener('blur', ()=>{ nombre.value = titleCase(nombre.value); });
+      }
+      if (desc){
+        desc.addEventListener('input', ()=>{
+          updateCounter();
+          if ((desc.value||'').length > 240) desc.setCustomValidity('Máximo 240 caracteres.');
+          else desc.setCustomValidity('');
+        });
+        desc.addEventListener('blur', ()=>{ desc.value = normalizeSpaces(desc.value); updateCounter(); });
+      }
+
+      // Confirmación + anti doble envío
+      let confirmed = false, submitting = false;
+      form.addEventListener('submit', function(e){
+        if (nombre) nombre.value = titleCase(nombre.value);
+        if (desc)   desc.value   = normalizeSpaces(desc.value);
+
+        if (!confirmed){
+          e.preventDefault(); e.stopPropagation();
+
+          if (!form.checkValidity()){
+            Array.from(form.elements).forEach(el=>{
+              if (el.tagName && /INPUT|SELECT|TEXTAREA/.test(el.tagName)){
+                el.classList.toggle('is-invalid', !el.checkValidity());
+                el.addEventListener('input', ()=> el.classList.remove('is-invalid'), {once:true});
+              }
+            });
+            return;
+          }
+
+          Swal.fire({
+            icon: "question",
+            title: "¿Guardar cambios del rol?",
+            showCancelButton: true,
+            confirmButtonText: "Sí, guardar",
+            cancelButtonText: "Cancelar"
+          }).then((res)=>{
+            if (res.isConfirmed){
+              confirmed = true;
+              if (!submitting){
+                submitting = true;
+                btn.disabled = true;
+                btn.textContent = 'Guardando...';
+                form.submit();
+              }
+            }
+          });
+          return;
+        }
+
+        if (!form.checkValidity()){ e.preventDefault(); e.stopPropagation(); return; }
+        if (submitting){ e.preventDefault(); e.stopPropagation(); return; }
+        submitting = true;
+        btn.disabled = true;
+        btn.textContent = 'Guardando...';
+      });
+    })();
+  </script>
+
 </body>
 </html>

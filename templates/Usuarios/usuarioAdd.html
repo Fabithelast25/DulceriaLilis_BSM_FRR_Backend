@@ -2,115 +2,337 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Añadir Usuario</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-    <link rel="stylesheet" href="{% static 'CSS/usuario.css' %}">
+  <meta charset="UTF-8" />
+  <title>Añadir Usuario</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <style>
+    :root{
+      --brand-red:#c8102e; --brand-red-700:#a40d25; --brand-red-50:#fff5f7;
+      --brand-gold:#d4af37; --brand-gold-700:#b89617; --brand-gold-100:#fcf6e6;
+      --ink:#1c1d22; --muted:#6b7280; --border:#e8e8e8; --bg:#ffffff; --page:#fafafa;
+      --shadow:0 10px 24px rgba(0,0,0,.08); --radius:14px;
+    }
+    html,body{height:100%}
+    body{ background:linear-gradient(180deg,var(--page),#fff); margin:0; font-family:system-ui, Segoe UI, Roboto, Arial, sans-serif; color:var(--ink); }
+
+    .navbar{ background:var(--brand-red)!important; box-shadow:0 8px 18px rgba(200,16,46,.18); }
+    .navbar-brand{ color:#fff!important; font-weight:800; letter-spacing:.3px; }
+    .nav-link{ color:#fff!important; opacity:.95; }
+    .nav-link:hover{ opacity:1; text-decoration:underline; text-underline-offset:4px; }
+
+    .page-wrap{ padding:24px 12px; }
+    .card{
+      max-width:950px; margin:0 auto; background:var(--bg); border-radius:var(--radius);
+      border:1px solid var(--border); box-shadow:var(--shadow); overflow:hidden;
+    }
+    .card-header{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      background:linear-gradient(180deg,#fff,var(--brand-gold-100));
+      border-bottom:2px solid var(--brand-gold);
+      padding:14px 18px; font-weight:800; font-size:1.1rem;
+    }
+    .card-header .mark{
+      width:10px; height:22px; border-radius:8px; margin-right:6px;
+      background:linear-gradient(180deg,var(--brand-gold),var(--brand-gold-700));
+      box-shadow:0 4px 10px rgba(212,175,55,.25);
+    }
+    .body{ padding:18px; }
+    .section-title{ font-size:1.05rem; font-weight:800; margin:10px 0 6px; }
+    .form-label{ font-weight:700; }
+    .form-text{ color:var(--muted)!important; }
+    .counter{ font-size:.85rem; color:var(--muted); }
+    .is-invalid + .invalid-feedback{ display:block; }
+
+    .btn-gold{
+      background:linear-gradient(180deg,var(--brand-gold),var(--brand-gold-700));
+      color:#1a1a1a; border:none; border-radius:10px; padding:10px 14px; font-weight:800;
+    }
+    .btn-gold:hover{ filter:brightness(.95); color:#111; }
+    .btn-outline{
+      background:#fff; color:var(--brand-red); border:2px solid var(--brand-red); border-radius:10px; padding:9px 14px; font-weight:800;
+    }
+    .btn-outline:hover{ background:var(--brand-red-50); }
+
+    @media (max-width:640px){ .card-header{ flex-direction:column; align-items:flex-start; gap:8px; } }
+  </style>
 </head>
 <body>
-    {% include 'Usuarios/navbarUsuarios.html' %}
-    <div class="container mt-4 mb-4">
-    <!--Formulario Usuarios-->
-        <form method="POST" novalidate>
-            {% csrf_token %}
-            <!--Identificación-->
-            <h4>Datos Usuario</h4>
-            {{ form.non_field_errors }}
-            <div class="mb-3">
-            <label for="username" class="form-label">Username</label>
-                {{ form.username }}
-                {{ form.username.errors }}
+
+  {% include 'Usuarios/navbarUsuarios.html' %}
+
+  <div class="page-wrap">
+    <div class="card">
+      <div class="card-header">
+        <div class="d-flex align-items-center">
+          <span class="mark"></span>
+          <span>Nuevo Usuario</span>
+        </div>
+      </div>
+
+      <div class="body">
+        <form method="POST" id="formAddUsuario" novalidate>
+          {% csrf_token %}
+          {% if form.non_field_errors %}
+            <div class="alert alert-warning border-0">{{ form.non_field_errors }}</div>
+          {% endif %}
+
+          <!-- Identificación -->
+          <div class="section-title">Datos del usuario</div>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="id_username" class="form-label">Username</label>
+              {{ form.username }}
+              {% if form.username.errors %}<div class="invalid-feedback d-block">{{ form.username.errors|striptags }}</div>{% endif %}
+              <div class="form-text">3–30, minúsculas; letras, números, punto, guion y guion bajo.</div>
             </div>
-            <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
-                {{ form.email }}
-                {{ form.email.errors }}
+            <div class="col-md-6">
+              <label for="id_email" class="form-label">Email</label>
+              {{ form.email }}
+              {% if form.email.errors %}<div class="invalid-feedback d-block">{{ form.email.errors|striptags }}</div>{% endif %}
             </div>
-            <div class="d-flex">
-                <div class="mb-3 me-3 flex-fill">
-                    <label for="first_name" class="form-label">Nombres</label>
-                    {{ form.first_name }}
-                    {{ form.first_name.errors }}
-                </div>
-                <div class="mb-3 flex-fill">
-                    <label for="last_name" class="form-label">Apellidos</label>
-                    {{ form.last_name }}
-                    {{ form.last_name.errors }}
-                </div>
+            <div class="col-md-6">
+              <label for="id_first_name" class="form-label">Nombres</label>
+              {{ form.first_name }}
+              {% if form.first_name.errors %}<div class="invalid-feedback d-block">{{ form.first_name.errors|striptags }}</div>{% endif %}
+              <div class="form-text">2–60 caracteres. Solo letras y espacios.</div>
             </div>
-            <div class="mb-3">
-                <label for="telefono" class="form-label">Telefono (Opcional)</label>
-                {{ form.telefono }}
-                {{ form.telefono.errors }}
+            <div class="col-md-6">
+              <label for="id_last_name" class="form-label">Apellidos</label>
+              {{ form.last_name }}
+              {% if form.last_name.errors %}<div class="invalid-feedback d-block">{{ form.last_name.errors|striptags }}</div>{% endif %}
+              <div class="form-text">2–60 caracteres. Solo letras y espacios.</div>
             </div>
-            <!--Estado y acceso-->
-            <h4>Estado y acceso</h4>
-            <div class="d-flex">
-                <div class="mb-3 me-3 flex-fill">
-                    <label for="rol" class="form-label">Rol</label>
-                    {{ form.rol }}
-                    {{ form.rol.errors }}
-                </div>
-                <div class="mb-3 flex-fill">
-                    <label for="estado" class="form-label">Estado</label>
-                    {{ form.estado }}
-                    {{ form.estado.errors }}
-                </div>
+            <div class="col-md-6">
+              <label for="id_telefono" class="form-label">Teléfono (opcional)</label>
+              {{ form.telefono }}
+              {% if form.telefono.errors %}<div class="invalid-feedback d-block">{{ form.telefono.errors|striptags }}</div>{% endif %}
+              <div class="form-text">Formato sugerido: +56 9 1234 5678</div>
             </div>
-            <div class="mb-3">
-                <label for="mfa_habilitado" class="form-label">MFA Habilitado</label>
+          </div>
+
+          <!-- Estado y acceso -->
+          <div class="section-title mt-2">Estado y acceso</div>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="id_rol" class="form-label">Rol</label>
+              {{ form.rol }}
+              {% if form.rol.errors %}<div class="invalid-feedback d-block">{{ form.rol.errors|striptags }}</div>{% endif %}
+            </div>
+            <div class="col-md-6">
+              <label for="id_estado" class="form-label">Estado</label>
+              {{ form.estado }}
+              {% if form.estado.errors %}<div class="invalid-feedback d-block">{{ form.estado.errors|striptags }}</div>{% endif %}
+            </div>
+            <div class="col-md-6 d-flex align-items-center">
+              <div>
+                <label for="id_mfa_habilitado" class="form-label d-block">MFA habilitado</label>
                 {{ form.mfa_habilitado }}
-                {{ form.mfa_habilitado.errors }}
+                {% if form.mfa_habilitado.errors %}<div class="invalid-feedback d-block">{{ form.mfa_habilitado.errors|striptags }}</div>{% endif %}
+              </div>
             </div>
-            <div class="mb-3">
-                <label for="ultimo_acceso" class="form-label">Ultimo Acceso (Lectura)</label>
-                {{ form.last_login }}
-                {{ form.last_login.errors }}
+            <div class="col-md-6">
+              <label for="id_area" class="form-label">Área (opcional)</label>
+              {{ form.area }}
+              {% if form.area.errors %}<div class="invalid-feedback d-block">{{ form.area.errors|striptags }}</div>{% endif %}
             </div>
-            <div class="mb-3">
-                <label for="sesiones_activas" class="form-label">Sesiones Activas (Lectura)</label>
-                {{ form.sesiones_activas }}
-                {{ form.sesiones_activas.errors }}
+          </div>
+
+          <!-- Solo lectura (no se envían si están disabled; preferible readonly) -->
+          <div class="section-title mt-2">Solo lectura</div>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="id_last_login" class="form-label">Último acceso</label>
+              {{ form.last_login }}
             </div>
-            <!--Metadatos-->
-            <h4>Opcional</h4>
-            <div class="mb-3">
-                <label for="area" class="form-label">Area (Opcional)</label>
-                {{ form.area }}
-                {{ form.area.errors }}
+            <div class="col-md-6">
+              <label for="id_sesiones_activas" class="form-label">Sesiones activas</label>
+              {{ form.sesiones_activas }}
             </div>
-            <div class="mb-3">
-                <label for="observaciones" class="form-label  d-block">Observaciones (Opcional)</label>
-                {{ form.observaciones }}
-                {{ form.observaciones.errors }}
-            </div>
-            <div>
-                <button type="submit" class="btn btn-primary mt-3">Guardar Usuario</button>
-            </div>
+          </div>
+
+          <!-- Observaciones -->
+          <div class="section-title mt-2">Observaciones (opcional)</div>
+          <div class="mb-2">
+            <label for="id_observaciones" class="form-label d-block">Observaciones</label>
+            {{ form.observaciones }}
+            {% if form.observaciones.errors %}<div class="invalid-feedback d-block">{{ form.observaciones.errors|striptags }}</div>{% endif %}
+            <div class="form-text">Máx. 240 caracteres. <span id="count_obs" class="counter">0/240</span></div>
+          </div>
+
+          <div class="d-flex gap-2 justify-content-end mt-2">
+            <a href="{% url 'usuarioLista' %}" class="btn btn-outline">Cancelar</a>
+            <button type="submit" class="btn btn-gold" id="btnGuardar">Guardar usuario</button>
+          </div>
         </form>
+      </div>
     </div>
-    <footer>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-        <!--Mensaje de SweetAlert de exito o error según resultado del formulario-->
-        {% if messages %}
-            {% for message in messages %}
-                <script>
-                Swal.fire({
-                    icon: "{% if message.tags == 'success' %}success{% elif message.tags == 'error' %}error{% else %}info{% endif %}",
-                    title: "{% if message.tags == 'success' %}¡Exito!{% elif message.tags == 'error' %}¡Error!{% else %}Info{% endif %}",
-                    text: "{{ message|escapejs }}",
-                    showConfirmButton: false,
-                    timer: 2500
-                }).then(() => {
-                    {% if message.tags == 'success' %}
-                    window.location.href = {% url 'usuarioLista' %}
-                    {% endif %}
-                });
-                </script>   
-            {% endfor %}
-        {% endif %}
-    </footer>
+  </div>
+
+  <script>
+    (function(){
+      const form   = document.getElementById('formAddUsuario');
+      const btn    = document.getElementById('btnGuardar');
+
+      const username = document.getElementById('id_username');
+      const email    = document.getElementById('id_email');
+      const firstN   = document.getElementById('id_first_name');
+      const lastN    = document.getElementById('id_last_name');
+      const tel      = document.getElementById('id_telefono');
+      const rol      = document.getElementById('id_rol');
+      const estado   = document.getElementById('id_estado');
+      const mfa      = document.getElementById('id_mfa_habilitado');
+      const lastLog  = document.getElementById('id_last_login');
+      const sesiones = document.getElementById('id_sesiones_activas');
+      const obs      = document.getElementById('id_observaciones');
+      const cObs     = document.getElementById('count_obs');
+
+      // Helpers
+      const normalizeSpaces = v => (v || '').replace(/\s+/g,' ').trim();
+      const titleCase = s => normalizeSpaces(s).toLowerCase().replace(/(^|\s)\S/g, c => c.toUpperCase());
+      const updateCounter = () => { if (obs && cObs) cObs.textContent = `${(obs.value||'').length}/240`; };
+
+      // Atributos/estilos mínimos
+      function ensureAttrs(){
+        [username,email,firstN,lastN,tel,obs].forEach(el=> el && el.classList.add('form-control'));
+        [rol,estado].forEach(el=> el && el.classList.add('form-select'));
+
+        if (username){
+          username.setAttribute('required',''); username.setAttribute('minlength','3'); username.setAttribute('maxlength','30');
+          username.setAttribute('pattern','^[a-z0-9._-]{3,30}$'); username.setAttribute('placeholder','ej.: t.gonzalez');
+          username.style.textTransform='lowercase';
+        }
+        if (email){
+          email.setAttribute('required',''); email.setAttribute('type','email');
+          email.setAttribute('placeholder','ej.: nombre@dominio.com');
+        }
+        if (firstN){
+          firstN.setAttribute('required',''); firstN.setAttribute('minlength','2'); firstN.setAttribute('maxlength','60');
+          firstN.setAttribute('pattern','^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ ]{2,60}$'); firstN.setAttribute('placeholder','Nombres');
+        }
+        if (lastN){
+          lastN.setAttribute('required',''); lastN.setAttribute('minlength','2'); lastN.setAttribute('maxlength','60');
+          lastN.setAttribute('pattern','^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ ]{2,60}$'); lastN.setAttribute('placeholder','Apellidos');
+        }
+        if (tel){
+          tel.setAttribute('maxlength','20'); tel.setAttribute('placeholder','+56 9 1234 5678');
+          tel.setAttribute('pattern','^[0-9+() -]{6,20}$');
+        }
+        if (rol){ rol.setAttribute('required',''); }
+        if (estado){ estado.setAttribute('required',''); }
+
+        if (obs){
+          obs.setAttribute('maxlength','240');
+          if (obs.tagName.toLowerCase()==='textarea') obs.setAttribute('rows','3');
+        }
+
+        // Solo lectura: usa readonly en vez de disabled para que se envíen si el form los contiene
+        if (lastLog){ lastLog.setAttribute('readonly',''); lastLog.classList.add('form-control'); }
+        if (sesiones){ sesiones.setAttribute('readonly',''); sesiones.classList.add('form-control'); }
+      }
+      ensureAttrs();
+      updateCounter();
+
+      // Validación live
+      if (username){
+        username.addEventListener('input', ()=>{
+          username.value = username.value.toLowerCase();
+          const v = username.value;
+          if (!/^[a-z0-9._-]{3,30}$/.test(v)) username.setCustomValidity('3–30, minúsculas y . _ -');
+          else username.setCustomValidity('');
+        });
+        username.addEventListener('blur', ()=>{ username.value = normalizeSpaces(username.value.toLowerCase()); });
+      }
+      if (email){
+        email.addEventListener('blur', ()=>{ email.value = normalizeSpaces(email.value); });
+      }
+      if (firstN){
+        firstN.addEventListener('input', ()=>{
+          const v = normalizeSpaces(firstN.value);
+          if (!/^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ ]{2,60}$/.test(v)) firstN.setCustomValidity('Solo letras y espacios (2–60).');
+          else firstN.setCustomValidity('');
+        });
+        firstN.addEventListener('blur', ()=>{ firstN.value = titleCase(firstN.value); });
+      }
+      if (lastN){
+        lastN.addEventListener('input', ()=>{
+          const v = normalizeSpaces(lastN.value);
+          if (!/^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ ]{2,60}$/.test(v)) lastN.setCustomValidity('Solo letras y espacios (2–60).');
+          else lastN.setCustomValidity('');
+        });
+        lastN.addEventListener('blur', ()=>{ lastN.value = titleCase(lastN.value); });
+      }
+      if (tel){
+        tel.addEventListener('input', ()=>{
+          const v = tel.value;
+          if (v && !/^[0-9+() -]{6,20}$/.test(v)) tel.setCustomValidity('Teléfono inválido.');
+          else tel.setCustomValidity('');
+        });
+        tel.addEventListener('blur', ()=>{ tel.value = normalizeSpaces(tel.value); });
+      }
+      if (obs){
+        obs.addEventListener('input', ()=>{
+          updateCounter();
+          if ((obs.value||'').length > 240) obs.setCustomValidity('Máximo 240 caracteres.');
+          else obs.setCustomValidity('');
+        });
+        obs.addEventListener('blur', ()=>{ obs.value = normalizeSpaces(obs.value); updateCounter(); });
+      }
+
+      // Confirmación + anti-doble envío
+      let confirmed = false, submitting = false;
+      form.addEventListener('submit', function(e){
+        if (username) username.value = normalizeSpaces(username.value.toLowerCase());
+        if (email)    email.value = normalizeSpaces(email.value);
+        if (firstN)   firstN.value = titleCase(firstN.value);
+        if (lastN)    lastN.value = titleCase(lastN.value);
+        if (tel)      tel.value = normalizeSpaces(tel.value);
+        if (obs)      obs.value = normalizeSpaces(obs.value);
+
+        if (!confirmed){
+          e.preventDefault(); e.stopPropagation();
+
+          if (!form.checkValidity()){
+            Array.from(form.elements).forEach(el=>{
+              if (el.tagName && /INPUT|SELECT|TEXTAREA/.test(el.tagName)){
+                el.classList.toggle('is-invalid', !el.checkValidity());
+                el.addEventListener('input', ()=> el.classList.remove('is-invalid'), {once:true});
+              }
+            });
+            return;
+          }
+
+          Swal.fire({
+            icon: "question",
+            title: "¿Guardar usuario?",
+            showCancelButton: true,
+            confirmButtonText: "Sí, guardar",
+            cancelButtonText: "Cancelar"
+          }).then((res)=>{
+            if (res.isConfirmed){
+              confirmed = true;
+              if (!submitting){
+                submitting = true;
+                btn.disabled = true;
+                btn.textContent = 'Guardando...';
+                form.submit();
+              }
+            }
+          });
+          return;
+        }
+
+        if (!form.checkValidity()){ e.preventDefault(); e.stopPropagation(); return; }
+        if (submitting){ e.preventDefault(); e.stopPropagation(); return; }
+        submitting = true;
+        btn.disabled = true;
+        btn.textContent = 'Guardando...';
+      });
+    })();
+  </script>
+
 </body>
 </html>
