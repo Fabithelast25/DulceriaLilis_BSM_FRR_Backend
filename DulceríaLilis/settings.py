@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     'Panel_Usuarios',
     'Panel_Productos',
     'Panel_Proveedores',
+    'Inventario',
 ]
 
 MIDDLEWARE = [

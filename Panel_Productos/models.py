@@ -112,6 +112,9 @@ class Producto(models.Model):
             self.costo_promedio = (self.costo_estandar + self.precio_venta)/2
 
         super(Producto, self).save(*args, **kwargs)  # Llamamos al método save original
+    
+    def __str__(self):
+        return f"{self.nombre}"
 
     class Meta:
         db_table = "producto" #Nombre de la tabla cuando se cree

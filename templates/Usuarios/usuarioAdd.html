@@ -56,6 +56,14 @@
       background:#fff; color:var(--brand-red); border:2px solid var(--brand-red); border-radius:10px; padding:9px 14px; font-weight:800;
     }
     .btn-outline:hover{ background:var(--brand-red-50); }
+    /* Errores Django */
+    .errorlist{list-style:none;margin:8px 0 0;padding:0}
+    .errorlist li{
+      background:#fde8ea;border:1px solid #f3bac1;color:#8f0c1f;padding:.45rem .6rem;border-radius:8px;font-weight:700
+    }
+    .non-field-errors{
+      margin-bottom:12px;background:#fff3cd;border:1px solid #ffe69c;color:#7a5d00;padding:.6rem .8rem;border-radius:10px;font-weight:700
+    }
 
     @media (max-width:640px){ .card-header{ flex-direction:column; align-items:flex-start; gap:8px; } }
   </style>
@@ -86,30 +94,30 @@
             <div class="col-md-6">
               <label for="id_username" class="form-label">Username</label>
               {{ form.username }}
-              {% if form.username.errors %}<div class="invalid-feedback d-block">{{ form.username.errors|striptags }}</div>{% endif %}
+              {{ form.username.errors }}
               <div class="form-text">3–30, minúsculas; letras, números, punto, guion y guion bajo.</div>
             </div>
             <div class="col-md-6">
               <label for="id_email" class="form-label">Email</label>
               {{ form.email }}
-              {% if form.email.errors %}<div class="invalid-feedback d-block">{{ form.email.errors|striptags }}</div>{% endif %}
+              {{ form.email.errors }}
             </div>
             <div class="col-md-6">
               <label for="id_first_name" class="form-label">Nombres</label>
               {{ form.first_name }}
-              {% if form.first_name.errors %}<div class="invalid-feedback d-block">{{ form.first_name.errors|striptags }}</div>{% endif %}
+              {{ form.first_name.errors }}
               <div class="form-text">2–60 caracteres. Solo letras y espacios.</div>
             </div>
             <div class="col-md-6">
               <label for="id_last_name" class="form-label">Apellidos</label>
               {{ form.last_name }}
-              {% if form.last_name.errors %}<div class="invalid-feedback d-block">{{ form.last_name.errors|striptags }}</div>{% endif %}
+              {{ form.last_name.errors }}
               <div class="form-text">2–60 caracteres. Solo letras y espacios.</div>
             </div>
             <div class="col-md-6">
               <label for="id_telefono" class="form-label">Teléfono (opcional)</label>
               {{ form.telefono }}
-              {% if form.telefono.errors %}<div class="invalid-feedback d-block">{{ form.telefono.errors|striptags }}</div>{% endif %}
+              {{ form.telefono.errors }}
               <div class="form-text">Formato sugerido: +56 9 1234 5678</div>
             </div>
           </div>
@@ -120,49 +128,48 @@
             <div class="col-md-6">
               <label for="id_rol" class="form-label">Rol</label>
               {{ form.rol }}
-              {% if form.rol.errors %}<div class="invalid-feedback d-block">{{ form.rol.errors|striptags }}</div>{% endif %}
+              {{ form.rol.errors }}
             </div>
             <div class="col-md-6">
               <label for="id_estado" class="form-label">Estado</label>
               {{ form.estado }}
-              {% if form.estado.errors %}<div class="invalid-feedback d-block">{{ form.estado.errors|striptags }}</div>{% endif %}
+              {{ form.estado.errors }}
             </div>
             <div class="col-md-6 d-flex align-items-center">
               <div>
                 <label for="id_mfa_habilitado" class="form-label d-block">MFA habilitado</label>
                 {{ form.mfa_habilitado }}
-                {% if form.mfa_habilitado.errors %}<div class="invalid-feedback d-block">{{ form.mfa_habilitado.errors|striptags }}</div>{% endif %}
+                {{ form.mfa_habilitado.errors }}
               </div>
             </div>
             <div class="col-md-6">
               <label for="id_area" class="form-label">Área (opcional)</label>
               {{ form.area }}
-              {% if form.area.errors %}<div class="invalid-feedback d-block">{{ form.area.errors|striptags }}</div>{% endif %}
+              {{ form.area.errors }}
             </div>
           </div>
 
           <!-- Solo lectura (no se envían si están disabled; preferible readonly) -->
-          <div class="section-title mt-2">Solo lectura</div>
-          <div class="row g-3">
+          <div class="section-title mt-4">Solo lectura</div>
+          <div class="row g-3 mt-2">
             <div class="col-md-6">
               <label for="id_last_login" class="form-label">Último acceso</label>
               {{ form.last_login }}
             </div>
             <div class="col-md-6">
-              <label for="id_sesiones_activas" class="form-label">Sesiones activas</label>
+              <label for="id_sesiones_activas" class="form-label d-block">Sesiones activas</label>
               {{ form.sesiones_activas }}
-            </div>
           </div>
 
           <!-- Observaciones -->
-          <div class="section-title mt-2">Observaciones (opcional)</div>
+          <div class="section-title mt-4">Observaciones (opcional)</div>
           <div class="mb-2">
             <label for="id_observaciones" class="form-label d-block">Observaciones</label>
             {{ form.observaciones }}
-            {% if form.observaciones.errors %}<div class="invalid-feedback d-block">{{ form.observaciones.errors|striptags }}</div>{% endif %}
+            {{ form.observaciones.errors }}
             <div class="form-text">Máx. 240 caracteres. <span id="count_obs" class="counter">0/240</span></div>
           </div>
-
+          </div>
           <div class="d-flex gap-2 justify-content-end mt-2">
             <a href="{% url 'usuarioLista' %}" class="btn btn-outline">Cancelar</a>
             <button type="submit" class="btn btn-gold" id="btnGuardar">Guardar usuario</button>
@@ -173,125 +180,9 @@
   </div>
 
   <script>
-    (function(){
-      const form   = document.getElementById('formAddUsuario');
-      const btn    = document.getElementById('btnGuardar');
-
-      const username = document.getElementById('id_username');
-      const email    = document.getElementById('id_email');
-      const firstN   = document.getElementById('id_first_name');
-      const lastN    = document.getElementById('id_last_name');
-      const tel      = document.getElementById('id_telefono');
-      const rol      = document.getElementById('id_rol');
-      const estado   = document.getElementById('id_estado');
-      const mfa      = document.getElementById('id_mfa_habilitado');
-      const lastLog  = document.getElementById('id_last_login');
-      const sesiones = document.getElementById('id_sesiones_activas');
-      const obs      = document.getElementById('id_observaciones');
-      const cObs     = document.getElementById('count_obs');
-
-      // Helpers
-      const normalizeSpaces = v => (v || '').replace(/\s+/g,' ').trim();
-      const titleCase = s => normalizeSpaces(s).toLowerCase().replace(/(^|\s)\S/g, c => c.toUpperCase());
-      const updateCounter = () => { if (obs && cObs) cObs.textContent = `${(obs.value||'').length}/240`; };
-
-      // Atributos/estilos mínimos
-      function ensureAttrs(){
-        [username,email,firstN,lastN,tel,obs].forEach(el=> el && el.classList.add('form-control'));
-        [rol,estado].forEach(el=> el && el.classList.add('form-select'));
-
-        if (username){
-          username.setAttribute('required',''); username.setAttribute('minlength','3'); username.setAttribute('maxlength','30');
-          username.setAttribute('pattern','^[a-z0-9._-]{3,30}$'); username.setAttribute('placeholder','ej.: t.gonzalez');
-          username.style.textTransform='lowercase';
-        }
-        if (email){
-          email.setAttribute('required',''); email.setAttribute('type','email');
-          email.setAttribute('placeholder','ej.: nombre@dominio.com');
-        }
-        if (firstN){
-          firstN.setAttribute('required',''); firstN.setAttribute('minlength','2'); firstN.setAttribute('maxlength','60');
-          firstN.setAttribute('pattern','^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ ]{2,60}$'); firstN.setAttribute('placeholder','Nombres');
-        }
-        if (lastN){
-          lastN.setAttribute('required',''); lastN.setAttribute('minlength','2'); lastN.setAttribute('maxlength','60');
-          lastN.setAttribute('pattern','^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ ]{2,60}$'); lastN.setAttribute('placeholder','Apellidos');
-        }
-        if (tel){
-          tel.setAttribute('maxlength','20'); tel.setAttribute('placeholder','+56 9 1234 5678');
-          tel.setAttribute('pattern','^[0-9+() -]{6,20}$');
-        }
-        if (rol){ rol.setAttribute('required',''); }
-        if (estado){ estado.setAttribute('required',''); }
-
-        if (obs){
-          obs.setAttribute('maxlength','240');
-          if (obs.tagName.toLowerCase()==='textarea') obs.setAttribute('rows','3');
-        }
-
-        // Solo lectura: usa readonly en vez de disabled para que se envíen si el form los contiene
-        if (lastLog){ lastLog.setAttribute('readonly',''); lastLog.classList.add('form-control'); }
-        if (sesiones){ sesiones.setAttribute('readonly',''); sesiones.classList.add('form-control'); }
-      }
-      ensureAttrs();
-      updateCounter();
-
-      // Validación live
-      if (username){
-        username.addEventListener('input', ()=>{
-          username.value = username.value.toLowerCase();
-          const v = username.value;
-          if (!/^[a-z0-9._-]{3,30}$/.test(v)) username.setCustomValidity('3–30, minúsculas y . _ -');
-          else username.setCustomValidity('');
-        });
-        username.addEventListener('blur', ()=>{ username.value = normalizeSpaces(username.value.toLowerCase()); });
-      }
-      if (email){
-        email.addEventListener('blur', ()=>{ email.value = normalizeSpaces(email.value); });
-      }
-      if (firstN){
-        firstN.addEventListener('input', ()=>{
-          const v = normalizeSpaces(firstN.value);
-          if (!/^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ ]{2,60}$/.test(v)) firstN.setCustomValidity('Solo letras y espacios (2–60).');
-          else firstN.setCustomValidity('');
-        });
-        firstN.addEventListener('blur', ()=>{ firstN.value = titleCase(firstN.value); });
-      }
-      if (lastN){
-        lastN.addEventListener('input', ()=>{
-          const v = normalizeSpaces(lastN.value);
-          if (!/^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ ]{2,60}$/.test(v)) lastN.setCustomValidity('Solo letras y espacios (2–60).');
-          else lastN.setCustomValidity('');
-        });
-        lastN.addEventListener('blur', ()=>{ lastN.value = titleCase(lastN.value); });
-      }
-      if (tel){
-        tel.addEventListener('input', ()=>{
-          const v = tel.value;
-          if (v && !/^[0-9+() -]{6,20}$/.test(v)) tel.setCustomValidity('Teléfono inválido.');
-          else tel.setCustomValidity('');
-        });
-        tel.addEventListener('blur', ()=>{ tel.value = normalizeSpaces(tel.value); });
-      }
-      if (obs){
-        obs.addEventListener('input', ()=>{
-          updateCounter();
-          if ((obs.value||'').length > 240) obs.setCustomValidity('Máximo 240 caracteres.');
-          else obs.setCustomValidity('');
-        });
-        obs.addEventListener('blur', ()=>{ obs.value = normalizeSpaces(obs.value); updateCounter(); });
-      }
-
       // Confirmación + anti-doble envío
       let confirmed = false, submitting = false;
       form.addEventListener('submit', function(e){
-        if (username) username.value = normalizeSpaces(username.value.toLowerCase());
-        if (email)    email.value = normalizeSpaces(email.value);
-        if (firstN)   firstN.value = titleCase(firstN.value);
-        if (lastN)    lastN.value = titleCase(lastN.value);
-        if (tel)      tel.value = normalizeSpaces(tel.value);
-        if (obs)      obs.value = normalizeSpaces(obs.value);
-
         if (!confirmed){
           e.preventDefault(); e.stopPropagation();
 
@@ -331,7 +222,6 @@
         btn.disabled = true;
         btn.textContent = 'Guardando...';
       });
-    })();
   </script>
 
 </body>

@@ -10,6 +10,9 @@ from Panel_Usuarios import views as vista
 # Importaciones Proveedores
 from Panel_Proveedores import views as vista_proveedores
 
+#Importaciones Inventario
+from Inventario import views as vista_inventario
+
 urlpatterns = [
     path('admin/', admin.site.urls),
 
@@ -92,5 +95,9 @@ urlpatterns = [
     # Exportaciones
     path('export/excel/<str:resource>/', views.export_excel, name='export_excel'),
     path('export/csv/<str:resource>/', views.export_csv, name='export_csv'),
+    
+    #Inventario
+    path('inventarioAdd/', vista_inventario.movimientoAdd, name='inventarioAdd'),
+    path('inventarioLista/', vista_inventario.inventarioLista, name='inventarioLista'),
 ]
 
