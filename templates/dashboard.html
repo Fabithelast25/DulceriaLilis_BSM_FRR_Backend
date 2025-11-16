@@ -57,7 +57,7 @@
     /* ===== Quick actions (botones grandes rojos) ===== */
 .quick-actions{
   display:grid;
-  grid-template-columns: repeat(3, minmax(220px, 1fr));
+  grid-template-columns: repeat(4, minmax(220px, 1fr));
   gap:14px;
   margin-bottom:18px;
 }
@@ -182,6 +182,9 @@
       </a>
       <a class="qa providers" href="{% url 'lista_proveedores' %}">
         <i class="bi bi-truck"></i> <span>Panel de Proveedores</span>
+      </a>
+      <a class="qa inventario just" href="{% url 'inventarioLista' %}">
+        <i class="bi bi-boxes"></i> <span>Inventario</span>
       </a>
     </nav>
 

@@ -99,5 +99,7 @@ urlpatterns = [
     #Inventario
     path('inventarioAdd/', vista_inventario.movimientoAdd, name='inventarioAdd'),
     path('inventarioLista/', vista_inventario.inventarioLista, name='inventarioLista'),
+    path('inventarioLista/delete/<int:id>/', vista_inventario.movimientoDelete, name='inventarioDelete'),
+    path('inventarioUpdate/<int:id>/', vista_inventario.movimientoUpdate, name='inventarioUpdate'),
 ]
 

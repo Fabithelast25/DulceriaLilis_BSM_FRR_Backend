@@ -91,7 +91,6 @@ def usuarioUpdate(request, id):
         if form.is_valid():
             form.save()
             messages.success(request, "Usuario actualizado correctamente.")
-            return redirect('usuarioUpdate', id=id)
         else:
             messages.error(request, "Hubo un error al actualizar, verifique que los campos se hayan ingresado correctamente")
             print(form.errors)

@@ -85,7 +85,7 @@
     .ingreso{ background:#e8f8ea; color:#0f5a14; border:1px solid #c7efcd; }
     .ajuste{ background:#fff9db; color:#6a5600; border:1px solid #ffe08a; }
     .salida{ background:#ffe7e5; color:#6b1204; border:1px solid #ffb3ab; }
-    .transferencia{ background:#ffe7e5; color:#075380; border:1px solid #ffb3ab; }
+    .transferencia{ background:#e5f0ff; color:#075380; border:1px solid #abe4ff; }
     .badge-soft{ display:inline-block; padding:6px 10px; border-radius:14px; font-weight:700; font-size:.8rem; background:#eef2ff; color:#0b3a9b; border:1px solid #d7e0ff; }
     @media (max-width: 992px){ .toolbar{ grid-template-columns: 1fr 1fr 1fr 1fr; } }
     @media (max-width: 640px){ .toolbar{ grid-template-columns: 1fr; } .card-header{ flex-direction:column; align-items:flex-start; gap:8px; } }
@@ -164,9 +164,9 @@
                   {% elif m.tipo == 'S'%}
                   <span class="tipo salida">Salida</span>
                   {% elif m.tipo == 'T'%}
-                  <span class="tipo salida">Transferencia</span>
+                  <span class="tipo transferencia">Transferencia</span>
                   {% elif m.tipo == 'A'%}
-                  <span class="tipo salida">Ajustes</span>
+                  <span class="tipo ajuste">Ajustes</span>
                   {% else %}
                   <span class="badge-soft">N/D</span>
                   {% endif %}
@@ -199,9 +199,9 @@
                 <td>{{ m.doc_referencia }}</td>
                 <td class="text-center">
                   <div class="d-inline-flex gap-2">
-                    <a href="#" class="btn btn-sm btn-edit">Editar</a>
+                    <a href="{% url 'inventarioUpdate' m.id %}" class="btn btn-sm btn-edit">Editar</a>
                     <button class="btn btn-sm btn-delete"
-                            data-url="#"
+                            data-url="{% url 'inventarioDelete' m.id %}"
                             onclick="confirmarEliminacion(this)">
                       Eliminar
                     </button>
@@ -227,8 +227,8 @@
       const url = btn.getAttribute('data-url');
       Swal.fire({
         icon: 'warning',
-        title: '¿Eliminar usuario?',
-        text: "Esta acción eliminará al usuario de forma permanente.",
+        title: '¿Eliminar movimiento?',
+        text: "Esta acción eliminará el movimiento de forma permanente.",
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
@@ -239,22 +239,13 @@
           Swal.fire({
             icon: "success",
             title: "¡Eliminado!",
-            text: "Usuario eliminado de la base de datos",
+            text: "Movimiento eliminado de la base de datos",
             showConfirmButton: false,
             timer: 1500
           }).then(() => { window.location.href = url; });
         }
       });
     }
-
-    // Pequeña validación del filtro de nombre: recorta espacios y evita enviar si no cambia nada
-    (function(){
-      const form = document.getElementById('form_filtros');
-      const fNombres = document.getElementById('f_nombres');
-      form.addEventListener('submit', (e)=>{
-        if (fNombres){ fNombres.value = (fNombres.value || '').replace(/\s+/g,' ').trim(); }
-      });
-    })();
   </script>
 
 </body>
