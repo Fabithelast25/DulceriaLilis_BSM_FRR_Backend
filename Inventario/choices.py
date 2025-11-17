@@ -2,5 +2,6 @@ tipos = (
     ("I", "Ingreso"),
     ("S", "Salida"),
     ("T", "Transferencia"),
-    ("A", "Ajustes")
+    ("A", "Ajustes"),
+    ("D", "Devoluciones"),
 )

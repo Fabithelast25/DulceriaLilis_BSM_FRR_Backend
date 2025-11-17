@@ -86,13 +86,13 @@
     .ajuste{ background:#fff9db; color:#6a5600; border:1px solid #ffe08a; }
     .salida{ background:#ffe7e5; color:#6b1204; border:1px solid #ffb3ab; }
     .transferencia{ background:#e5f0ff; color:#075380; border:1px solid #abe4ff; }
+    .transferencia{ background:#e5fdff; color:#078080; border:1px solid #abf9ff; }
     .badge-soft{ display:inline-block; padding:6px 10px; border-radius:14px; font-weight:700; font-size:.8rem; background:#eef2ff; color:#0b3a9b; border:1px solid #d7e0ff; }
     @media (max-width: 992px){ .toolbar{ grid-template-columns: 1fr 1fr 1fr 1fr; } }
     @media (max-width: 640px){ .toolbar{ grid-template-columns: 1fr; } .card-header{ flex-direction:column; align-items:flex-start; gap:8px; } }
   </style>
 </head>
 <body>
-
   {% include 'Inventario/navbarInventario.html' %}
   <div class="page-wrap">
     <div class="card">
@@ -101,41 +101,47 @@
           <span class="mark"></span>
           <span>Movimientos</span>
         </div>
+                      <!-- FILTROS -->
+      <div class="filters mb-3 d-flex gap-3 align-items-end flex-wrap">
+        <!-- Busqueda general -->
+        <div>
+          <label>Buscar</label>
+          <input id="searchBox" type="text" class="form-control" placeholder="SKU, producto, proveedor...">
+        </div>
+
+        <!-- Fecha desde -->
+        <div>
+          <label>Fecha desde</label>
+          <input id="fechaDesde" type="date" class="form-control">
+        </div>
+
+        <!-- Fecha hasta -->
+        <div>
+          <label>Fecha hasta</label>
+          <input id="fechaHasta" type="date" class="form-control">
+        </div>
+
+        <!-- Tipo -->
+        <div>
+          <label>Tipo</label>
+          <select id="tipoFiltro" class="form-control">
+            <option value="">Todos</option>
+            <option value="Ingreso">Ingreso</option>
+            <option value="Salida">Salida</option>
+            <option value="Transferencia">Transferencia</option>
+            <option value="Ajustes">Ajustes</option>
+          </select>
+        </div>
+      </div>
         <div class="d-flex gap-2">
           <a class="btn btn-gold" href="{% url 'inventarioAdd' %}">Añadir Movimiento</a>
         </div>
+        
       </div>
 
+
+
       <div class="body">
-
-        <!-- 🔹 FORMULARIO DE FILTROS -->
-        <form method="get" class="toolbar" id="form_filtros">
-          <input type="text" name="nombres" id="f_nombres" class="form-control" placeholder="Buscar por nombre" value="{{ nombres|default_if_none:'' }}"/>
-
-          <select name="estado" class="form-select" id="f_estado">
-            <option value="None" {% if estado == "None" or not estado %}selected{% endif %}>Todos los estados</option>
-            {% for id, est in estados %}
-              <option value="{{ id }}" {% if id|stringformat:"s" == estado %}selected{% endif %}>{{ est }}</option>
-            {% endfor %}
-          </select>
-
-          <select name="rol" class="form-select" id="f_rol">
-            <option value="">Todos los roles</option>
-            {% for r in roles %}
-              <option value="{{ r.id }}" {% if r.id|stringformat:"s" == rol %}selected{% endif %}>{{ r.nombre }}</option>
-            {% endfor %}
-          </select>
-
-          <select name="area" class="form-select" id="f_area">
-            <option value="">Todas las áreas</option>
-            {% for a in areas %}
-              <option value="{{ a.id }}" {% if a.id|stringformat:"s" == area %}selected{% endif %}>{{ a.nombre }}</option>
-            {% endfor %}
-          </select>
-
-          <button type="submit" class="btn btn-outline">Filtrar</button>
-        </form>
-
         <!-- Tabla -->
         <div class="table-wrap">
           <table class="table mb-0">
@@ -157,7 +163,7 @@
             <tbody>
               {% for m in movimientos %}
               <tr>
-                <td>{{ m.fecha }}</td>
+                <td data-fecha="{{ m.fecha|date:'Y-m-d H:i:s' }}">{{ m.fecha }}</td>
                 <td>
                   {% if m.tipo == 'I' %}
                   <span class="tipo ingreso">Ingreso</span>
@@ -247,6 +253,65 @@
       });
     }
   </script>
+<script>
+  function filtrarTabla() {
+    const texto = searchBox.value.toLowerCase().trim();
+    const desde = fechaDesde.value ? new Date(fechaDesde.value + "T00:00:00") : null;
+    const hasta = fechaHasta.value ? new Date(fechaHasta.value + "T23:59:59") : null;
+    const tipo = tipoFiltro.value.toLowerCase();
+
+    const filas = document.querySelectorAll("table tbody tr");
+
+    filas.forEach(fila => {
+      const fechaISO = fila.children[0].dataset.fecha;
+      const fechaMovimiento = fechaISO ? new Date(fechaISO.replace(" ", "T")) : null;
+
+      const tipoTexto = fila.children[1].innerText.trim().toLowerCase();
+      const sku = fila.children[2].textContent.toLowerCase();
+      const proveedor = fila.children[3].textContent.toLowerCase();
+
+      let mostrar = true;
+
+      // --- BÚSQUEDA GENERAL ---
+      if (texto) {
+        if (
+          !sku.includes(texto) &&
+          !proveedor.includes(texto)
+        ) {
+          mostrar = false;
+        }
+      }
+
+      // --- FILTRO POR TIPO ---
+      if (tipo && !tipoTexto.includes(tipo)) {
+        mostrar = false;
+      }
+
+      // --- FILTRO FECHAS ---
+      if ((desde || hasta) && fechaMovimiento) {
+        const ts = fechaMovimiento.getTime();
+
+        if (desde && ts < desde.getTime()) mostrar = false;
+        if (hasta && ts > hasta.getTime()) mostrar = false;
+      }
+
+      fila.style.display = mostrar ? "" : "none";
+    });
+  }
+</script>
+
+<script>
+  // EVENTOS PARA ACTIVAR FILTROS
+  const searchBox = document.getElementById("searchBox");
+  const fechaDesde = document.getElementById("fechaDesde");
+  const fechaHasta = document.getElementById("fechaHasta");
+  const tipoFiltro = document.getElementById("tipoFiltro");
+
+  searchBox.addEventListener("input", filtrarTabla);
+  fechaDesde.addEventListener("change", filtrarTabla);
+  fechaHasta.addEventListener("change", filtrarTabla);
+  tipoFiltro.addEventListener("change", filtrarTabla);
+</script>
 
 </body>
 </html>

@@ -57,6 +57,14 @@
       background:#fff; color:var(--brand-red); border:2px solid var(--brand-red); border-radius:10px; padding:9px 14px; font-weight:800;
     }
     .btn-outline:hover{ background:var(--brand-red-50); }
+    /* Errores Django */
+    .errorlist{list-style:none;margin:8px 0 0;padding:0}
+    .errorlist li{
+      background:#fde8ea;border:1px solid #f3bac1;color:#8f0c1f;padding:.45rem .6rem;border-radius:8px;font-weight:700
+    }
+    .non-field-errors{
+      margin-bottom:12px;background:#fff3cd;border:1px solid #ffe69c;color:#7a5d00;padding:.6rem .8rem;border-radius:10px;font-weight:700
+    }
 
     @media (max-width:640px){ .card-header{ flex-direction:column; align-items:flex-start; gap:8px; } }
   </style>
@@ -117,6 +125,7 @@
                         </option>
                     {% endfor %}
                 </select>
+                {{ form.producto.errors }}
             </div>
 
             <div class="col-md-6">
@@ -191,12 +200,12 @@
                 <label for="id_observaciones" class="form-label d-block">Observaciones (Opcional)</label>
                 {{ form.observaciones }}
                 {{ form.observaciones.errors }}
-                <div class="form-text">Máx. 240 caracteres. <span id="count_obs" class="counter">0/240</span></div>
+                <div class="form-text">Máx. 500 caracteres.</div>
                 </div>
             </div>
             <div class="d-flex gap-2 justify-content-end mt-2">
-                <a href="{% url 'usuarioLista' %}" class="btn btn-outline">Cancelar</a>
-                <button type="submit" class="btn btn-gold" id="btnGuardar">Guardar usuario</button>
+                <a href="{% url 'inventarioLista' %}" class="btn btn-outline">Cancelar</a>
+                <button type="submit" class="btn btn-gold" id="btnGuardar">Guardar movimiento</button>
             </div>
         </form>
       </div>
@@ -242,6 +251,39 @@ document.addEventListener("DOMContentLoaded", function () {
     selectProducto.addEventListener("change", actualizarCampos);
     actualizarCampos();
 });
+
+  document.getElementById("btnGuardar").addEventListener("click", function () {
+      Swal.fire({
+          icon: "warning",
+          title: "¿Registrar cambios?",
+          text: "Se guardará la información del movimiento.",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Sí, guardar",
+          cancelButtonText: "Cancelar"
+      }).then((result) => {
+          if (result.isConfirmed) {
+              document.getElementById("formAddMovimiento").submit();
+          }
+      });
+  });
+  {% if messages %}
+      {% for message in messages %}
+          Swal.fire({
+              icon: "{% if message.tags == 'success' %}success{% elif message.tags == 'error' %}error{% else %}info{% endif %}",
+              title: "{% if message.tags == 'success' %}¡Exito!{% elif message.tags == 'error' %}¡Error!{% else %}¡Info!{% endif %}",
+              text: "{{ message }}",
+              showConfirmButton: false,
+              timer: 2000
+          }).then(() => {
+              {% if message.tags == 'success' %}
+              window.location.href = {% url 'inventarioLista' %}
+              {% endif %}
+          });
+      {% endfor %}
+  {% endif %}
+
 </script>
 
 </body>

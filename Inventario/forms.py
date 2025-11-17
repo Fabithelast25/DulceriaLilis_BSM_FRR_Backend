@@ -5,6 +5,9 @@ from Panel_Productos.models import Producto
 from Panel_Proveedores.models import Proveedor
 from django.utils import timezone
 from django.utils.safestring import mark_safe
+from django.core.exceptions import ValidationError
+from datetime import date
+from .validators import cantidad_positivo
 """ #Datos movimiento
     fecha = models.DateTimeField(auto_now_add=True)
     estado = models.CharField(max_length=1, choices=tipos, default="I")
@@ -34,7 +37,7 @@ class movimientoForm(forms.ModelForm):
     #Datos movimiento
     fecha = forms.DateTimeField(initial= timezone.now(), widget=forms.DateTimeInput(attrs={'class':'form-control','readonly':'readonly'}))
     tipo = forms.CharField(widget=forms.Select(choices=tipos, attrs={'class':'form-select'}))
-    cantidad = forms.CharField(widget=forms.NumberInput(attrs={'class':'form-control'}))
+    cantidad = forms.CharField(max_length=6, validators=[cantidad_positivo], widget=forms.NumberInput(attrs={'class':'form-control'}))
     
     #Foraneo
     proveedor = forms.ModelChoiceField(queryset=Proveedor.objects.all(),
@@ -49,13 +52,13 @@ class movimientoForm(forms.ModelForm):
     control_por_serie = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={'class':'form-check-input', 'disabled':'disabled'}))
     perishable = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={'class':'form-check-input', 'disabled':'disabled'}))
 
-    lote = forms.CharField(required=False, max_length=10, widget=forms.TextInput(attrs={'class':'form-control', 'disabled':'disabled'}))
-    serie = forms.CharField(required=False, max_length=10, widget=forms.TextInput(attrs={'class':'form-control', 'disabled':'disabled'}))
+    lote = forms.CharField(required=False, max_length=10, widget=forms.TextInput(attrs={'class':'form-control', 'disabled':'disabled', 'placeholder':'Lote 1'}))
+    serie = forms.CharField(required=False, max_length=10, widget=forms.TextInput(attrs={'class':'form-control', 'disabled':'disabled', 'placeholder':'Serie 1'}))
     fechaVencimiento = forms.DateField(required=False, widget=forms.DateInput(attrs={'class':'form-control', 'type':'date', 'disabled':'disabled'}))
     
     #Referencias/Observaciones
-    doc_referencia  = forms.CharField(max_length=10, widget=forms.TextInput(attrs={'class':'form-control'}))
-    motivo = forms.CharField(max_length=50, widget=forms.TextInput(attrs={'class':'form-control'}))
+    doc_referencia  = forms.CharField(max_length=10, widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'DOC-001'}))
+    motivo = forms.CharField(max_length=50, widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Reajuste, ingreso de nuevo lote, etc.'}))
     observaciones = forms.CharField(required=False, widget=forms.Textarea(attrs={'class':'form-control', 'placeholder':'(Max: 500 carácteres)'}), max_length=500)
     
     class Meta:
@@ -69,7 +72,7 @@ class movimientoForm(forms.ModelForm):
         productos = Producto.objects.all()
 
         # Crear las opciones manualmente con data-*
-        opciones = [("", "Seleccione un producto")]  # placeholder REAL
+        opciones = []  # placeholder REAL
 
         for p in productos:
             opciones.append((
@@ -81,7 +84,7 @@ class movimientoForm(forms.ModelForm):
         self.fields['producto'].choices = opciones
 
         # Agregamos data-* a cada opción desde el widget
-        self.fields['producto'].widget.attrs.update({'class': 'form-select', 'id': 'id_producto'})
+        self.fields['producto'].widget.attrs.update({'class': 'form-select', 'id': 'id_producto', 'placeholder':'Seleccione un producto'})
         self.fields['producto'].widget.choices = opciones
 
         # Guardamos los datos para procesarlos en el template
@@ -93,6 +96,12 @@ class movimientoForm(forms.ModelForm):
             }
             for p in productos
         }
+    def clean_fechaVencimiento(self):
+        fecha = self.cleaned_data.get('fechaVencimiento')
+        if fecha and fecha < date.today():
+            raise ValidationError("La fecha de vencimiento no puede ser anterior a hoy.")
+        return fecha
+
 
             
         

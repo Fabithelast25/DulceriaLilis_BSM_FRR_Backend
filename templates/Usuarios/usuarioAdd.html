@@ -170,7 +170,7 @@
             <div class="form-text">Máx. 240 caracteres. <span id="count_obs" class="counter">0/240</span></div>
           </div>
           </div>
-          <div class="d-flex gap-2 justify-content-end mt-2">
+          <div class="d-flex gap-2 justify-content-center mt-2">
             <a href="{% url 'usuarioLista' %}" class="btn btn-outline">Cancelar</a>
             <button type="submit" class="btn btn-gold" id="btnGuardar">Guardar usuario</button>
           </div>
@@ -179,50 +179,39 @@
     </div>
   </div>
 
-  <script>
-      // Confirmación + anti-doble envío
-      let confirmed = false, submitting = false;
-      form.addEventListener('submit', function(e){
-        if (!confirmed){
-          e.preventDefault(); e.stopPropagation();
-
-          if (!form.checkValidity()){
-            Array.from(form.elements).forEach(el=>{
-              if (el.tagName && /INPUT|SELECT|TEXTAREA/.test(el.tagName)){
-                el.classList.toggle('is-invalid', !el.checkValidity());
-                el.addEventListener('input', ()=> el.classList.remove('is-invalid'), {once:true});
-              }
-            });
-            return;
-          }
-
+<script>
+    document.getElementById("btnGuardar").addEventListener("click", function () {
           Swal.fire({
-            icon: "question",
-            title: "¿Guardar usuario?",
-            showCancelButton: true,
-            confirmButtonText: "Sí, guardar",
-            cancelButtonText: "Cancelar"
-          }).then((res)=>{
-            if (res.isConfirmed){
-              confirmed = true;
-              if (!submitting){
-                submitting = true;
-                btn.disabled = true;
-                btn.textContent = 'Guardando...';
-                form.submit();
+              icon: "warning",
+              title: "¿Guardar cambios?",
+              text: "Se guardará la información del usuario.",
+              showCancelButton: true,
+              confirmButtonColor: "#3085d6",
+              cancelButtonColor: "#d33",
+              confirmButtonText: "Sí, guardar",
+              cancelButtonText: "Cancelar"
+          }).then((result) => {
+              if (result.isConfirmed) {
+                  document.getElementById("formEditarUsuario").submit();
               }
-            }
           });
-          return;
-        }
-
-        if (!form.checkValidity()){ e.preventDefault(); e.stopPropagation(); return; }
-        if (submitting){ e.preventDefault(); e.stopPropagation(); return; }
-        submitting = true;
-        btn.disabled = true;
-        btn.textContent = 'Guardando...';
       });
-  </script>
+      {% if messages %}
+          {% for message in messages %}
+              Swal.fire({
+                  icon: "{% if message.tags == 'success' %}success{% elif message.tags == 'error' %}error{% else %}info{% endif %}",
+                  title: "{% if message.tags == 'success' %}¡Exito!{% elif message.tags == 'error' %}¡Error!{% else %}¡Info!{% endif %}",
+                  text: "{{ message }}",
+                  showConfirmButton: false,
+                  timer: 2000
+              }).then(() => {
+                  {% if message.tags == 'success' %}
+                  window.location.href = {% url 'usuarioLista' %}
+                  {% endif %}
+              });
+          {% endfor %}
+      {% endif %}
+</script>
 
 </body>
 </html>
