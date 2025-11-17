@@ -101,47 +101,71 @@
           <span class="mark"></span>
           <span>Movimientos</span>
         </div>
-                      <!-- FILTROS -->
-      <div class="filters mb-3 d-flex gap-3 align-items-end flex-wrap">
-        <!-- Busqueda general -->
-        <div>
-          <label>Buscar</label>
-          <input id="searchBox" type="text" class="form-control" placeholder="SKU, producto, proveedor...">
-        </div>
-
-        <!-- Fecha desde -->
-        <div>
-          <label>Fecha desde</label>
-          <input id="fechaDesde" type="date" class="form-control">
-        </div>
-
-        <!-- Fecha hasta -->
-        <div>
-          <label>Fecha hasta</label>
-          <input id="fechaHasta" type="date" class="form-control">
-        </div>
-
-        <!-- Tipo -->
-        <div>
-          <label>Tipo</label>
-          <select id="tipoFiltro" class="form-control">
-            <option value="">Todos</option>
-            <option value="Ingreso">Ingreso</option>
-            <option value="Salida">Salida</option>
-            <option value="Transferencia">Transferencia</option>
-            <option value="Ajustes">Ajustes</option>
-          </select>
-        </div>
-      </div>
         <div class="d-flex gap-2">
           <a class="btn btn-gold" href="{% url 'inventarioAdd' %}">Añadir Movimiento</a>
         </div>
-        
       </div>
-
-
-
       <div class="body">
+          <!-- FILTROS -->
+          <form method="get" class="mb-3">
+
+            <div class="row g-2 align-items-end">
+
+              <!-- BUSCAR SKU / PRODUCTO / PROVEEDOR -->
+              <div class="col-md-4">
+                <label class="form-label">Buscar</label>
+                <input type="text"
+                      name="busqueda"
+                      placeholder="SKU, Producto, Proveedor..."
+                      class="form-control"
+                      value="{{ busqueda_actual }}"
+                      oninput="delayedSubmit()">
+              </div>
+
+              <!-- TIPO DE MOVIMIENTO -->
+              <div class="col-md-2">
+                <label class="form-label">Tipo</label>
+                <select name="tipo" class="form-select" onchange="this.form.submit()">
+                  <option value="">Todos</option>
+                  <option value="I" {% if tipo_actual == 'I' %}selected{% endif %}>Ingreso</option>
+                  <option value="S" {% if tipo_actual == 'S' %}selected{% endif %}>Salida</option>
+                  <option value="T" {% if tipo_actual == 'T' %}selected{% endif %}>Transferencia</option>
+                </select>
+              </div>
+
+              <!-- FECHA DESDE -->
+              <div class="col-md-2">
+                <label class="form-label">Desde</label>
+                <input type="date"
+                      name="fecha_desde"
+                      class="form-control"
+                      value="{{ fecha_desde_actual }}"
+                      onchange="this.form.submit()">
+              </div>
+
+              <!-- FECHA HASTA -->
+              <div class="col-md-2">
+                <label class="form-label">Hasta</label>
+                <input type="date"
+                      name="fecha_hasta"
+                      class="form-control"
+                      value="{{ fecha_hasta_actual }}"
+                      onchange="this.form.submit()">
+              </div>
+
+              <!-- PER PAGE -->
+              <div class="col-md-2">
+                <label class="form-label">Mostrar</label>
+                <select name="per_page" class="form-select" onchange="this.form.submit()">
+                  <option value="10" {% if per_page_actual == "10" %}selected{% endif %}>10</option>
+                  <option value="20" {% if per_page_actual == "20" %}selected{% endif %}>20</option>
+                  <option value="30" {% if per_page_actual == "30" %}selected{% endif %}>30</option>
+                  <option value="1000" {% if per_page_actual == "1000" %}selected{% endif %}>Todos</option>
+                </select>
+              </div>
+
+            </div>
+          </form>
         <!-- Tabla -->
         <div class="table-wrap">
           <table class="table mb-0">
@@ -222,7 +246,56 @@
             </tbody>
           </table>
         </div>
+      <!-- PAGINADOR -->
+      {% with u_s=request.GET.s u_tipo=request.GET.tipo u_fdesde=request.GET.fdesde u_fhasta=request.GET.fhasta u_per_page=request.GET.per_page|default:'10' %}
+      <nav aria-label="Paginación" class="mt-4">
+        <ul class="pagination">
 
+          {% if movimientos.has_previous %}
+            <li class="page-item">
+              <a class="page-link"
+                href="?page={{ movimientos.previous_page_number }}
+                        &busqueda={{ u_busqueda }}
+                        &tipo={{ u_tipo }}
+                        &fecha_desde={{ u_fdesde }}
+                        &fecha_hasta={{ u_fhasta }}
+                        &per_page={{ u_per_page }}">
+                Anterior
+              </a>
+            </li>
+          {% endif %}
+
+          {% for num in movimientos.paginator.page_range %}
+            <li class="page-item {% if movimientos.number == num %}active{% endif %}">
+              <a class="page-link"
+                href="?page={{ num }}
+                        &busqueda={{ u_busqueda }}
+                        &tipo={{ u_tipo }}
+                        &fecha_desde={{ u_fdesde }}
+                        &fecha_hasta={{ u_fhasta }}
+                        &per_page={{ u_per_page }}">
+                {{ num }}
+              </a>
+            </li>
+          {% endfor %}
+
+          {% if movimientos.has_next %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ movimientos.next_page_number }}
+                &s={{ u_s }}
+                &tipo={{ u_tipo }}
+                &fdesde={{ u_fdesde }}
+                &fhasta={{ u_fhasta }}
+                &per_page={{ u_per_page }}">
+                Siguiente
+              </a>
+            </li>
+          {% endif %}
+
+        </ul>
+      </nav>
+
+      {% endwith %}
       </div>
     </div>
   </div>
@@ -253,65 +326,15 @@
       });
     }
   </script>
-<script>
-  function filtrarTabla() {
-    const texto = searchBox.value.toLowerCase().trim();
-    const desde = fechaDesde.value ? new Date(fechaDesde.value + "T00:00:00") : null;
-    const hasta = fechaHasta.value ? new Date(fechaHasta.value + "T23:59:59") : null;
-    const tipo = tipoFiltro.value.toLowerCase();
+  <script>
+let timeout = null;
 
-    const filas = document.querySelectorAll("table tbody tr");
-
-    filas.forEach(fila => {
-      const fechaISO = fila.children[0].dataset.fecha;
-      const fechaMovimiento = fechaISO ? new Date(fechaISO.replace(" ", "T")) : null;
-
-      const tipoTexto = fila.children[1].innerText.trim().toLowerCase();
-      const sku = fila.children[2].textContent.toLowerCase();
-      const proveedor = fila.children[3].textContent.toLowerCase();
-
-      let mostrar = true;
-
-      // --- BÚSQUEDA GENERAL ---
-      if (texto) {
-        if (
-          !sku.includes(texto) &&
-          !proveedor.includes(texto)
-        ) {
-          mostrar = false;
-        }
-      }
-
-      // --- FILTRO POR TIPO ---
-      if (tipo && !tipoTexto.includes(tipo)) {
-        mostrar = false;
-      }
-
-      // --- FILTRO FECHAS ---
-      if ((desde || hasta) && fechaMovimiento) {
-        const ts = fechaMovimiento.getTime();
-
-        if (desde && ts < desde.getTime()) mostrar = false;
-        if (hasta && ts > hasta.getTime()) mostrar = false;
-      }
-
-      fila.style.display = mostrar ? "" : "none";
-    });
-  }
+function delayedSubmit() {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => {
+        document.forms[0].submit();
+    }, 500);
+}
 </script>
-
-<script>
-  // EVENTOS PARA ACTIVAR FILTROS
-  const searchBox = document.getElementById("searchBox");
-  const fechaDesde = document.getElementById("fechaDesde");
-  const fechaHasta = document.getElementById("fechaHasta");
-  const tipoFiltro = document.getElementById("tipoFiltro");
-
-  searchBox.addEventListener("input", filtrarTabla);
-  fechaDesde.addEventListener("change", filtrarTabla);
-  fechaHasta.addEventListener("change", filtrarTabla);
-  tipoFiltro.addEventListener("change", filtrarTabla);
-</script>
-
 </body>
 </html>

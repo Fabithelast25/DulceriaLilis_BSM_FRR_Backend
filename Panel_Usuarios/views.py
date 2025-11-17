@@ -4,6 +4,8 @@ from Panel_Usuarios.forms import UsuarioForm, RolForm, AreaForm
 from Panel_Usuarios.models import Usuario, Area, Rol
 from Panel_Usuarios.choices import estados
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
+from django.http import JsonResponse
 
 #Importaciones para que cuando se cree un usuario se envie un email y contraseña automatica
 from django.core.mail import send_mail
@@ -47,36 +49,56 @@ def usuarioAdd(request):
 
 @login_required(login_url='login')
 def usuarioLista(request):
-    nombres = request.GET.get('first_name', '')
-    estado = request.GET.get('estado', '')
-    rol = request.GET.get('rol', '')
-    area = request.GET.get('area', '')
+    def clean_param(param):
+        if param is None:
+            return ""
+        return param.strip()
+
+    username = clean_param(request.GET.get("username", ""))
+    rol = clean_param(request.GET.get("rol", ""))
+    estado = clean_param(request.GET.get("estado", ""))
+    per_page = clean_param(request.GET.get("per_page", "10"))
 
     usuarios = Usuario.objects.all()
 
-    if nombres:
-        usuarios = usuarios.filter(nombres__icontains=nombres)
-    if estado and estado != "None":
+    # Filtrar Username
+    if username:
+        usuarios = usuarios.filter(username__icontains=username)
+
+    # Filtrar Rol
+    if rol:
+        usuarios = usuarios.filter(rol_id=rol)
+
+    # Filtrar Estado
+    if estado:
         usuarios = usuarios.filter(estado=estado)
-    if rol and rol != "None":
-        usuarios = usuarios.filter(rol__id=rol)
-    if area and area != "None":
-        usuarios = usuarios.filter(area__id=area)
 
+    # Paginación
+    if per_page == "all":
+        usuarios_page = usuarios
+    else:
+        try:
+            per_page_int = int(per_page)
+        except ValueError:
+            per_page_int = 10
+        paginator = Paginator(usuarios, per_page_int)
+        page = request.GET.get("page")
+        usuarios_page = paginator.get_page(page)
+
+    # Obtener roles para el select
     roles = Rol.objects.all()
-    areas = Area.objects.all()
 
-    return render(request, 'Usuarios/usuarios.html', {
-        'usuario': usuarios,
-        'roles': roles,
-        'areas': areas,
-        'estados': estados,
-        'first_name': nombres,
-        'estado': estado,
-        'rol': rol,
-        'area': area,
+    # Obtener estados para el select (reutilizando tu variable de choices)
+    return render(request, "Usuarios/usuarios.html", {
+        "usuarios": usuarios_page,
+        "roles": roles,
+        "estados": estados,
+        "username_actual": username,
+        "rol_actual": rol,
+        "estado_actual": estado,
+        "per_page_actual": per_page,
     })
-
+    
 def usuarioDelete(request, id):
     usuario = get_object_or_404(Usuario, id=id)
     usuario.delete()

@@ -29,7 +29,7 @@
     /* Card principal */
     .page-wrap{ padding:24px 12px; }
     .card{
-      max-width: 1200px; margin:0 auto; background:var(--bg); border-radius:var(--radius);
+      max-width: 1400px; margin:0 auto; background:var(--bg); border-radius:var(--radius);
       border:1px solid var(--border); box-shadow:var(--shadow); overflow:hidden;
     }
     .card-header{
@@ -108,35 +108,55 @@
       </div>
 
       <div class="body">
+      <form method="get" id="filterForm" class="row g-3 mb-4">
 
-        <!-- 🔹 FORMULARIO DE FILTROS -->
-        <form method="get" class="toolbar" id="form_filtros">
-          <input type="text" name="nombres" id="f_nombres" class="form-control" placeholder="Buscar por nombre" value="{{ nombres|default_if_none:'' }}"/>
+        <!-- Filtro Username (en tiempo real) -->
+        <div class="col-md-3">
+          <input
+            type="text"
+            name="username"
+            class="form-control"
+            placeholder="Username"
+            value="{{ username_actual }}"
+            oninput="delayedSubmit()"
+          >
+        </div>
 
-          <select name="estado" class="form-select" id="f_estado">
-            <option value="None" {% if estado == "None" or not estado %}selected{% endif %}>Todos los estados</option>
-            {% for id, est in estados %}
-              <option value="{{ id }}" {% if id|stringformat:"s" == estado %}selected{% endif %}>{{ est }}</option>
-            {% endfor %}
-          </select>
-
-          <select name="rol" class="form-select" id="f_rol">
-            <option value="">Todos los roles</option>
+        <!-- Filtro Rol -->
+        <div class="col-md-3">
+          <select name="rol" class="form-select" onchange="this.form.submit()">
+            <option value="">Rol (Todos)</option>
             {% for r in roles %}
-              <option value="{{ r.id }}" {% if r.id|stringformat:"s" == rol %}selected{% endif %}>{{ r.nombre }}</option>
+              <option value="{{ r.id }}" {% if r.id|stringformat:"s" == rol_actual %}selected{% endif %}>
+                {{ r.nombre }}
+              </option>
             {% endfor %}
           </select>
+        </div>
 
-          <select name="area" class="form-select" id="f_area">
-            <option value="">Todas las áreas</option>
-            {% for a in areas %}
-              <option value="{{ a.id }}" {% if a.id|stringformat:"s" == area %}selected{% endif %}>{{ a.nombre }}</option>
+        <!-- Filtro Estado -->
+        <div class="col-md-3">
+          <select name="estado" class="form-select" onchange="this.form.submit()">
+            <option value="">Estado (Todos)</option>
+            {% for e_val, e_txt in estados %}
+              <option value="{{ e_val }}" {% if e_val == estado_actual %}selected{% endif %}>
+                {{ e_txt }}
+              </option>
             {% endfor %}
           </select>
+        </div>
 
-          <button type="submit" class="btn btn-outline">Filtrar</button>
-        </form>
+        <!-- Cantidad por página -->
+        <div class="col-md-3">
+          <select name="per_page" class="form-select" onchange="this.form.submit()">
+            <option value="10" {% if per_page_actual == "10" %}selected{% endif %}>10</option>
+            <option value="20" {% if per_page_actual == "20" %}selected{% endif %}>20</option>
+            <option value="30" {% if per_page_actual == "30" %}selected{% endif %}>30</option>
+            <option value="all" {% if per_page_actual == "all" %}selected{% endif %}>Todos</option>
+          </select>
+        </div>
 
+      </form>
         <!-- Tabla -->
         <div class="table-wrap">
           <table class="table mb-0">
@@ -156,7 +176,7 @@
               </tr>
             </thead>
             <tbody>
-              {% for u in usuario %}
+              {% for u in usuarios %}
               <tr>
                 <td class="fw-semibold">{{ u.username }}</td>
                 <td>{{ u.first_name }} {{ u.last_name }}</td>
@@ -209,7 +229,40 @@
             </tbody>
           </table>
         </div>
+        {% with u_username=username_actual|urlencode u_rol=rol_actual|urlencode u_estado=estado_actual|urlencode u_per_page=per_page_actual|urlencode %}
+        <nav aria-label="Paginación">
+          <ul class="pagination">
 
+            {% if usuarios.has_previous %}
+              <li class="page-item">
+                <a class="page-link"
+                  href="?page={{ usuarios.previous_page_number }}&username={{ u_username }}&rol={{ u_rol }}&estado={{ u_estado }}&per_page={{ u_per_page }}">
+                    Anterior
+                </a>
+              </li>
+            {% endif %}
+
+            {% for num in usuarios.paginator.page_range %}
+              <li class="page-item {% if usuarios.number == num %}active{% endif %}">
+                <a class="page-link"
+                  href="?page={{ num }}&username={{ u_username }}&rol={{ u_rol }}&estado={{ u_estado }}&per_page={{ u_per_page }}">
+                    {{ num }}
+                </a>
+              </li>
+            {% endfor %}
+
+            {% if usuarios.has_next %}
+              <li class="page-item">
+                <a class="page-link"
+                href="?page={{ usuarios.next_page_number }}&username={{ u_username }}&rol={{ u_rol }}&estado={{ u_estado }}&per_page={{ u_per_page }}">
+                  Siguiente
+              </a>
+              </li>
+            {% endif %}
+
+          </ul>
+        </nav>
+        {% endwith %}
       </div>
     </div>
   </div>
@@ -239,16 +292,62 @@
         }
       });
     }
-
-    // Pequeña validación del filtro de nombre: recorta espacios y evita enviar si no cambia nada
-    (function(){
-      const form = document.getElementById('form_filtros');
-      const fNombres = document.getElementById('f_nombres');
-      form.addEventListener('submit', (e)=>{
-        if (fNombres){ fNombres.value = (fNombres.value || '').replace(/\s+/g,' ').trim(); }
-      });
-    })();
   </script>
+  <script>
+  const inputs = document.querySelectorAll("#filters input, #filters select");
+
+  inputs.forEach(el => {
+      el.addEventListener("input", filtrar);
+      el.addEventListener("change", filtrar);
+  });
+
+  function filtrar() {
+      const params = new URLSearchParams(new FormData(document.getElementById("filters")));
+
+      fetch("{{ request.path }}?" + params, {
+          headers: { "X-Requested-With": "XMLHttpRequest" }
+      })
+      .then(res => res.json())
+      .then(data => {
+          const tbody = document.querySelector("table tbody");
+          tbody.innerHTML = "";
+
+          data.usuarios.forEach(u => {
+              tbody.innerHTML += `
+              <tr>
+                <td>${u.username}</td>
+                <td>${u.nombre}</td>
+                <td>${u.email}</td>
+                <td>${u.telefono}</td>
+                <td>${u.rol}</td>
+                <td>${u.estado}</td>
+                <td>${u.mfa ? "MFA activo" : "MFA inactivo"}</td>
+                <td>${u.last_login}</td>
+                <td>${u.sesiones}</td>
+                <td>${u.area}</td>
+                <td class="text-center">
+                  <a href="/usuarios/update/${u.id}" class="btn btn-sm btn-edit">Editar</a>
+                  <button class="btn btn-sm btn-delete"
+                          onclick="confirmarEliminacion(this)"
+                          data-url="/usuarios/delete/${u.id}">
+                    Eliminar
+                  </button>
+                </td>
+              </tr>`;
+          });
+      });
+  }
+  </script>
+  <script>
+  // Delay para evitar que el input dispare miles de requests
+  let typingTimer;
+  function delayedSubmit() {
+    clearTimeout(typingTimer);
+    typingTimer = setTimeout(() => {
+      document.getElementById("filterForm").submit();
+    }, 500); // medio segundo
+  }
+</script>
 
 </body>
 </html>

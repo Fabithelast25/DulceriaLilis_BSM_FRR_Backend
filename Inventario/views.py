@@ -6,6 +6,8 @@ from .choices import tipos
 from django.contrib.auth.decorators import login_required
 from Panel_Productos.models import Producto
 from django.db import transaction
+from django.core.paginator import Paginator
+from datetime import datetime, timedelta
 # Create your views here.
 @login_required(login_url='login')
 def movimientoAdd(request):
@@ -60,13 +62,56 @@ def movimientoAdd(request):
 
 @login_required(login_url='login')
 def inventarioLista(request):
-    movimientos = Movimiento.objects.all()
-    
-    return render(request, 'Inventario/inventarioLista.html', {
-        'movimientos': movimientos,
-    })
+    # 1️⃣ Obtener queryset base
+    movimientos = Movimiento.objects.all().order_by('-fecha')
 
-@login_required(login_url='login')
+    # 2️⃣ Obtener filtros GET
+    busqueda = request.GET.get('busqueda', '').strip()
+    tipo = request.GET.get('tipo', '').strip()
+    fecha_desde_str = request.GET.get('fecha_desde', '').strip()
+    fecha_hasta_str = request.GET.get('fecha_hasta', '').strip()
+
+    # 3️⃣ Aplicar filtros de búsqueda y tipo
+    if busqueda:
+        movimientos = movimientos.filter(producto__nombre__icontains=busqueda)
+    if tipo:
+        movimientos = movimientos.filter(tipo=tipo)
+
+    # 4️⃣ Filtrar fechas (convertir a datetime y crear rango)
+    if fecha_desde_str:
+        try:
+            fecha_desde = datetime.strptime(fecha_desde_str, '%Y-%m-%d')
+            movimientos = movimientos.filter(fecha__gte=fecha_desde)
+        except ValueError:
+            pass  # ignorar si la fecha está mal escrita
+
+    if fecha_hasta_str:
+        try:
+            # sumamos un día para incluir todo el día seleccionado
+            fecha_hasta = datetime.strptime(fecha_hasta_str, '%Y-%m-%d') + timedelta(days=1)
+            movimientos = movimientos.filter(fecha__lt=fecha_hasta)
+        except ValueError:
+            pass  # ignorar si la fecha está mal escrita
+
+    # 5️⃣ Paginación
+    per_page = request.GET.get('per_page', 10)
+    paginator = Paginator(movimientos, per_page)
+    page_number = request.GET.get('page')
+    movimientos = paginator.get_page(page_number)
+
+    # 6️⃣ Pasar variables al template
+    context = {
+        'movimientos': movimientos,
+        'busqueda_actual': busqueda,
+        'tipo_actual': tipo,
+        'fecha_desde_actual': fecha_desde_str,
+        'fecha_hasta_actual': fecha_hasta_str,
+        'per_page_actual': str(per_page),  # siempre como string porque en template comparas con "10", "20", etc.
+    }
+
+
+    return render(request, 'Inventario/inventarioLista.html', context)
+
 @login_required(login_url='login')
 def movimientoUpdate(request, id):
     movimiento = get_object_or_404(Movimiento, id=id)
