@@ -1,4 +1,8 @@
 from django.db import models
+from django.db import models
+from django.utils import timezone
+from datetime import timedelta
+from Panel_Usuarios.models import Usuario
 
 # Create your models here.
 productos = {
@@ -39,3 +43,10 @@ productos = {
     ]
 }
 
+class CodigoRecuperacion(models.Model):
+    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
+    codigo = models.CharField(max_length=6)
+    creado_en = models.DateTimeField(auto_now_add=True)
+
+    def expirado(self):
+        return timezone.now() > self.creado_en + timedelta(seconds=60)

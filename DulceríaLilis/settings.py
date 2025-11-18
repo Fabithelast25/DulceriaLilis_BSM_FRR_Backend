@@ -29,6 +29,22 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+#Modelo personalizado para el login
+AUTH_USER_MODEL = 'Panel_Usuarios.Usuario'
+
+# Configuración de envío de correos
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'benjitasilvamarquez2020@gmail.com'
+EMAIL_HOST_PASSWORD = 'fjaj laxb vpgu ugif'
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+#Configuración de Login y Logout
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'usuarioLista'
+LOGOUT_REDIRECT_URL = 'login'
 
 # Application definition
 
@@ -43,6 +59,7 @@ INSTALLED_APPS = [
     'Panel_Usuarios',
     'Panel_Productos',
     'Panel_Proveedores',
+    'Inventario',
 ]
 
 MIDDLEWARE = [

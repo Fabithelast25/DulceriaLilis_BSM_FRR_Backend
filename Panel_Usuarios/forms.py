@@ -2,6 +2,7 @@ from django import forms
 from Panel_Usuarios.choices import estados
 from Panel_Usuarios.models import Area, Rol, Usuario
 from django.utils import timezone
+from .validators import validar_telefono_chileno
 """    #Identificación
     username = models.CharField(max_length=50, verbose_name="Username", unique=True)
     email = models.EmailField(max_length=70, verbose_name="Email", unique=True)
@@ -21,11 +22,11 @@ from django.utils import timezone
     observaciones = models.TextField(max_length=200, verbose_name="Observaciones", blank=True)"""
 class UsuarioForm(forms.ModelForm):
     #Identificación
-    username = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control'}))
-    email = forms.CharField(widget=forms.EmailInput(attrs={'class':'form-control'}))
-    nombres = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control'}))
-    apellidos = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control'}))
-    telefono = forms.CharField(required=False,widget=forms.NumberInput(attrs={'class':'form-control'}))
+    username = forms.CharField(max_length=50, widget=forms.TextInput(attrs={'class':'form-control'}))
+    first_name = forms.CharField(max_length=50, widget=forms.TextInput(attrs={'class':'form-control'}))
+    last_name = forms.CharField(max_length=60, widget=forms.TextInput(attrs={'class':'form-control'}))
+    email = forms.CharField(max_length=70, widget=forms.EmailInput(attrs={'class':'form-control'}))
+    telefono = forms.CharField(max_length=11, required=False,validators=[validar_telefono_chileno],widget=forms.NumberInput(attrs={'class':'form-control'}))
     
     #Estado y acceso
     rol = forms.ModelChoiceField(
@@ -35,7 +36,13 @@ class UsuarioForm(forms.ModelForm):
     )
     estado = forms.CharField(widget=forms.Select(choices=estados, attrs={'class':'form-select'}))
     mfa_habilitado = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={'class':'form-check-input'}))
-    ultimo_acceso = forms.DateField(initial=timezone.now, widget=forms.DateInput(attrs={'class':'form-control', 'placeholder':'--------', 'readonly': True}))
+    last_login = forms.DateTimeField(initial = timezone.now(),
+        required=False,
+        widget=forms.DateTimeInput(attrs={
+            'class': 'form-control',
+            'readonly': True
+        })
+    )
     sesiones_activas = forms.CharField(required=False, empty_value=0, widget=forms.NumberInput(attrs={'class':'form_control', 'readonly':True, 'placeholder':'0'}))
     
     #Metadatos
@@ -50,9 +57,10 @@ class UsuarioForm(forms.ModelForm):
     class Meta:
         model = Usuario
         fields = '__all__'
+        exclude = ["password", "date_joined"]
 
 class RolForm(forms.ModelForm):
-    nombre = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control'}))
+    nombre = forms.CharField(max_length=20, widget=forms.TextInput(attrs={'class':'form-control'}))
     descripcion = forms.CharField(required=False, widget=forms.TextInput(attrs={'class':'form-control'}))
     
     class Meta:
@@ -60,7 +68,7 @@ class RolForm(forms.ModelForm):
         fields = '__all__'
         
 class AreaForm(forms.ModelForm):
-    nombre = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control'}))
+    nombre = forms.CharField(max_length=20, widget=forms.TextInput(attrs={'class':'form-control'}))
     
     class Meta:
         model = Area

@@ -1,0 +1,24 @@
+{% for p in productos %}
+<tr>
+    <td>{{ p.sku }}</td>
+    <td>
+        <div class="fw-semibold">{{ p.nombre }}</div>
+        {% if p.bajo_stock %}
+        <div class="low-stock mt-2"><strong>¡Atención!</strong> Stock bajo para <em>{{ p.nombre }}</em>.</div>
+        {% endif %}
+    </td>
+    <td class="text-end">{{ p.stock_actual }}</td>
+    <td class="text-center">
+        <div class="d-inline-flex gap-2">
+            <a href="{% url 'producto-modificado' p.id %}" class="btn btn-sm btn-edit">Editar</a>
+            <a href="{% url 'producto-eliminado' p.id %}" 
+               class="btn btn-sm btn-delete"
+               onclick="confirmarEliminacion(event, this)">Eliminar</a>
+        </div>
+    </td>
+</tr>
+{% empty %}
+<tr>
+    <td colspan="4" class="text-center py-4 text-muted">No hay productos para mostrar.</td>
+</tr>
+{% endfor %}

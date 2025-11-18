@@ -1,5 +1,26 @@
-﻿__pycache__/
+﻿# === Python / Django ===
+__pycache__/
 *.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+.eggs/
+db.sqlite3
+
+# === Entornos / IDE ===
 venv/
 .env
-*.sqlite3
+.env.*
+.vscode/
+
+# === Django estáticos opcional (si usas collectstatic en deploy) ===
+staticfiles/
+media/
+
+# === Node/Front opcional ===
+node_modules/
+dist/
+
+# === SO ===
+.DS_Store
+Thumbs.db

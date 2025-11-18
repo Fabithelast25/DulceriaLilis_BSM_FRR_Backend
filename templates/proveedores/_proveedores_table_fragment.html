@@ -1,0 +1,65 @@
+<div class="table-wrap">
+  <table class="table mb-0">
+    <thead>
+      <tr>
+        <th>RUT/NIF</th>
+        <th>Razón Social</th>
+        <th>Fantasía</th>
+        <th>Email</th>
+        <th>Teléfono</th>
+        <th>Ciudad</th>
+        <th>Moneda</th>
+        <th>Estado</th>
+        <th style="width:180px">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in page_obj %}
+        <tr>
+          <td>{{ p.rut_nif }}</td>
+          <td>{{ p.razon_social }}</td>
+          <td>{{ p.nombre_fantasia|default:"—" }}</td>
+          <td>{{ p.email }}</td>
+          <td>{{ p.telefono|default:"—" }}</td>
+          <td>{{ p.ciudad|default:"—" }}</td>
+          <td>{{ p.moneda }}</td>
+          <td>
+            {% if p.estado == "ACTIVO" %}
+              <span class="pill pill-ok">Activo</span>
+            {% elif p.estado == "INACTIVO" %}
+              <span class="pill pill-warn">Inactivo</span>
+            {% else %}
+              <span class="pill pill-bad">Bloqueado</span>
+            {% endif %}
+          </td>
+          <td class="d-flex gap-2">
+            <a class="btn-outline-gold btn-sm" href="{% url 'editar_proveedor' p.id %}">Editar</a>
+            <a class="btn-red btn-sm" href="{% url 'eliminar_proveedor' p.id %}">Eliminar</a>
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="9" class="text-center py-4 text-muted">No se encontraron proveedores.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% if page_obj.paginator.num_pages > 1 %}
+  <div class="pagination">
+    {% if page_obj.has_previous %}
+      <a href="?q={{ q }}&estado={{ estado }}&moneda={{ moneda }}&page={{ page_obj.previous_page_number }}">«</a>
+    {% else %}<span>«</span>{% endif %}
+
+    {% for num in page_obj.paginator.page_range %}
+      {% if num == page_obj.number %}
+        <span class="active">{{ num }}</span>
+      {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+        <a href="?q={{ q }}&estado={{ estado }}&moneda={{ moneda }}&page={{ num }}">{{ num }}</a>
+      {% endif %}
+    {% endfor %}
+
+    {% if page_obj.has_next %}
+      <a href="?q={{ q }}&estado={{ estado }}&moneda={{ moneda }}&page={{ page_obj.next_page_number }}">»</a>
+    {% else %}<span>»</span>{% endif %}
+  </div>
+{% endif %}

@@ -5,6 +5,12 @@ from django.db.models import Q
 from django.core.paginator import Paginator
 from django import forms
 from django.db import IntegrityError
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+from .models import Proveedor, ESTADO_PROVEEDOR, MONEDA_CHOICES
+from django.http import HttpResponse
+import openpyxl
+
 
 from .models import Proveedor, ESTADO_PROVEEDOR, MONEDA_CHOICES, CONDICIONES_PAGO_CHOICES, OfertaProveedor
 from .forms import OfertaProveedorForm
@@ -12,6 +18,7 @@ from .forms import OfertaProveedorForm
 # =========================
 # Formulario (ModelForm)
 # =========================
+
 class ProveedorForm(forms.ModelForm):
     class Meta:
         model = Proveedor
@@ -59,51 +66,64 @@ class ProveedorForm(forms.ModelForm):
 # =========================
 # Vistas CRUD + Listado
 # =========================
-def lista_proveedores(request):
-    """
-    Listado con búsqueda y filtros:
-    - q: busca por rut_nif, razón social, nombre_fantasia, email, ciudad, país
-    - estado: ACTIVO/BLOQUEADO
-    - moneda: CLP/USD/EUR...
-    Paginación de 10 por página (param 'page').
-    """
-    qs = Proveedor.objects.all()
+@login_required(login_url='login')
+def lista_ofertas(request):
+    q = (request.GET.get("q") or "").strip()
+    preferente = request.GET.get("preferente")
 
-    q = request.GET.get('q', '').strip()
-    estado = request.GET.get('estado', '').strip()
-    moneda = request.GET.get('moneda', '').strip()
+    qs = OfertaProveedor.objects.select_related("producto", "proveedor")
+    if q:
+        qs = qs.filter(
+            Q(producto__nombre__icontains=q) |
+            Q(proveedor__razon_social__icontains=q)
+        )
+    if preferente in ("0", "1"):
+        qs = qs.filter(preferente=(preferente == "1"))
+
+    paginator = Paginator(qs, 10)
+    page_obj = paginator.get_page(request.GET.get("page"))
+
+    ctx = {"page_obj": page_obj, "q": q, "preferente": preferente}
+
+    # ---- DEBUG: para ver en consola qué está devolviendo ----
+    is_partial = request.headers.get("X-Partial") == "1" or request.GET.get("partial") == "1"
+    print("lista_ofertas -> is_partial:", is_partial)  # mira tu consola del runserver
+    # ---------------------------------------------------------
+
+    if is_partial:
+        return render(request, "proveedores/_ofertas_table_fragment.html", ctx)
+
+    return render(request, "proveedores/ofertas_lista.html", ctx)
+
+@login_required(login_url='login')
+def lista_ofertas_page(request):
+    # página completa (layout + toolbar + include del fragmento)
+    return lista_ofertas_fragment(request, render_full=True)
+
+@login_required(login_url='login')
+def lista_ofertas_fragment(request, render_full=False):
+    q = (request.GET.get("q") or "").strip()
+    preferente = request.GET.get("preferente")
+    qs = OfertaProveedor.objects.select_related("producto", "proveedor")
 
     if q:
         qs = qs.filter(
-            Q(rut_nif__icontains=q) |
-            Q(razon_social__icontains=q) |
-            Q(nombre_fantasia__icontains=q) |
-            Q(email__icontains=q) |
-            Q(ciudad__icontains=q) |
-            Q(pais__icontains=q)
+            Q(producto__nombre__icontains=q) |
+            Q(proveedor__razon_social__icontains=q)
         )
-
-    if estado:
-        qs = qs.filter(estado=estado)
-
-    if moneda:
-        qs = qs.filter(moneda=moneda)
+    if preferente in ("0", "1"):
+        qs = qs.filter(preferente=(preferente == "1"))
 
     paginator = Paginator(qs, 10)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    page_obj = paginator.get_page(request.GET.get("page"))
 
-    context = {
-        'page_obj': page_obj,
-        'q': q,
-        'estado': estado,
-        'moneda': moneda,
-        'ESTADO_PROVEEDOR': ESTADO_PROVEEDOR,
-        'MONEDA_CHOICES': MONEDA_CHOICES,
-    }
-    return render(request, 'proveedores/lista.html', context)
+    ctx = {"page_obj": page_obj, "q": q, "preferente": preferente}
 
+    if render_full:
+        return render(request, "proveedores/ofertas_lista.html", ctx)
+    return render(request, "proveedores/_ofertas_table_fragment.html", ctx)
 
+@login_required(login_url='login')
 def agregar_proveedor(request):
     if request.method == 'POST':
         form = ProveedorForm(request.POST)
@@ -116,7 +136,7 @@ def agregar_proveedor(request):
         form = ProveedorForm()
     return render(request, 'proveedores/form.html', {'form': form, 'accion': 'Agregar'})
 
-
+@login_required(login_url='login')
 def editar_proveedor(request, pk):
     proveedor = get_object_or_404(Proveedor, pk=pk)
     if request.method == 'POST':
@@ -130,7 +150,7 @@ def editar_proveedor(request, pk):
         form = ProveedorForm(instance=proveedor)
     return render(request, 'proveedores/form.html', {'form': form, 'accion': 'Editar'})
 
-
+@login_required(login_url='login')
 def eliminar_proveedor(request, pk):
     proveedor = get_object_or_404(Proveedor, pk=pk)
     if request.method == 'POST':
@@ -139,7 +159,115 @@ def eliminar_proveedor(request, pk):
         return redirect('lista_proveedores')
     return render(request, 'proveedores/eliminar.html', {'proveedor': proveedor})
 
+@login_required(login_url='login')
+def _filtrar_proveedores(request):
+    q = (request.GET.get('q') or '').strip()
+    estado = (request.GET.get('estado') or '').strip()
+    moneda = (request.GET.get('moneda') or '').strip()
+
+    qs = Proveedor.objects.all()
+    if q:
+        qs = qs.filter(
+            Q(razon_social__icontains=q) |
+            Q(rut_nif__icontains=q) |
+            Q(email__icontains=q) |
+            Q(ciudad__icontains=q) |
+            Q(pais__icontains=q) |
+            Q(nombre_fantasia__icontains=q)
+        )
+    if estado:
+        qs = qs.filter(estado=estado)
+    if moneda:
+        qs = qs.filter(moneda=moneda)
+
+    qs = qs.order_by('razon_social')
+    paginator = Paginator(qs, 10)
+    page_obj = paginator.get_page(request.GET.get('page'))
+
+    return {
+        'page_obj': page_obj,
+        'q': q, 'estado': estado, 'moneda': moneda,
+        'ESTADO_PROVEEDOR': getattr(Proveedor, 'ESTADO_PROVEEDOR', []),
+        'MONEDA_CHOICES': getattr(Proveedor, 'MONEDA_CHOICES', []),
+    }
+
+@login_required(login_url='login')
+def lista_proveedores(request):
+    ctx = _filtrar_proveedores(request)
+    return render(request, 'proveedores/lista.html', ctx)  # nombre del template ok
+
+@login_required(login_url='login')
+def lista_proveedores_fragment(request):
+    ctx = _filtrar_proveedores(request)
+    return render(request, 'proveedores/_proveedores_table_fragment.html', ctx)
+
+def exportar_proveedores_excel(request):
+    rut = request.GET.get("rut", "").strip()
+    nombre = request.GET.get("nombre", "").strip()
+    estado = request.GET.get("estado", "").strip()
+
+    proveedores = Proveedor.objects.all()
+
+    # FILTROS
+    if rut:
+        proveedores = proveedores.filter(rut_nif__icontains=rut)
+
+    if nombre:
+        proveedores = proveedores.filter(
+            Q(razon_social__icontains=nombre) |
+            Q(nombre_fantasia__icontains=nombre)
+        )
+
+    if estado:
+        proveedores = proveedores.filter(estado__iexact=estado)
+
+    # CREAR EXCEL
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Proveedores"
+
+    # Encabezados
+    headers = [
+        "RUT",
+        "Razón Social",
+        "Nombre Fantasía",
+        "Email",
+        "Teléfono",
+        "Ciudad",
+        "País",
+        "Condiciones Pago",
+        "Moneda",
+        "Estado",
+        "Observaciones",
+    ]
+    ws.append(headers)
+
+    # Rellenar filas
+    for p in proveedores:
+        ws.append([
+            p.rut_nif,
+            p.razon_social,
+            p.nombre_fantasia or "",
+            p.email,
+            p.telefono or "",
+            p.ciudad or "",
+            p.pais,
+            p.condiciones_pago,
+            p.moneda,
+            p.estado,
+            p.observaciones or "",
+        ])
+
+    # Respuesta HTTP
+    response = HttpResponse(
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+    response["Content-Disposition"] = 'attachment; filename="proveedores.xlsx"'
+    wb.save(response)
+    return response
+
 # ---------- OFERTAS: LISTA ----------
+@login_required(login_url='login')
 def lista_ofertas(request):
     q = (request.GET.get("q") or "").strip()
     preferente = request.GET.get("preferente")  # '1', '0' o None
@@ -168,6 +296,7 @@ def lista_ofertas(request):
     )
 
 # ---------- OFERTAS: AGREGAR ----------
+@login_required(login_url='login')
 def agregar_oferta(request):
     if request.method == "POST":
         form = OfertaProveedorForm(request.POST)
@@ -188,6 +317,7 @@ def agregar_oferta(request):
     )
 
 # ---------- OFERTAS: EDITAR ----------
+@login_required(login_url='login')
 def editar_oferta(request, pk):
     oferta = get_object_or_404(OfertaProveedor, pk=pk)
     if request.method == "POST":
@@ -209,6 +339,7 @@ def editar_oferta(request, pk):
     )
 
 # ---------- OFERTAS: ELIMINAR ----------
+@login_required(login_url='login')
 def eliminar_oferta(request, pk):
     oferta = get_object_or_404(OfertaProveedor, pk=pk)
     if request.method == "POST":

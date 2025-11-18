@@ -2,25 +2,159 @@
 {% load static %}
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editar Area</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-    <link rel="stylesheet" href="{% static 'CSS/usuario.css' %}">
+  <meta charset="UTF-8" />
+  <title>Editar Área</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Bootstrap + SweetAlert -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <!-- (Opcional) tu css global -->
+  <link rel="stylesheet" href="{% static 'CSS/usuario.css' %}">
+
+  <style>
+    /* ===== Paleta corporativa ===== */
+    :root{
+      --brand-red:#c8102e; --brand-red-700:#a40d25; --brand-red-50:#fff5f7;
+      --brand-gold:#d4af37; --brand-gold-700:#b89617; --brand-gold-100:#fcf6e6;
+      --ink:#1c1d22; --muted:#6b7280; --border:#e8e8e8; --bg:#ffffff; --page:#fafafa;
+      --shadow:0 10px 24px rgba(0,0,0,.08); --radius:14px;
+    }
+    html,body{height:100%}
+    body{
+      background: linear-gradient(180deg, var(--page), #fff);
+      margin:0; font-family: system-ui, Segoe UI, Roboto, Arial, sans-serif; color:var(--ink);
+    }
+
+    /* Navbar */
+    .navbar{ background: var(--brand-red) !important; box-shadow: 0 8px 18px rgba(200,16,46,.18); }
+    .navbar-brand{ color:#fff !important; font-weight:800; letter-spacing:.3px; }
+    .nav-link{ color:#fff !important; opacity:.95; }
+    .nav-link:hover{ opacity:1; text-decoration: underline; text-underline-offset: 4px; }
+
+    /* Card */
+    .page-wrap{ padding:24px 12px; }
+    .card{
+      max-width: 900px; margin:0 auto; background:var(--bg); border-radius:var(--radius);
+      border:1px solid var(--border); box-shadow:var(--shadow); overflow:hidden;
+    }
+    .card-header{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      background: linear-gradient(180deg, #fff, var(--brand-gold-100));
+      border-bottom:2px solid var(--brand-gold);
+      padding:14px 18px; font-weight:800; font-size:1.1rem;
+    }
+    .card-header .left{ display:flex; align-items:center; gap:8px; }
+    .mark{
+      width:10px; height:22px; border-radius:8px;
+      background:linear-gradient(180deg, var(--brand-gold), var(--brand-gold-700));
+      box-shadow:0 4px 10px rgba(212,175,55,.25);
+    }
+    .body{ padding:18px; }
+
+    /* Formulario */
+    .form-grid{ display:grid; gap:14px; }
+    .form-group label{ font-weight:700; margin-bottom:6px; }
+    .form-group input[type="text"],
+    .form-group input[type="date"],
+    .form-group select,
+    .form-group textarea{
+      width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:10px;
+      outline:none; transition: box-shadow .15s ease, border-color .15s ease;
+      background:#fff;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus{
+      border-color: var(--brand-gold);
+      box-shadow: 0 0 0 .2rem rgba(212,175,55,.18);
+    }
+    .helptext{ font-size:.9rem; color:var(--muted); }
+    .errorlist{ margin:6px 0 0; padding-left:18px; color:#8b0010; }
+
+    /* Botones */
+    .actions{ display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
+    .btn-gold{
+      background: linear-gradient(180deg, var(--brand-gold), var(--brand-gold-700));
+      color:#1a1a1a; border:none; border-radius:10px; padding:10px 16px; font-weight:800;
+    }
+    .btn-gold:hover{ filter:brightness(.95); color:#111; }
+    .btn-outline{
+      background:#fff; color:var(--brand-red); border:2px solid var(--brand-red); border-radius:10px; padding:10px 16px; font-weight:800;
+    }
+    .btn-outline:hover{ background:var(--brand-red-50); }
+
+    /* Breadcrumb simple */
+    .crumbs{ font-size:.95rem; color:var(--muted); margin: 0 0 6px 2px; }
+    .crumbs a{ color:var(--brand-red-700); text-decoration:none; }
+    .crumbs a:hover{ text-decoration:underline; }
+  </style>
 </head>
 <body>
-    {% include 'Usuarios/navbarUsuarios.html' %}
-    <div class="container mt-4 mb-4">
-        <h2>Editar Area</h2>
-        <form method="post">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="btn btn-primary">Guardar cambios</button>
+
+  {% include 'Usuarios/navbarUsuarios.html' %}
+
+  <div class="page-wrap">
+    <div class="card">
+      <div class="card-header">
+        <div class="left">
+          <span class="mark"></span>
+          <span>Editar Área</span>
+        </div>
+        <div>
+          <a href="{% url 'areaLista' %}" class="btn btn-outline">Volver a la lista</a>
+        </div>
+      </div>
+
+      <div class="body">
+        <div class="crumbs">
+          <a href="{% url 'areaLista' %}">Áreas</a> · <span>Editar</span>
+        </div>
+
+        <form method="post" class="form-grid" novalidate>
+          {% csrf_token %}
+
+          {% for field in form %}
+            <div class="form-group">
+              <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+              {{ field }}
+              {% if field.help_text %}
+                <div class="helptext">{{ field.help_text }}</div>
+              {% endif %}
+              {% if field.errors %}
+                <ul class="errorlist">
+                  {% for error in field.errors %}
+                    <li>{{ error }}</li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+            </div>
+          {% endfor %}
+
+          <div class="actions">
+            <button type="submit" class="btn btn-gold">Guardar cambios</button>
+            <a href="{% url 'areaLista' %}" class="btn btn-outline">Cancelar</a>
+          </div>
         </form>
-        <a href="{% url 'areaLista' %}" class="btn btn-secondary mt-2">Cancelar</a>
+      </div>
     </div>
-    <footer>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
-    </footer>
+  </div>
+
+  {% if messages %}
+    {% for message in messages %}
+      <script>
+        Swal.fire({
+          icon: "{% if message.tags == 'success' %}success{% elif message.tags == 'error' %}error{% else %}info{% endif %}",
+          title: "{% if message.tags == 'success' %}¡Éxito!{% elif message.tags == 'error' %}¡Error!{% else %}Información{% endif %}",
+          text: "{{ message|escapejs }}",
+          showConfirmButton: false,
+          timer: 2000
+        });
+      </script>
+    {% endfor %}
+  {% endif %}
+
 </body>
 </html>
