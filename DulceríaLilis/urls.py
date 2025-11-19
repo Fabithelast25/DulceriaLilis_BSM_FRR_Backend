@@ -102,5 +102,6 @@ urlpatterns = [
     path('inventarioUpdate/<int:id>/', vista_inventario.movimientoUpdate, name='inventarioUpdate'),
     path("inventario/exportar-excel/", vista_inventario.exportar_movimientos_excel, name="exportar_movimientos_excel"),
 
+    path("no_autorizado/", views.no_autorizado, name='no_autorizado'),
 ]
 
