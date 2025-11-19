@@ -174,18 +174,26 @@
 
     <!-- Accesos rápidos grandes -->
     <nav class="quick-actions" aria-label="Accesos rápidos">
+      {% if request.user.rol.puede_gestionar_usuarios %}
       <a class="qa users" href="{% url 'usuarioLista' %}">
         <i class="bi bi-people-fill"></i> <span>Panel de Usuarios</span>
       </a>
+      {% endif %}
+      {% if request.user.rol.puede_gestionar_productos %}
       <a class="qa products" href="{% url 'productos' %}">
         <i class="bi bi-box-seam"></i> <span>Panel de Productos</span>
       </a>
+      {% endif %}
+      {% if request.user.rol.puede_gestionar_proveedores %}
       <a class="qa providers" href="{% url 'lista_proveedores' %}">
         <i class="bi bi-truck"></i> <span>Panel de Proveedores</span>
       </a>
+      {% endif %}
+      {% if request.user.rol.puede_gestionar_inventario or request.user.rol.puede_ver_reportes %}
       <a class="qa inventario just" href="{% url 'inventarioLista' %}">
         <i class="bi bi-boxes"></i> <span>Inventario</span>
       </a>
+      {% endif %}
     </nav>
 
     <!-- KPIs -->

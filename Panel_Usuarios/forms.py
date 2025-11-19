@@ -58,14 +58,6 @@ class UsuarioForm(forms.ModelForm):
         model = Usuario
         fields = '__all__'
         exclude = ["password", "date_joined"]
-
-class RolForm(forms.ModelForm):
-    nombre = forms.CharField(max_length=20, widget=forms.TextInput(attrs={'class':'form-control'}))
-    descripcion = forms.CharField(required=False, widget=forms.TextInput(attrs={'class':'form-control'}))
-    
-    class Meta:
-        model = Rol
-        fields = '__all__'
         
 class AreaForm(forms.ModelForm):
     nombre = forms.CharField(max_length=20, widget=forms.TextInput(attrs={'class':'form-control'}))

@@ -18,6 +18,7 @@ import csv
 import io
 from Panel_Productos.models import Producto, Categoria
 from Panel_Proveedores.models import Proveedor
+from django.contrib.auth.decorators import login_required
 
 User = get_user_model()
 
@@ -144,6 +145,7 @@ def crearContraseña(request):
 
 
 # Views para el Dashboard
+@login_required(login_url='login')
 def dashboard(request):
     return render(request, 'dashboard.html')
 

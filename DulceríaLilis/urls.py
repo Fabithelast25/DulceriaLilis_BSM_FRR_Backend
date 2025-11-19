@@ -33,13 +33,6 @@ urlpatterns = [
     path('usuarioLista/delete/<int:id>/', vista.usuarioDelete, name='usuarioDelete'),
     path('usuarioUpdate/<int:id>/', vista.usuarioUpdate, name='usuarioUpdate'),
     path("usuarios/exportar-excel/", vista.exportar_usuarios_excel, name="exportar_usuarios_excel"),
-
-    
-    # Rutas Roles
-    path('rolLista/', vista.rolLista, name="rolLista"),
-    path('rolAdd/', vista.rolAdd, name='rolAdd'),
-    path('rolLista/delete/<int:id>/', vista.rolDelete, name='rolDelete'),
-    path('rolUpdate/<int:id>/', vista.rolUpdate, name='rolUpdate'),
     
     # Rutas Areas
     path('areaLista/', vista.areaLista, name="areaLista"),

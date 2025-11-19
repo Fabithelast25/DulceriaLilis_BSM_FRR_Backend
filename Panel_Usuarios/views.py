@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from Panel_Usuarios.forms import UsuarioForm, RolForm, AreaForm
+from Panel_Usuarios.forms import UsuarioForm, AreaForm
 from Panel_Usuarios.models import Usuario, Area, Rol
 from Panel_Usuarios.choices import estados
 from django.contrib.auth.decorators import login_required
@@ -8,6 +8,7 @@ from django.core.paginator import Paginator
 from django.http import JsonResponse, HttpResponse
 from openpyxl import Workbook
 from django.db.models import Q
+from Panel_Usuarios.middleware import role_required
 
 #Importaciones para que cuando se cree un usuario se envie un email y contraseña automatica
 from django.core.mail import send_mail
@@ -23,7 +24,8 @@ def generar_contrasenia():
 
 
 #CRUD DE USUARIOS
-
+@login_required(login_url='login')
+@role_required(gestionar_usuarios=True)
 def usuarioAdd(request):
     if request.method == 'POST':
         form = UsuarioForm(request.POST)
@@ -50,6 +52,7 @@ def usuarioAdd(request):
     return render(request, 'Usuarios/usuarioAdd.html', {'form':form})
 
 @login_required(login_url='login')
+@role_required(gestionar_usuarios=True)
 def usuarioLista(request):
     def clean_param(param):
         if param is None:
@@ -107,6 +110,7 @@ def usuarioDelete(request, id):
     return redirect('usuarioLista')
 
 @login_required(login_url='login')
+@role_required(gestionar_usuarios=True)
 def usuarioUpdate(request, id):
     usuario = get_object_or_404(Usuario, id=id)
     if request.method == 'POST':
@@ -195,58 +199,9 @@ def exportar_usuarios_excel(request):
     wb.save(response)
     return response
 
-#CRUD ROLES
-
-def rolAdd(request):
-    if request.method == 'POST':
-        form = RolForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('rolLista')
-        else:
-            print(form.errors)
-    else:
-        form = RolForm()
-    
-    return render(request, 'Usuarios/roles/rolAdd.html', {'form':form})
-
-def rolDelete(request, id):
-    rol = get_object_or_404(Rol, id=id)
-    rol.delete()
-    return redirect('rolLista')
-
-@login_required(login_url='login')
-def rolUpdate(request, id):
-    rol = get_object_or_404(Rol, id=id)
-    if request.method == 'POST':
-        form = RolForm(request.POST, instance=rol)
-        if form.is_valid():
-            form.save()
-            return redirect('rolLista')
-        else:
-            print(form.errors)
-    else:
-        form = RolForm(instance=rol)
-    return render(request, 'Usuarios/roles/rolUpdate.html', {'form': form})
-
-
-def rolLista(request):
-    fecha_inicio = request.GET.get('fecha_inicio', '')
-    fecha_fin = request.GET.get('fecha_fin', '')
-
-    roles = Rol.objects.all()
-
-    if fecha_inicio:
-        roles = roles.filter(creado__gte=fecha_inicio)  # mayor o igual a fecha_inicio
-    if fecha_fin:
-        roles = roles.filter(creado__lte=fecha_fin)  # menor o igual a fecha_fin
-
-    return render(request, 'Usuarios/roles/roles.html', {
-        'roles': roles,
-    })
-    
 #CRUD AREAS
-
+@login_required(login_url='login')
+@role_required(gestionar_usuarios=True)
 def areaAdd(request):
     if request.method == 'POST':
         form = AreaForm(request.POST)
@@ -266,6 +221,7 @@ def areaDelete(request, id):
     return redirect('areaLista')
 
 @login_required(login_url='login')
+@role_required(gestionar_usuarios=True)
 def areaUpdate(request, id):
     area = get_object_or_404(Area, id=id)
     if request.method == 'POST':
@@ -279,6 +235,8 @@ def areaUpdate(request, id):
         form = AreaForm(instance=area)
     return render(request, 'Usuarios/areas/areaUpdate.html', {'form': form})
 
+@login_required(login_url='login')
+@role_required(gestionar_usuarios=True)
 def areaLista(request):
     fecha_inicio = request.GET.get('fecha_inicio', '')
     fecha_fin = request.GET.get('fecha_fin', '')

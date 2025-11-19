@@ -56,7 +56,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'Dulceria',
-    'Panel_Usuarios',
+    'Panel_Usuarios.apps.PanelUsuariosConfig',
     'Panel_Productos',
     'Panel_Proveedores',
     'Inventario',
