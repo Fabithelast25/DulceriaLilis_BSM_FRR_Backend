@@ -102,7 +102,9 @@
           <span>Movimientos</span>
         </div>
         <div class="d-flex gap-2">
+          {% if request.user.rol.puede_gestionar_inventario %}
           <a class="btn btn-gold" href="{% url 'inventarioAdd' %}">Añadir Movimiento</a>
+          {% endif %}
           <a href="{% url 'exportar_movimientos_excel' %}?tipo={{ tipo }}&producto={{ producto }}&proveedor={{ proveedor }}&bodega={{ bodega }}&desde={{ desde }}&hasta={{ hasta }}"
             class="btn btn-success">
             Exportar Excel
@@ -234,12 +236,16 @@
                 <td>{{ m.doc_referencia }}</td>
                 <td class="text-center">
                   <div class="d-inline-flex gap-2">
+                    {% if request.user.rol.puede_gestionar_inventario %}
                     <a href="{% url 'inventarioUpdate' m.id %}" class="btn btn-sm btn-edit">Editar</a>
+                    {% endif %}
+                    {% if request.user.rol.puede_gestionar_inventario %}
                     <button class="btn btn-sm btn-delete"
                             data-url="{% url 'inventarioDelete' m.id %}"
                             onclick="confirmarEliminacion(this)">
                       Eliminar
                     </button>
+                    {% endif %}
                   </div>
                 </td>
               </tr>

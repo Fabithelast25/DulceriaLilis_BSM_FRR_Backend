@@ -11,8 +11,10 @@ from Panel_Productos.models import Producto
 from django.db import transaction
 from django.core.paginator import Paginator
 from datetime import datetime, timedelta
+from Panel_Usuarios.middleware import role_required
 # Create your views here.
 @login_required(login_url='login')
+@role_required(gestionar_inventario=True)
 def movimientoAdd(request):
     if request.method == "POST":
         form = movimientoForm(request.POST)
@@ -64,6 +66,7 @@ def movimientoAdd(request):
     return render(request, "Inventario/inventarioAdd.html", {"form": form})
 
 @login_required(login_url='login')
+@role_required(gestionar_inventario=True, ver_reportes=True)
 def inventarioLista(request):
     # 1️⃣ Obtener queryset base
     movimientos = Movimiento.objects.all().order_by('-fecha')
@@ -116,6 +119,7 @@ def inventarioLista(request):
     return render(request, 'Inventario/inventarioLista.html', context)
 
 @login_required(login_url='login')
+@role_required(gestionar_inventario=True)
 def movimientoUpdate(request, id):
     movimiento = get_object_or_404(Movimiento, id=id)
 
@@ -175,7 +179,8 @@ def movimientoUpdate(request, id):
 
     return render(request, 'Inventario/inventarioUpdate.html', {'form': form})
 
-
+@login_required(login_url='login')
+@role_required(gestionar_inventario=True)
 def movimientoDelete(request, id):
     movimiento = get_object_or_404(Movimiento, id=id)
     movimiento.delete()

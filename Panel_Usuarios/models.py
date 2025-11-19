@@ -28,6 +28,11 @@ class Rol(models.Model):
     nombre = models.CharField(max_length=20, verbose_name="Rol")
     creado = models.DateTimeField(auto_now_add=True)
     descripcion = models.TextField(max_length=200, verbose_name="Descripcion", blank=True)
+    puede_gestionar_usuarios = models.BooleanField(default=False)
+    puede_gestionar_productos = models.BooleanField(default=False)
+    puede_gestionar_proveedores = models.BooleanField(default=False)
+    puede_gestionar_inventario = models.BooleanField(default=False)
+    puede_ver_reportes = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.nombre}"
@@ -49,22 +54,6 @@ class Area(models.Model):
         verbose_name = "Area" #Nombre de la tabla en el panel Admin
         verbose_name_plural = "Areas" #Nombre en plural
 
-class UsuarioManager(UserManager):
-    def create_superuser(self, username, email=None, password=None, **extra_fields):
-        extra_fields.setdefault('is_staff', True)
-        extra_fields.setdefault('is_superuser', True)
-        extra_fields.setdefault('estado', 'A')
-        user = super().create_superuser(username, email, password, **extra_fields)
-        # Auto-asigna rol Admin si no viene
-        try:
-            from .models import Rol
-            if getattr(user, 'rol_id', None) is None:
-                rol, _ = Rol.objects.get_or_create(nombre="Admin", defaults={"descripcion":"Rol administrador"})
-                user.rol = rol
-                user.save(update_fields=['rol'])
-        except Exception:
-            pass
-        return user
 
 class Usuario(AbstractUser):
     #Estos valores se heredan de AbstractUser
@@ -86,7 +75,6 @@ class Usuario(AbstractUser):
     #Metadatos
     area = models.ForeignKey(Area, on_delete=models.SET_NULL, blank=True, null=True)
     observaciones = models.TextField(max_length=500, verbose_name="Observaciones", blank=True)
-    objects = UsuarioManager()
     class Meta:
         db_table = "usuario" #Nombre de la tabla cuando se cree
         verbose_name = "Usuario" #Nombre de la tabla en el panel Admin

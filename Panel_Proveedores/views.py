@@ -10,7 +10,7 @@ from django.shortcuts import render
 from .models import Proveedor, ESTADO_PROVEEDOR, MONEDA_CHOICES
 from django.http import HttpResponse
 import openpyxl
-
+from Panel_Usuarios.middleware import role_required
 
 from .models import Proveedor, ESTADO_PROVEEDOR, MONEDA_CHOICES, CONDICIONES_PAGO_CHOICES, OfertaProveedor
 from .forms import OfertaProveedorForm
@@ -18,7 +18,6 @@ from .forms import OfertaProveedorForm
 # =========================
 # Formulario (ModelForm)
 # =========================
-
 class ProveedorForm(forms.ModelForm):
     class Meta:
         model = Proveedor
@@ -67,6 +66,7 @@ class ProveedorForm(forms.ModelForm):
 # Vistas CRUD + Listado
 # =========================
 @login_required(login_url='login')
+@role_required(gestionar_proveedores=True)
 def lista_ofertas(request):
     q = (request.GET.get("q") or "").strip()
     preferente = request.GET.get("preferente")
@@ -96,11 +96,13 @@ def lista_ofertas(request):
     return render(request, "proveedores/ofertas_lista.html", ctx)
 
 @login_required(login_url='login')
+@role_required(gestionar_proveedores=True)
 def lista_ofertas_page(request):
     # página completa (layout + toolbar + include del fragmento)
     return lista_ofertas_fragment(request, render_full=True)
 
 @login_required(login_url='login')
+@role_required(gestionar_proveedores=True)
 def lista_ofertas_fragment(request, render_full=False):
     q = (request.GET.get("q") or "").strip()
     preferente = request.GET.get("preferente")
@@ -124,6 +126,7 @@ def lista_ofertas_fragment(request, render_full=False):
     return render(request, "proveedores/_ofertas_table_fragment.html", ctx)
 
 @login_required(login_url='login')
+@role_required(gestionar_proveedores=True)
 def agregar_proveedor(request):
     if request.method == 'POST':
         form = ProveedorForm(request.POST)
@@ -137,6 +140,7 @@ def agregar_proveedor(request):
     return render(request, 'proveedores/form.html', {'form': form, 'accion': 'Agregar'})
 
 @login_required(login_url='login')
+@role_required(gestionar_proveedores=True)
 def editar_proveedor(request, pk):
     proveedor = get_object_or_404(Proveedor, pk=pk)
     if request.method == 'POST':
@@ -151,6 +155,7 @@ def editar_proveedor(request, pk):
     return render(request, 'proveedores/form.html', {'form': form, 'accion': 'Editar'})
 
 @login_required(login_url='login')
+@role_required(gestionar_proveedores=True)
 def eliminar_proveedor(request, pk):
     proveedor = get_object_or_404(Proveedor, pk=pk)
     if request.method == 'POST':
@@ -192,11 +197,13 @@ def _filtrar_proveedores(request):
     }
 
 @login_required(login_url='login')
+@role_required(gestionar_proveedores=True)
 def lista_proveedores(request):
     ctx = _filtrar_proveedores(request)
     return render(request, 'proveedores/lista.html', ctx)  # nombre del template ok
 
 @login_required(login_url='login')
+@role_required(gestionar_proveedores=True)
 def lista_proveedores_fragment(request):
     ctx = _filtrar_proveedores(request)
     return render(request, 'proveedores/_proveedores_table_fragment.html', ctx)
@@ -268,6 +275,7 @@ def exportar_proveedores_excel(request):
 
 # ---------- OFERTAS: LISTA ----------
 @login_required(login_url='login')
+@role_required(gestionar_proveedores=True)
 def lista_ofertas(request):
     q = (request.GET.get("q") or "").strip()
     preferente = request.GET.get("preferente")  # '1', '0' o None
@@ -297,6 +305,7 @@ def lista_ofertas(request):
 
 # ---------- OFERTAS: AGREGAR ----------
 @login_required(login_url='login')
+@role_required(gestionar_proveedores=True)
 def agregar_oferta(request):
     if request.method == "POST":
         form = OfertaProveedorForm(request.POST)
@@ -318,6 +327,7 @@ def agregar_oferta(request):
 
 # ---------- OFERTAS: EDITAR ----------
 @login_required(login_url='login')
+@role_required(gestionar_proveedores=True)
 def editar_oferta(request, pk):
     oferta = get_object_or_404(OfertaProveedor, pk=pk)
     if request.method == "POST":
@@ -340,6 +350,7 @@ def editar_oferta(request, pk):
 
 # ---------- OFERTAS: ELIMINAR ----------
 @login_required(login_url='login')
+@role_required(gestionar_proveedores=True)
 def eliminar_oferta(request, pk):
     oferta = get_object_or_404(OfertaProveedor, pk=pk)
     if request.method == "POST":
