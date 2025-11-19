@@ -345,3 +345,6 @@ def export_excel(request, resource: str):
     )
     resp['Content-Disposition'] = f'attachment; filename="{resource}.xlsx"'
     return resp
+
+def no_autorizado(request):
+    return render(request, "no_autorizado.html")
