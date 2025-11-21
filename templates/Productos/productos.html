@@ -170,7 +170,7 @@
         <form method="get" class="toolbar">
           <input type="text" id="buscador" name="nombres" class="form-control" placeholder="Buscar por SKU o nombre" value="{{ nombres }}"/>
 
-          <select name="categoria" class="form-select" style="color: #000;">
+          <select id="filtro-categoria" name="categoria" class="form-select" style="color: #000;">
               <option value="" style="color:#000;">Todas las categorías</option>
               {% for c in categorias %}
                   <option value="{{ c.id }}" style="color:#000;"
@@ -180,7 +180,7 @@
               {% endfor %}
           </select>
 
-          <select name="unidad_medida" class="form-select" style="color: #000;">
+          <select id="filtro-unidad" name="unidad_medida" class="form-select" style="color: #000;">
               <option value="" style="color:#000;">Todas las unidades de medida</option>
               {% for u in unidades_medida %}
                   <option value="{{ u.id }}" style="color:#000;"
@@ -294,5 +294,89 @@
 
   });
   </script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Elementos
+        const tabla = document.getElementById("tabla-productos");
+        const inputNombre = document.getElementById("buscador");
+        const selectCategoria = document.getElementById("filtro-categoria");
+        const selectUnidad = document.getElementById("filtro-unidad");
+        const exportBtn = document.getElementById("exportar-excel-btn");
+
+        if (!tabla || !inputNombre || !selectCategoria || !selectUnidad || !exportBtn) {
+            return;
+        }
+
+        // URL base de export (generada por Django)
+        const exportBase = "{{ request.scheme }}://{{ request.get_host }}{% url 'exportar_productos_excel' %}";
+
+        // Construye parámetros (sin ajax por defecto)
+        function construirParams(includeAjax = false) {
+            const params = new URLSearchParams();
+            const nombre = inputNombre.value.trim();
+            const categoria = selectCategoria.value;
+            const unidad = selectUnidad.value;
+
+            if (nombre) params.set("nombres", nombre);
+            if (categoria) params.set("categoria", categoria);
+            if (unidad) params.set("unidad_medida", unidad);
+            if (includeAjax) params.set("ajax", "1");
+            return params.toString();
+        }
+
+        // Actualiza solo el href del botón export y la URL (sin recargar)
+        function actualizarHrefYUrl() {
+            const qsSinAjax = construirParams(false);
+            const newPath = qsSinAjax ? ("?" + qsSinAjax) : window.location.pathname;
+            try {
+                window.history.replaceState(null, "", newPath);
+            } catch (e) {}
+
+            exportBtn.href = exportBase + (qsSinAjax ? ("?" + qsSinAjax) : "");
+        }
+
+        // Llamada AJAX para actualizar tabla
+        function actualizarTabla() {
+            const qsAjax = construirParams(true);
+            const fetchUrl = window.location.pathname + (qsAjax ? ("?" + qsAjax) : "");
+
+            fetch(fetchUrl, { credentials: "same-origin" })
+                .then(response => {
+                    if (!response.ok) throw new Error("Respuesta no OK");
+                    return response.text();
+                })
+                .then(html => {
+                    tabla.innerHTML = html;
+                    actualizarHrefYUrl();
+                })
+                .catch(() => {
+                    actualizarHrefYUrl();
+                });
+        }
+
+        // Evitar envío del formulario por Enter
+        const filtroForm = document.querySelector("form.toolbar");
+        if (filtroForm) {
+            filtroForm.addEventListener("submit", function (e) {
+                e.preventDefault();
+                actualizarTabla();
+            });
+        }
+
+        // Debounce input
+        let debounceTimer = null;
+        inputNombre.addEventListener("input", function () {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(actualizarTabla, 300);
+        });
+
+        // Cambios selects
+        selectCategoria.addEventListener("change", actualizarTabla);
+        selectUnidad.addEventListener("change", actualizarTabla);
+
+        // Inicializar href del botón al cargar
+        actualizarHrefYUrl();
+    });
+    </script>
 </body>
 </html>
