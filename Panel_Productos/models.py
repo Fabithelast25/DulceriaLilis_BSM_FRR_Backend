@@ -103,6 +103,10 @@ class Producto(models.Model):
     #Fecha de creación
     creado = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return f"{self.nombre} ({self.sku})"
+
+
     def save(self, *args, **kwargs):
         if self.ean_upc == '':  # Si el campo es una cadena vacía, lo asignamos como None
             self.ean_upc = None

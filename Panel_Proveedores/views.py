@@ -61,70 +61,6 @@ class ProveedorForm(forms.ModelForm):
         v = self.cleaned_data.get('ciudad')
         return v.strip().title() if v else v
 
-
-# =========================
-# Vistas CRUD + Listado
-# =========================
-@login_required(login_url='login')
-@role_required(gestionar_proveedores=True)
-def lista_ofertas(request):
-    q = (request.GET.get("q") or "").strip()
-    preferente = request.GET.get("preferente")
-
-    qs = OfertaProveedor.objects.select_related("producto", "proveedor")
-    if q:
-        qs = qs.filter(
-            Q(producto__nombre__icontains=q) |
-            Q(proveedor__razon_social__icontains=q)
-        )
-    if preferente in ("0", "1"):
-        qs = qs.filter(preferente=(preferente == "1"))
-
-    paginator = Paginator(qs, 10)
-    page_obj = paginator.get_page(request.GET.get("page"))
-
-    ctx = {"page_obj": page_obj, "q": q, "preferente": preferente}
-
-    # ---- DEBUG: para ver en consola qué está devolviendo ----
-    is_partial = request.headers.get("X-Partial") == "1" or request.GET.get("partial") == "1"
-    print("lista_ofertas -> is_partial:", is_partial)  # mira tu consola del runserver
-    # ---------------------------------------------------------
-
-    if is_partial:
-        return render(request, "proveedores/_ofertas_table_fragment.html", ctx)
-
-    return render(request, "proveedores/ofertas_lista.html", ctx)
-
-@login_required(login_url='login')
-@role_required(gestionar_proveedores=True)
-def lista_ofertas_page(request):
-    # página completa (layout + toolbar + include del fragmento)
-    return lista_ofertas_fragment(request, render_full=True)
-
-@login_required(login_url='login')
-@role_required(gestionar_proveedores=True)
-def lista_ofertas_fragment(request, render_full=False):
-    q = (request.GET.get("q") or "").strip()
-    preferente = request.GET.get("preferente")
-    qs = OfertaProveedor.objects.select_related("producto", "proveedor")
-
-    if q:
-        qs = qs.filter(
-            Q(producto__nombre__icontains=q) |
-            Q(proveedor__razon_social__icontains=q)
-        )
-    if preferente in ("0", "1"):
-        qs = qs.filter(preferente=(preferente == "1"))
-
-    paginator = Paginator(qs, 10)
-    page_obj = paginator.get_page(request.GET.get("page"))
-
-    ctx = {"page_obj": page_obj, "q": q, "preferente": preferente}
-
-    if render_full:
-        return render(request, "proveedores/ofertas_lista.html", ctx)
-    return render(request, "proveedores/_ofertas_table_fragment.html", ctx)
-
 @login_required(login_url='login')
 @role_required(gestionar_proveedores=True)
 def agregar_proveedor(request):
@@ -273,12 +209,11 @@ def exportar_proveedores_excel(request):
     wb.save(response)
     return response
 
-# ---------- OFERTAS: LISTA ----------
-@login_required(login_url='login')
-@role_required(gestionar_proveedores=True)
-def lista_ofertas(request):
+# ---------- OFERTAS: LISTA + FRAGMENTO ----------
+
+def _filtrar_ofertas(request):
     q = (request.GET.get("q") or "").strip()
-    preferente = request.GET.get("preferente")  # '1', '0' o None
+    preferente = (request.GET.get("preferente") or "").strip()  # '1', '0' o ''
 
     ofertas = OfertaProveedor.objects.select_related("producto", "proveedor")
 
@@ -288,20 +223,50 @@ def lista_ofertas(request):
             Q(producto__sku__icontains=q) |
             Q(proveedor__razon_social__icontains=q)
         )
+
     if preferente in ("0", "1"):
         ofertas = ofertas.filter(preferente=(preferente == "1"))
 
     ofertas = ofertas.order_by("proveedor__razon_social", "producto__nombre")
 
-    paginator = Paginator(ofertas, 10)
+    paginator = Paginator(ofertas, 10)  # 👈 10 ofertas por página
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
+    return {
+        "page_obj": page_obj,
+        "q": q,
+        "preferente": preferente,
+    }
+
+
+@login_required(login_url='login')
+@role_required(gestionar_proveedores=True)
+def lista_ofertas(request):
+    """
+    Vista de página completa: layout + toolbar + include del fragmento.
+    """
+    ctx = _filtrar_ofertas(request)
     return render(
         request,
         "proveedores/ofertas_lista.html",
-        {"page_obj": page_obj, "q": q, "preferente": preferente},
+        ctx,
     )
+
+
+@login_required(login_url='login')
+@role_required(gestionar_proveedores=True)
+def lista_ofertas_fragment(request):
+    """
+    Solo el fragmento de la tabla + paginación para AJAX.
+    """
+    ctx = _filtrar_ofertas(request)
+    return render(
+        request,
+        "proveedores/_ofertas_table_fragment.html",
+        ctx,
+    )
+
 
 # ---------- OFERTAS: AGREGAR ----------
 @login_required(login_url='login')

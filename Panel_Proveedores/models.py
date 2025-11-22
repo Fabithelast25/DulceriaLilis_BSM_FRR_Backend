@@ -4,6 +4,7 @@ from django.core.validators import RegexValidator, EmailValidator, MinValueValid
 from django.core.exceptions import ValidationError
 from Panel_Productos.models import Producto
 from .validators import validate_rut_chile, normalize_rut  # RUT chileno estricto
+from django.utils import timezone
 
 ESTADO_PROVEEDOR = (("ACTIVO", "Activo"), ("BLOQUEADO", "Bloqueado"))
 
@@ -66,6 +67,8 @@ class Proveedor(models.Model):
 
     estado = models.CharField(max_length=10, choices=ESTADO_PROVEEDOR, default="ACTIVO")
     observaciones = models.TextField(blank=True, null=True)
+
+    creado = models.DateTimeField(auto_now_add=True, db_index=True)
 
     class Meta:
         verbose_name = "Proveedor"

@@ -44,7 +44,7 @@
     label{font-weight:700;margin-bottom:6px;display:block}
     .hint{font-size:.85rem;color:var(--muted);margin-top:4px}
 
-    /* Inputs base (aplican a lo que renderiza Django) */
+    /* Inputs base */
     input[type="text"], input[type="email"], input[type="tel"], input[type="url"],
     select, textarea, .form-control, .form-select{
       width:100%;border:1px solid var(--border);border-radius:10px;padding:10px 12px;background:#fff
@@ -191,6 +191,74 @@
       </form>
     </div>
   </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // ====== Límites de caracteres por NOMBRE de campo ======
+      const maxLenByName = {
+        "rut_nif": 20,
+        "razon_social": 50,
+        "nombre_fantasia": 20,
+        "email": 254,
+        "telefono": 20,
+        "sitio_web": 200,
+        "direccion": 200,
+        "ciudad": 20,
+        "pais": 20,
+        "condiciones_pago": 100,
+        "contacto_principal_nombre": 120,
+        "contacto_principal_email": 254,
+        "contacto_principal_telefono": 20,
+        "observaciones": 500
+      };
+
+      Object.entries(maxLenByName).forEach(([name, max]) => {
+        const elements = document.getElementsByName(name);
+        if (!elements || !elements.length) return;
+
+        for (const el of elements) {
+          // atributo HTML
+          el.setAttribute("maxlength", max);
+
+          // recorte manual en cada input
+          el.addEventListener("input", (e) => {
+            if (e.target.value.length > max) {
+              e.target.value = e.target.value.slice(0, max);
+            }
+          });
+        }
+      });
+
+      // ====== Restricción teléfonos: solo números y "+" (solo al inicio) ======
+      const phoneNames = ["telefono", "contacto_principal_telefono"];
+
+      phoneNames.forEach(name => {
+        const elements = document.getElementsByName(name);
+        if (!elements || !elements.length) return;
+
+        for (const input of elements) {
+          input.setAttribute("inputmode", "tel");
+
+          input.addEventListener("input", (e) => {
+            let v = e.target.value;
+
+            const startsWithPlus = v.startsWith("+");
+            v = v.replace(/[^0-9+]/g, "");  // deja solo dígitos y +
+            v = v.replace(/\+/g, "");       // quita todos los +
+
+            let nuevo = startsWithPlus ? "+" + v : v;
+
+            const max = parseInt(input.getAttribute("maxlength") || "20", 10);
+            if (nuevo.length > max) {
+              nuevo = nuevo.slice(0, max);
+            }
+
+            e.target.value = nuevo;
+          });
+        }
+      });
+    });
+  </script>
 
 </body>
 </html>

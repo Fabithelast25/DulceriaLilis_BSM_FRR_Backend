@@ -1,4 +1,4 @@
-{% load static %}
+{% load static %} 
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -111,28 +111,33 @@
     <div class="title">Proveedores</div>
 
     <form method="get" class="toolbar" role="search">
+      <!-- Búsqueda libre -->
       <input class="form-control grow" type="text" name="q" value="{{ q }}" placeholder="Buscar por RUT/NIF, razón social, email, ciudad, país…">
 
+      <!-- Filtro por estado -->
       <select class="form-select" name="estado">
         <option value="">Todos los estados</option>
-        {% for value,label in ESTADO_PROVEEDOR %}
-          <option value="{{ value }}" {% if estado == value %}selected{% endif %}>{{ label }}</option>
-        {% endfor %}
+        <option value="ACTIVO" {% if estado == "ACTIVO" %}selected{% endif %}>Activo</option>
+        <option value="BLOQUEADO" {% if estado == "BLOQUEADO" %}selected{% endif %}>Bloqueado</option>
       </select>
 
+      <!-- Filtro por moneda -->
       <select class="form-select" name="moneda">
         <option value="">Todas las monedas</option>
-        {% for value,label in MONEDA_CHOICES %}
-          <option value="{{ value }}" {% if moneda == value %}selected{% endif %}>{{ label }}</option>
-        {% endfor %}
+        <option value="CLP" {% if moneda == "CLP" %}selected{% endif %}>CLP</option>
+        <option value="USD" {% if moneda == "USD" %}selected{% endif %}>USD</option>
+        <option value="EUR" {% if moneda == "EUR" %}selected{% endif %}>EUR</option>
       </select>
 
-      <a href="{% url 'agregar_proveedor' %}" class="btn-outline-gold">Añadir Proveedor</a>
-      <a href="{% url 'exportar_proveedores_excel' %}?rut={{ rut }}&nombre={{ nombre }}&estado={{ estado }}"
-        class="btn btn-success">
-          Exportar Excel
+      <a href="{% url 'agregar_proveedor' %}" class="btn-outline-gold">
+        Añadir Proveedor
       </a>
 
+      <!-- Exportar Excel respetando filtros actuales -->
+      <a href="{% url 'exportar_proveedores_excel' %}?q={{ q }}&estado={{ estado }}&moneda={{ moneda }}"
+         class="btn btn-success">
+        Exportar Excel
+      </a>
     </form>
 
     {% if messages %}
@@ -204,7 +209,10 @@
     const onType = () => {
       clearTimeout(typingTimer);
       const val = (search.value || "").trim();
-      if (val.length === 0) { typingTimer = setTimeout(trigger, 200); return; }
+      if (val.length === 0) {
+        typingTimer = setTimeout(trigger, 200);
+        return;
+      }
       if (val.length < MIN_CHARS) return;
       typingTimer = setTimeout(trigger, DEBOUNCE);
     };

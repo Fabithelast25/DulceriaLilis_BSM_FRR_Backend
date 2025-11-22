@@ -55,54 +55,52 @@
     }
 
     /* ===== Quick actions (botones grandes rojos) ===== */
-.quick-actions{
-  display:grid;
-  grid-template-columns: repeat(4, minmax(220px, 1fr));
-  gap:14px;
-  margin-bottom:18px;
-}
+    .quick-actions{
+      display:grid;
+      grid-template-columns: repeat(4, minmax(220px, 1fr));
+      gap:14px;
+      margin-bottom:18px;
+    }
 
-.qa{
-  display:flex;
-  gap:12px;
-  align-items:center;
-  justify-content:center;
-  border:none;
-  border-radius:18px;
-  padding:16px 14px;
-  background: linear-gradient(180deg, var(--brand-red), var(--brand-red-700));
-  color:#fff;
-  font-weight:900;
-  text-decoration:none;
-  box-shadow: 0 10px 20px rgba(200,16,46,.25);
-  transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
-}
+    .qa{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      justify-content:center;
+      border:none;
+      border-radius:18px;
+      padding:16px 14px;
+      background: linear-gradient(180deg, var(--brand-red), var(--brand-red-700));
+      color:#fff;
+      font-weight:900;
+      text-decoration:none;
+      box-shadow: 0 10px 20px rgba(200,16,46,.25);
+      transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+    }
 
-.qa i{
-  font-size:22px;
-}
+    .qa i{
+      font-size:22px;
+    }
 
-.qa:focus-visible{
-  outline:3px solid var(--brand-gold);
-  outline-offset:3px;
-}
+    .qa:focus-visible{
+      outline:3px solid var(--brand-gold);
+      outline-offset:3px;
+    }
 
-.qa:hover{
-  transform: translateY(-2px);
-  filter: brightness(1.05);
-  box-shadow:0 16px 26px rgba(200,16,46,.35);
-}
+    .qa:hover{
+      transform: translateY(-2px);
+      filter: brightness(1.05);
+      box-shadow:0 16px 26px rgba(200,16,46,.35);
+    }
 
-/* opcional: versión activa (click sostenido) */
-.qa:active{
-  transform: scale(.98);
-  filter: brightness(.9);
-}
+    .qa:active{
+      transform: scale(.98);
+      filter: brightness(.9);
+    }
 
-/* mantén el diseño responsivo */
-@media (max-width:992px){
-  .quick-actions{ grid-template-columns: 1fr; }
-}
+    @media (max-width:992px){
+      .quick-actions{ grid-template-columns: 1fr; }
+    }
 
     /* ===== Cards/KPI ===== */
     .card{
@@ -122,7 +120,6 @@
       opacity:.25; pointer-events:none;
     }
 
-    /* Small pill buttons (descargas) */
     .btn-pill{ border-radius:999px; }
     .btn-brand{
       background: linear-gradient(180deg, var(--brand-red), var(--brand-red-700));
@@ -139,10 +136,6 @@
     .table-wrap{ overflow:auto; border:1px solid var(--border); border-radius:12px; }
     thead th{ background:linear-gradient(180deg, #fff, var(--brand-gold-100)); }
 
-    /* Accesibilidad y responsive */
-    @media (max-width:992px){
-      .quick-actions{ grid-template-columns: 1fr; }
-    }
     @media (prefers-reduced-motion:no-preference){
       .fade-in{ animation:fade .35s ease both; }
       @keyframes fade{ from{opacity:0; transform:translateY(4px)} to{opacity:1; transform:none} }
@@ -152,25 +145,22 @@
 <body>
   <div class="page container-xxl">
 
-<div class="topbar d-flex align-items-center justify-content-between flex-wrap gap-2">
-  <h1 class="title h3 m-0">
-    <span class="title-badge" aria-hidden="true"></span>
-    Dashboard · Dulcería Lilis
-  </h1>
+    <div class="topbar d-flex align-items-center justify-content-between flex-wrap gap-2">
+      <h1 class="title h3 m-0">
+        <span class="title-badge" aria-hidden="true"></span>
+        Dashboard · Dulcería Lilis
+      </h1>
 
-  <div class="d-flex gap-2">
-    <!-- Botón refrescar -->
-    <button class="btn btn-sm btn-brand btn-pill" onclick="init()" aria-label="Refrescar dashboard">
-      <i class="bi bi-arrow-clockwise me-1"></i> Refrescar
-    </button>
+      <div class="d-flex gap-2">
+        <button class="btn btn-sm btn-brand btn-pill" onclick="init()" aria-label="Refrescar dashboard">
+          <i class="bi bi-arrow-clockwise me-1"></i> Refrescar
+        </button>
 
-    <!-- Botón cerrar sesión -->
-    <a href="{% url 'login' %}" class="btn btn-sm btn-danger btn-pill" aria-label="Cerrar sesión">
-      <i class="bi bi-box-arrow-right me-1"></i> Cerrar Sesión
-    </a>
-  </div>
-</div>
-
+        <a href="{% url 'login' %}" class="btn btn-sm btn-danger btn-pill" aria-label="Cerrar sesión">
+          <i class="bi bi-box-arrow-right me-1"></i> Cerrar Sesión
+        </a>
+      </div>
+    </div>
 
     <!-- Accesos rápidos grandes -->
     <nav class="quick-actions" aria-label="Accesos rápidos">
@@ -226,14 +216,14 @@
 
     <!-- Gráficas -->
     <div class="row g-3">
+      <!-- Izquierda: rueda (productos por categoría) -->
       <div class="col-12 col-lg-6 fade-in">
-        <div class="card p-3">
+        <div class="card p-3 h-100">
           <div class="panel-head">
-            <h2 class="panel-title m-0"><i class="bi bi-pie-chart me-1"></i> Productos por categoría</h2>
+            <h2 class="panel-title m-0">
+              <i class="bi bi-pie-chart me-1"></i> Productos por categoría
+            </h2>
             <div class="d-flex gap-2">
-              <a class="btn btn-sm btn-outline-secondary btn-pill" href="{% url 'export_excel' 'productos' %}">
-                <i class="bi bi-file-earmark-spreadsheet"></i> Excel
-              </a>
               <a class="btn btn-sm btn-outline-secondary btn-pill" href="{% url 'export_csv' 'productos' %}">
                 <i class="bi bi-filetype-csv"></i> CSV
               </a>
@@ -243,30 +233,33 @@
         </div>
       </div>
 
-      <div class="col-12 col-lg-6 fade-in">
+      <!-- Derecha: 3 gráficas apiladas -->
+      <div class="col-12 col-lg-6 d-flex flex-column gap-3 fade-in">
         <div class="card p-3">
           <div class="panel-head">
-            <h2 class="panel-title m-0"><i class="bi bi-activity me-1"></i> Altas de productos (12 meses)</h2>
+            <h2 class="panel-title m-0">
+              <i class="bi bi-activity me-1"></i> Altas de productos (12 meses)
+            </h2>
           </div>
-          <canvas id="chartMonthlyProducts" height="140" aria-label="Altas de productos en 12 meses" role="img"></canvas>
+          <canvas id="chartMonthlyProducts" height="120" aria-label="Altas de productos en 12 meses" role="img"></canvas>
         </div>
-      </div>
 
-      <div class="col-12 col-lg-6 fade-in">
         <div class="card p-3">
           <div class="panel-head">
-            <h2 class="panel-title m-0"><i class="bi bi-building-gear me-1"></i> Nuevos proveedores (12 meses)</h2>
+            <h2 class="panel-title m-0">
+              <i class="bi bi-building-gear me-1"></i> Nuevos proveedores (12 meses)
+            </h2>
           </div>
-          <canvas id="chartMonthlyProviders" height="140" aria-label="Altas de proveedores en 12 meses" role="img"></canvas>
+          <canvas id="chartMonthlyProviders" height="120" aria-label="Altas de proveedores en 12 meses" role="img"></canvas>
         </div>
-      </div>
 
-      <div class="col-12 col-lg-6 fade-in">
         <div class="card p-3">
           <div class="panel-head">
-            <h2 class="panel-title m-0"><i class="bi bi-person-check me-1"></i> Nuevos usuarios (12 meses)</h2>
+            <h2 class="panel-title m-0">
+              <i class="bi bi-person-check me-1"></i> Nuevos usuarios (12 meses)
+            </h2>
           </div>
-          <canvas id="chartMonthlyUsers" height="140" aria-label="Altas de usuarios en 12 meses" role="img"></canvas>
+          <canvas id="chartMonthlyUsers" height="120" aria-label="Altas de usuarios en 12 meses" role="img"></canvas>
         </div>
       </div>
     </div>
@@ -306,7 +299,11 @@
   </div>
 
   <script>
-    async function getJSON(url){ const r = await fetch(url); if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); }
+    async function getJSON(url){
+      const r = await fetch(url);
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      return r.json();
+    }
 
     // KPIs
     async function loadKPIs(){
@@ -373,7 +370,6 @@
           tbody.appendChild(tr);
         });
       }
-      // Actualiza links de descarga con el umbral
       document.getElementById('btnXlsxLow').href = "{% url 'export_excel' 'low_stock' %}" + `?umbral=${umbral}`;
       document.getElementById('btnCsvLow').href  = "{% url 'export_csv' 'low_stock' %}"  + `?umbral=${umbral}`;
     }
