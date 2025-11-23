@@ -2,6 +2,8 @@ import re
 from django import forms
 from Panel_Productos.choices import alertas_por_vencer, alertas_bajo_stock
 from Panel_Productos.models import Categoria, UnidadMedida, Producto
+from django.core.validators import URLValidator
+from django.core.exceptions import ValidationError
 
 class ProductoForm(forms.ModelForm):
 
@@ -78,7 +80,31 @@ class ProductoForm(forms.ModelForm):
             'impuesto_iva': forms.NumberInput(attrs={'class': 'form-control', 'value': 19}),
 
         }
-    # Validación de SKU
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            numeric_fields = [
+                'factor_conversion',
+                'costo_estandar',
+                'costo_promedio',
+                'precio_venta',
+                'stock_minimo',
+                'stock_maximo',
+                'punto_reorden',
+                'stock_actual',
+            ]
+
+            for field in numeric_fields:
+                if field in self.fields:
+                    self.fields[field].widget.attrs.update({
+                        'max': 999999,
+                    })
+
+            # Caso especial: impuesto_iva → solo hasta 100
+            if 'impuesto_iva' in self.fields:
+                self.fields['impuesto_iva'].widget.attrs.update({
+                    'max': 100,
+            })
+     # SKU
     def clean_sku(self):
         sku = self.cleaned_data.get('sku')
         if not sku:
@@ -86,191 +112,235 @@ class ProductoForm(forms.ModelForm):
         if not re.match(r'^[A-Z0-9\-]+$', sku):
             raise forms.ValidationError("El SKU solo puede contener letras mayúsculas, números y guiones")
         if len(sku) >= 15:
-            raise forms.ValidationError('El número debe tener menos de 15 caracteres')
-        # CLAVE: excluir el producto actual cuando estás editando
+            raise forms.ValidationError("El número debe tener menos de 15 caracteres")
         qs = Producto.objects.filter(sku=sku)
-        if self.instance.pk:  # si estamos EDITANDO
+        if self.instance.pk:
             qs = qs.exclude(pk=self.instance.pk)
-
         if qs.exists():
             raise forms.ValidationError("Ya existe un producto con este SKU.")
         return sku
 
-    # Validacion de EAN/UPC
-    def validate_ean(self):
+    # EAN/UPC
+    def clean_ean_upc(self):
         ean_upc = self.cleaned_data.get('ean_upc')
-        # Si ean_upc es None o vacío, no lo valida
-        if ean_upc is None or ean_upc == '':
-            return
+        if not ean_upc:
+            return ean_upc
         if not ean_upc.isdigit():
-            raise forms.ValidationError('Este campo solo debe contener números.')
+            raise forms.ValidationError("Este campo solo debe contener números.")
         if not (12 <= len(ean_upc) <= 13):
-            raise forms.ValidationError('El número debe tener entre 12 y 13 caracteres.')
-        if Producto.objects.filter(ean_upc).exists():
+            raise forms.ValidationError("El número debe tener entre 12 y 13 caracteres.")
+        qs = Producto.objects.filter(ean_upc=ean_upc)
+        if self.instance.pk:
+            qs = qs.exclude(pk=self.instance.pk)
+        if qs.exists():
             raise forms.ValidationError("Ya existe un producto con esta EAN/UPC.")
-    # Validación de nombre
+        return ean_upc
+
+    # Nombre
     def clean_nombre(self):
         nombre = self.cleaned_data.get('nombre')
         if not nombre:
             raise forms.ValidationError("Este campo no puede estar vacío.")
-        if nombre and not all(c.isalpha() or c.isspace() or c.isdigit() for c in nombre):
-            raise forms.ValidationError("El nombre solo puede contener letras, números y espacios")
+        if not re.match(r'^[A-Za-z0-9áéíóúÁÉÍÓÚüÜñÑ\s]+$', nombre):
+            raise forms.ValidationError("El nombre solo puede contener letras, números y espacios, incluyendo acentos.")
         if len(nombre) >= 70:
-            raise forms.ValidationError('El nombre debe tener menos de 70 caracteres')
+            raise forms.ValidationError("El nombre debe tener menos de 70 caracteres")
         return nombre
-    
-    # Validación de descripcion
+
+    # Descripción
     def clean_descripcion(self):
-        descripcion = self.cleaned_data.get('descripcion')
+        descripcion = self.cleaned_data.get('descripcion') or ''
         if len(descripcion) >= 300:
-            raise forms.ValidationError('La descripción debe tener menos de 300 caracteres')
+            raise forms.ValidationError("La descripción debe tener menos de 300 caracteres")
         return descripcion
-    
-    # Validación de marca
+
+    # Marca
     def clean_marca(self):
         marca = self.cleaned_data.get('marca')
-        if marca and not all(c.isalpha() or c.isspace() or c.isdigit() for c in marca):
-            raise forms.ValidationError("La marca solo puede contener letras, números y espacios")
-        if marca is not None and len(marca) >= 50:  # Solo verifica la longitud si 'marca' tiene valor
-            raise forms.ValidationError("La marca debe tener al menos 50 caracteres.")
+        if marca:
+            if not re.match(r'^[A-Za-z0-9 ]+$', marca):
+                raise forms.ValidationError("La marca solo puede contener letras, números y espacios")
+            if len(marca) > 50:
+                raise forms.ValidationError("La marca no puede tener más de 50 caracteres")
         return marca
-    
-    # Validación de modelo
+
+    # Modelo
     def clean_modelo(self):
         modelo = self.cleaned_data.get('modelo')
-        if modelo and not all(c.isalpha() or c.isspace() or c.isdigit() for c in modelo):
-            raise forms.ValidationError("El modelo solo puede contener letras, números y espacios")
-        if modelo is not None and len(modelo) >= 50:  # Solo verifica la longitud si 'marca' tiene valor
-            raise forms.ValidationError("La marca debe tener al menos 50 caracteres.")
+        if modelo:
+            if not re.match(r'^[A-Za-z0-9 ]+$', modelo):
+                raise forms.ValidationError("El modelo solo puede contener letras, números y espacios")
+            if len(modelo) > 50:
+                raise forms.ValidationError("El modelo no puede tener más de 50 caracteres")
         return modelo
-    
+
+    # Factor de conversión
     def clean_factor_conversion(self):
-        factor_conversion = self.cleaned_data.get("factor_conversion")
-
-        if factor_conversion is None:
+        factor = self.cleaned_data.get('factor_conversion')
+        if factor is None:
             raise forms.ValidationError("Este campo no puede estar vacío.")
-        
-        if factor_conversion < 0:
-            raise forms.ValidationError("El costo estándar no puede ser negativo.")
-    
-        return factor_conversion
+        if factor < 0:
+            raise forms.ValidationError("El factor de conversión no puede ser negativo.")
+        return factor
 
-    # Validación de costos y precios
+    # Costos
     def clean_costo_estandar(self):
         costo = self.cleaned_data.get('costo_estandar')
-        if costo == '' or costo is None:  # Permitir vacío
-            return None  # O puedes devolver un valor predeterminado, como 0 si es necesario.
+        if costo in (None, ''):
+            return None
         try:
             costo = float(costo)
         except ValueError:
             raise forms.ValidationError("El costo estándar debe ser un número")
         if costo < 0:
             raise forms.ValidationError("El costo estándar no puede ser negativo")
+        if costo > 999999:
+            raise forms.ValidationError("El costo estándar no puede superar 999.999")
         return costo
 
     def clean_costo_promedio(self):
         costo = self.cleaned_data.get('costo_promedio')
+        if costo in (None, ''):
+            return None
         try:
             costo = float(costo)
         except ValueError:
             raise forms.ValidationError("El costo promedio debe ser un número")
         if costo < 0:
             raise forms.ValidationError("El costo promedio no puede ser negativo")
+        if costo > 999999:
+            raise forms.ValidationError("El costo promedio no puede superar 999.999")
         return costo
 
     def clean_precio_venta(self):
         precio = self.cleaned_data.get('precio_venta')
-        if precio == '' or precio is None:  # Permitir vacío
-            return None  # O puedes devolver 0 si deseas que tenga un valor por defecto.
+        if precio in (None, ''):
+            return None
         try:
             precio = float(precio)
         except ValueError:
             raise forms.ValidationError("El precio de venta debe ser un número")
         if precio < 0:
             raise forms.ValidationError("El precio de venta no puede ser negativo")
+        if precio > 999999:
+            raise forms.ValidationError("El precio de venta no puede superar 999.999")
         return precio
 
+    # IVA
     def clean_impuesto_iva(self):
         iva = self.cleaned_data.get('impuesto_iva')
+        if iva in (None, ''):
+            raise forms.ValidationError("Este campo no puede estar vacío.")
         try:
             iva = float(iva)
         except ValueError:
             raise forms.ValidationError("El IVA debe ser un número")
-        if iva is None:
-            raise forms.ValidationError("Este campo no puede estar vacío.")
         if not (0 <= iva <= 100):
             raise forms.ValidationError("El IVA debe estar entre 0 y 100")
         return iva
 
-    # Validación de stock
+    # Stock
     def clean_stock_minimo(self):
         stock = self.cleaned_data.get('stock_minimo')
+        if stock in (None, ''):
+            raise forms.ValidationError("Este campo no puede estar vacío.")
         try:
             stock = int(stock)
         except ValueError:
             raise forms.ValidationError("El stock mínimo debe ser un número entero")
-        if stock is None:
-            raise forms.ValidationError("Este campo no puede estar vacío.")
         if stock < 0:
             raise forms.ValidationError("El stock mínimo no puede ser negativo")
+        if stock > 999999:
+            raise forms.ValidationError("El stock mínimo no puede superar 999.999")
         return stock
 
     def clean_stock_maximo(self):
         stock = self.cleaned_data.get('stock_maximo')
-        if stock == '' or stock is None:  # Permitir vacío
-            return None  # O puedes devolver 0 si deseas un valor por defecto.
+        if stock in (None, ''):
+            return None
         try:
             stock = int(stock)
         except ValueError:
             raise forms.ValidationError("El stock máximo debe ser un número entero")
         if stock < 0:
             raise forms.ValidationError("El stock máximo no puede ser negativo")
+        if stock > 999999:
+            raise forms.ValidationError("El stock máximo no puede superar 999.999")
+        return stock
+
+    def clean_stock_actual(self):
+        stock = self.cleaned_data.get('stock_actual')
+        if stock in (None, ''):
+            raise forms.ValidationError("Este campo no puede estar vacío.")
+        try:
+            stock = int(stock)
+        except ValueError:
+            raise forms.ValidationError("El stock debe ser un número entero")
+        if stock < 0:
+            raise forms.ValidationError("El stock no puede ser negativo")
+        if stock > 999999:
+            raise forms.ValidationError("El stock no puede superar 999.999")
         return stock
 
     def clean_punto_reorden(self):
         punto = self.cleaned_data.get('punto_reorden')
-        if punto == '' or punto is None:  # Permitir vacío
-            return None  # O puedes devolver 0 si deseas un valor por defecto.
+        if punto in (None, ''):
+            return None
         try:
             punto = int(punto)
         except ValueError:
             raise forms.ValidationError("El punto de reorden debe ser un número entero")
-        if punto is None:
-            raise forms.ValidationError("Este campo no puede estar vacío.")
         if punto < 0:
             raise forms.ValidationError("El punto de reorden no puede ser negativo")
+        if punto > 999999:
+            raise forms.ValidationError("El punto de reorden no puede superar 999.999")
         return punto
-    
-    def clean_stock_actual(self):
-        stock = self.cleaned_data.get('stock_actual')
-        try:
-            stock = int(stock)
-        except ValueError:
-            raise forms.ValidationError("El stock máximo debe ser un número entero")
-        if stock < 0:
-            raise forms.ValidationError("El stock máximo no puede ser negativo")
-        return stock
-    # Validación de URLs
-    def clean_url(self):
-        url = self.cleaned_data.get('url')
-        if url and not url.startswith(('http://', 'https://')):
+
+    # URLs
+    def clean_imagen_url(self):
+        url = self.cleaned_data.get('imagen_url')
+        if not url:
+            return url
+        if not url.startswith(('http://','https://')):
             raise forms.ValidationError("La URL debe iniciar con http:// o https://")
         return url
 
     def clean_ficha_tecnica_url(self):
-        url_ficha = self.cleaned_data.get('ficha_tecnica_url')
-        if url_ficha and not url_ficha.startswith(('http://', 'https://')):
-            raise forms.ValidationError("La URL de la ficha técnica debe iniciar con http:// o https://")
-        return url_ficha
+        url = self.cleaned_data.get('ficha_tecnica_url')
+        if not url:
+            return url
+        if not url.startswith(('http://','https://')):
+            raise forms.ValidationError("La URL debe iniciar con http:// o https://")
+        return url
+
+    # Validación general
     def clean(self):
         cleaned_data = super().clean()
+
         stock_minimo = cleaned_data.get('stock_minimo')
         stock_maximo = cleaned_data.get('stock_maximo')
+        punto_reorden = cleaned_data.get('punto_reorden')
 
-        if stock_minimo > stock_maximo:
-            raise forms.ValidationError("El stock mínimo no puede ser mayor que el stock máximo.")
+        # Validación stock_min < stock_max
+        if stock_minimo is not None and stock_maximo is not None:
+            if stock_minimo > stock_maximo:
+                self.add_error('stock_minimo', "El stock mínimo no puede ser mayor que el stock máximo.")
+                self.add_error('stock_maximo', "El stock máximo no puede ser menor que el stock mínimo.")
+
+        # Validación punto de reorden dentro del rango
+        if (
+            stock_minimo not in (None, 0) and
+            stock_maximo not in (None, 0) and
+            punto_reorden is not None
+        ):
+            if not (stock_minimo <= punto_reorden <= stock_maximo):
+                self.add_error('punto_reorden', "El punto de reorden debe estar entre el stock mínimo y el stock máximo.")
+                # Opcional: puedes mostrar también el error en los otros campos
+                self.add_error('stock_minimo', "El punto de reorden debe estar dentro del rango definido.")
+                self.add_error('stock_maximo', "El punto de reorden debe estar dentro del rango definido.")
 
         return cleaned_data
+
 
 class CategoriaForm(forms.ModelForm):
     nombre_abreviado = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control','placeholder':'CH'}), max_length=3)
@@ -282,7 +352,7 @@ class CategoriaForm(forms.ModelForm):
             'rows':3,
             'placeholder':'Descripción de la categoría'
         }),
-        max_length=200
+        max_length=240
     )
 
     class Meta:

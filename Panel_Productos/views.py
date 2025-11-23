@@ -4,6 +4,7 @@ from django.db.models import Q
 from django.http import JsonResponse, HttpResponse
 from Panel_Productos.forms import ProductoForm,CategoriaForm,UnidadMedidaForm
 from django.contrib import messages
+from django.core.paginator import Paginator
 from Panel_Productos.models import Producto,Categoria,UnidadMedida
 from django.contrib.auth.decorators import login_required
 from Panel_Usuarios.middleware import role_required
@@ -13,74 +14,100 @@ from Panel_Usuarios.middleware import role_required
 @login_required(login_url='login')
 @role_required(gestionar_productos=True)
 def productosAdd(request):
-    form = ProductoForm(request.POST)
     if request.method == 'POST':
         form = ProductoForm(request.POST)
+
         if form.is_valid():
-            # Si 'punto_reorden' está vacío, asignamos el valor de 'stock_minimo'
+            # Si 'punto_reorden' está vacío, asignamos stock_minimo
             if not form.cleaned_data['punto_reorden']:
-                form.cleaned_data['punto_reorden'] = form.cleaned_data.get('stock_minimo', 0)  # Asigna 'stock_minimo' si está vacío
+                form.cleaned_data['punto_reorden'] = form.cleaned_data.get('stock_minimo', 0)
+
             form.save()
             messages.success(request, 'Producto agregado correctamente.')
-        else:
-            print(form.errors)
+
+        # ❗ IMPORTANTE: si es inválido, NO crear un nuevo form.
+        # El mismo form con errores se envía de vuelta
+        return render(request, 'Productos/productos_add.html', {'form': form})
+
     else:
+        # GET → crear formulario vacío
         form = ProductoForm()
+
     return render(request, 'Productos/productos_add.html', {'form': form})
 
 
-from django.db.models import Q
-from .models import Producto, Categoria, UnidadMedida  # ajusta nombres si los tienes diferentes
 @login_required(login_url='login')
 @role_required(gestionar_productos=True)
 def mostrarProductos(request):
-    # Capturar búsqueda desde el input "nombres"
-    buscar = request.GET.get("nombres", "")
+    def clean_param(param):
+        if param is None:
+            return ""
+        return param.strip()
 
-    # capturar filtros actuales (para mantener el select seleccionado en el template)
+    # Capturar los filtros
+    buscar = request.GET.get("nombres", "")
     selected_categoria = request.GET.get("categoria", "")
     selected_unidad = request.GET.get("unidad_medida", "")
+    per_page = clean_param(request.GET.get("per_page", "10"))
 
-    # Construir queryset base y aplicar búsqueda
-    productos = Producto.objects.all()
+    productos =  Producto.objects.all().order_by('id') 
+
+    # Aplicar los filtros
     if buscar:
-        productos = productos.filter(
-            Q(nombre__icontains=buscar) |
-            Q(sku__icontains=buscar)
-        )
-
-    # Aplicar filtros de categoria / unidad si vienen (opcional, sigue funcionando el botón Filtrar)
+        productos = productos.filter(Q(nombre__icontains=buscar) | Q(sku__icontains=buscar))
     if selected_categoria:
         productos = productos.filter(categoria_id=selected_categoria)
     if selected_unidad:
-        # dependiendo de tu modelo puedes tener uom_compra_id o uom_venta_id; aquí filtramos en ambas
         productos = productos.filter(Q(uom_compra_id=selected_unidad) | Q(uom_venta_id=selected_unidad))
 
-    # Mantén tu lógica EXACTA de bajo_stock (no la modifiqué)
+     # Verificar el estado de "bajo stock" en cada producto
     for producto in productos:
         if producto.stock_actual <= producto.punto_reorden:
             producto.bajo_stock = True
         else:
             producto.bajo_stock = False
 
-    # Obtener listas para los selects
-    categorias = Categoria.objects.all()
-    unidades_medida = UnidadMedida.objects.all()
+    # Paginación
+    hide_pagination = False
+    if per_page == "all":
+        productos_page = productos
+        hide_pagination = True  # No mostrar paginador si se muestran todos los productos
+    else:
+        try:
+            per_page_int = int(per_page)
+        except ValueError:
+            per_page_int = 10  # Valor predeterminado de paginación
+        paginator = Paginator(productos, per_page_int)
+        page = request.GET.get("page")
+        productos_page = paginator.get_page(page)
 
-    # Si la petición es AJAX, devuelve solo las filas de la tabla
+        # Si solo hay una página, ocultamos la paginación
+        if productos_page.paginator.num_pages == 1:
+            hide_pagination = True
+
+
+    # Si es AJAX → solo renderizamos la tabla
     if request.GET.get("ajax") == "1":
-        return render(request, "Productos/partial_tabla_productos.html", {"productos": productos})
+        return render(request, "Productos/partial_tabla_productos.html", {
+            "productos": productos_page,
+            "nombres": buscar,
+            "categoria": selected_categoria,
+            "unidad_medida": selected_unidad,
+            "per_page_actual": per_page,
+            "hide_pagination": hide_pagination
+        })
 
-    # Render normal cuando no es AJAX (incluimos las listas para los selects)
-    ctx = {
-        "productos": productos,
-        "categorias": categorias,
-        "unidades_medida": unidades_medida,
+    # Renderizar la vista completa
+    return render(request, "Productos/productos.html", {
+        "productos": productos_page,
+        "categorias": Categoria.objects.all(),
+        "unidades_medida": UnidadMedida.objects.all(),
         "nombres": buscar,
         "categoria": selected_categoria,
         "unidad_medida": selected_unidad,
-    }
-    return render(request, "Productos/productos.html", ctx)
+        "per_page_actual": per_page,
+        "hide_pagination": hide_pagination  # Añadir esto para controlar la visibilidad del paginador
+    })
 
 
 def cargarProductos(request,producto_id):
@@ -108,12 +135,14 @@ def modificarProductos(request, id):
         else:
             # Errores
             if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-                return JsonResponse({'success': False, 'errors': form.errors})
+                # Convertimos errores a dict simple
+                errors = {k: [str(m) for m in v] for k,v in form.errors.items()}
+                return JsonResponse({'success': False, 'errors': errors})
             messages.error(request, "Hubo un error al actualizar el producto.")
     else:
         form = ProductoForm(instance=producto)
 
-    return render(request, 'Productos/update_producto.html', {'form': form})
+    return render(request, 'Productos/update_producto.html', {'form': form, 'producto': producto})
 
 def productoDelete(request, producto_id):
     producto = get_object_or_404(Producto, id=producto_id)
@@ -228,12 +257,13 @@ def categoriasAdd(request):
         form = CategoriaForm(request.POST)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Categoria creada correctamente.')
+            messages.success(request, 'Categoría creada correctamente.')
         else:
-            print(form.errors)
-            messages.error(request, 'Revisa los campos del formulario.')
+            # NO SE USA messages.error
+            return render(request, 'Productos/categorias/categorias_add.html', {'form': form})
     else:
         form = CategoriaForm()
+
     return render(request, 'Productos/categorias/categorias_add.html', {'form': form})
 
 
@@ -255,21 +285,24 @@ def cargarCategorias(request,categoria_id):
 
 @login_required(login_url='login')
 @role_required(gestionar_productos=True)
-def modificarCategorias(request,id):
+def modificarCategorias(request, id):
     categoria = get_object_or_404(Categoria, id=id)
+    mensaje_exito = False  # <- bandera para JS
     if request.method == 'POST':
-       
         form = CategoriaForm(request.POST, instance=categoria)
         if form.is_valid():
             form.save()
-            messages.success(request, "Categoría actualizada correctamente.")
-            return redirect('categoria-modificada', id=id)
+            mensaje_exito = True
         else:
-            messages.error(request, "Hubo un error al actualizar, verifique que los campos se hayan ingresado correctamente")
-            print(form.errors)
+            messages.error(request, "Revisa los campos, hay errores en el formulario.")
     else:
         form = CategoriaForm(instance=categoria)
-    return render(request, 'Productos/categorias/update_categoria.html', {'form': form})
+
+    return render(request, 'Productos/categorias/update_categoria.html', {
+        'form': form,
+        'mensaje_exito': mensaje_exito
+    })
+
 
 def categoriaDelete(request, categoria_id):
     categoria = get_object_or_404(Categoria, id=categoria_id)
@@ -286,8 +319,7 @@ def unidadesAdd(request):
             form.save()
             messages.success(request, 'Unidad de medida creada correctamente.')
         else:
-            print(form.errors)
-            messages.error(request, 'Revisa los campos del formulario.')
+            return render(request, 'Productos/unidades_medida/unidad_medida_add.html', {'form': form})
     else:
         form = UnidadMedidaForm()
     return render(request, 'Productos/unidades_medida/unidad_medida_add.html', {'form': form})
@@ -311,19 +343,22 @@ def cargarUnidades(request,unidad_medida_id):
 @role_required(gestionar_productos=True)
 def modificarUnidades(request,id):
     unidad_medida = get_object_or_404(UnidadMedida, id=id)
+    mensaje_exito = False  # <- bandera para JS
+
     if request.method == 'POST':
-       
         form = UnidadMedidaForm(request.POST, instance=unidad_medida)
         if form.is_valid():
             form.save()
-            messages.success(request, "Unidad de medida actualizada correctamente.")
-            return redirect('unidad-medida-modificada', id=id)
+            mensaje_exito = True
         else:
-            messages.error(request, "Hubo un error al actualizar, verifique que los campos se hayan ingresado correctamente")
-            print(form.errors)
+            messages.error(request, "Revisa los campos, hay errores en el formulario.")
     else:
         form = UnidadMedidaForm(instance=unidad_medida)
-    return render(request, 'Productos/unidades_medida/update_unidad_medida.html', {'form': form})
+
+    return render(request, 'Productos/unidades_medida/update_unidad_medida.html', {
+        'form': form,
+        'mensaje_exito': mensaje_exito
+    })
 
 def unidadesDelete(request, unidad_medida_id):
     unidad_medida = get_object_or_404(UnidadMedida, id=unidad_medida_id)
