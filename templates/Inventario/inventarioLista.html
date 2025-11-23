@@ -85,8 +85,7 @@
     .ingreso{ background:#e8f8ea; color:#0f5a14; border:1px solid #c7efcd; }
     .ajuste{ background:#fff9db; color:#6a5600; border:1px solid #ffe08a; }
     .salida{ background:#ffe7e5; color:#6b1204; border:1px solid #ffb3ab; }
-    .transferencia{ background:#e5f0ff; color:#075380; border:1px solid #abe4ff; }
-    .transferencia{ background:#e5fdff; color:#078080; border:1px solid #abf9ff; }
+    .devoluciones{ background:#e5f0ff; color:#075380; border:1px solid #abe4ff; }
     .badge-soft{ display:inline-block; padding:6px 10px; border-radius:14px; font-weight:700; font-size:.8rem; background:#eef2ff; color:#0b3a9b; border:1px solid #d7e0ff; }
     @media (max-width: 992px){ .toolbar{ grid-template-columns: 1fr 1fr 1fr 1fr; } }
     @media (max-width: 640px){ .toolbar{ grid-template-columns: 1fr; } .card-header{ flex-direction:column; align-items:flex-start; gap:8px; } }
@@ -105,11 +104,10 @@
           {% if request.user.rol.puede_gestionar_inventario %}
           <a class="btn btn-gold" href="{% url 'inventarioAdd' %}">Añadir Movimiento</a>
           {% endif %}
-          <a href="{% url 'exportar_movimientos_excel' %}?tipo={{ tipo }}&producto={{ producto }}&proveedor={{ proveedor }}&bodega={{ bodega }}&desde={{ desde }}&hasta={{ hasta }}"
-            class="btn btn-success">
-            Exportar Excel
+          <a href="{% url 'exportar_movimientos_excel' %}?tipo={{ tipo_actual }}&fecha_desde={{ fecha_desde_actual }}&fecha_hasta={{ fecha_hasta_actual }}"
+              class="btn btn-success">
+              Exportar Excel
           </a>
-
         </div>
       </div>
       <div class="body">
@@ -136,7 +134,8 @@
                   <option value="">Todos</option>
                   <option value="I" {% if tipo_actual == 'I' %}selected{% endif %}>Ingreso</option>
                   <option value="S" {% if tipo_actual == 'S' %}selected{% endif %}>Salida</option>
-                  <option value="T" {% if tipo_actual == 'T' %}selected{% endif %}>Transferencia</option>
+                  <option value="D" {% if tipo_actual == 'D' %}selected{% endif %}>Devoluciones</option>
+                  <option value="A" {% if tipo_actual == 'A' %}selected{% endif %}>Ajustes</option>
                 </select>
               </div>
 
@@ -200,8 +199,8 @@
                   <span class="tipo ingreso">Ingreso</span>
                   {% elif m.tipo == 'S'%}
                   <span class="tipo salida">Salida</span>
-                  {% elif m.tipo == 'T'%}
-                  <span class="tipo transferencia">Transferencia</span>
+                  {% elif m.tipo == 'D'%}
+                  <span class="tipo devoluciones">Devoluciones</span>
                   {% elif m.tipo == 'A'%}
                   <span class="tipo ajuste">Ajustes</span>
                   {% else %}

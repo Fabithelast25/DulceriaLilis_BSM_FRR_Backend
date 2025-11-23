@@ -164,17 +164,17 @@
 
     <!-- Accesos rápidos grandes -->
     <nav class="quick-actions" aria-label="Accesos rápidos">
-      {% if request.user.rol.puede_gestionar_usuarios %}
+      {% if request.user.rol.puede_gestionar_usuarios or request.user.rol.puede_ver_usuarios %}
       <a class="qa users" href="{% url 'usuarioLista' %}">
         <i class="bi bi-people-fill"></i> <span>Panel de Usuarios</span>
       </a>
       {% endif %}
-      {% if request.user.rol.puede_gestionar_productos %}
+      {% if request.user.rol.puede_gestionar_productos or request.user.rol.puede_ver_productos %}
       <a class="qa products" href="{% url 'productos' %}">
         <i class="bi bi-box-seam"></i> <span>Panel de Productos</span>
       </a>
       {% endif %}
-      {% if request.user.rol.puede_gestionar_proveedores %}
+      {% if request.user.rol.puede_gestionar_proveedores or request.user.rol.puede_ver_proveedores %}
       <a class="qa providers" href="{% url 'lista_proveedores' %}">
         <i class="bi bi-truck"></i> <span>Panel de Proveedores</span>
       </a>

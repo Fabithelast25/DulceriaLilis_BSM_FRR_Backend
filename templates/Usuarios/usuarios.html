@@ -103,7 +103,9 @@
           <span>Usuarios</span>
         </div>
         <div class="d-flex gap-2">
+          {% if request.user.rol.puede_gestionar_usuarios %}
           <a class="btn btn-gold" href="{% url 'usuarioAdd' %}">Añadir Usuario</a>
+          {% endif %}
           <a 
               href="{% url 'exportar_usuarios_excel' %}?buscar={{ request.GET.buscar }}&rol={{ request.GET.rol }}&estado={{ request.GET.estado }}&area={{ request.GET.area }}"
               class="btn btn-success"
@@ -219,12 +221,16 @@
                 <td>{% if u.area %}{{ u.area }}{% else %}<span class="text-muted">—</span>{% endif %}</td>
                 <td class="text-center">
                   <div class="d-inline-flex gap-2">
+                    {% if request.user.rol.puede_gestionar_inventario %}
+                    {% endif %}
+                    {% if request.user.rol.puede_gestionar_inventario %}
                     <a href="{% url 'usuarioUpdate' u.id %}" class="btn btn-sm btn-edit">Editar</a>
                     <button class="btn btn-sm btn-delete"
                             data-url="{% url 'usuarioDelete' u.id %}"
                             onclick="confirmarEliminacion(this)">
                       Eliminar
                     </button>
+                    {% endif %}
                   </div>
                 </td>
               </tr>

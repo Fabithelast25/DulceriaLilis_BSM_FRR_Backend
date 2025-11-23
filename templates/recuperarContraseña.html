@@ -9,30 +9,49 @@
     Recuperar Contraseña
 {% endblock title %}
 
-
 {% block cuerpo %}
 <div class="container mt-4 w-25 mb-4" id="contenedor_login">
     <h4 class="text-center">Recuperar Contraseña</h4>
+
     <div class="d-flex justify-content-center mt-4">
         <img src="{% static 'images/logo_lilis.png' %}" alt="">
     </div>
 
-    
-
     <form method="POST" action="{% url 'recuperarContraseña' %}">
         {% csrf_token %}
-        <p class="mt-4">Ingrese su correo asociado. Se le enviará un código para recuperar su contraseña.</p>
-        <input type="email" name="email" class="form-control" placeholder="username@correo.cl" required>
+        {% if not ocultar_email %}
+        <p class="mt-4">
+            Ingrese su correo asociado. Se le enviará un código para recuperar su contraseña.
+        </p>
+            <!-- 🔵 Caso 1: usuario común — mostrar campo email -->
+            <input type="email"
+                   name="email"
+                   class="form-control"
+                   placeholder="username@correo.cl"
+                   required>
+        {% else %}
+            <!-- 🔵 Caso 2: viene desde login (primer acceso) — ocultar campo -->
+            <input type="hidden" name="email" value="{{ email_session }}">
+
+            <div class="alert alert-info mt-2">
+                <strong>Correo detectado:</strong> {{ email_session }} <br>
+                Se requiere actualizar su contraseña antes del primer inicio de sesión.
+            </div>
+        {% endif %}
+
         {% if messages %}
             {% for message in messages %}
                 <div class="alert alert-{{ message.tags }} mt-3">{{ message }}</div>
             {% endfor %}
         {% endif %}
+
         <div class="d-flex mt-4">
             <button type="submit" class="btn btn-primary flex-fill">Enviar correo</button>
         </div>
     </form>
 
-    <a class="d-flex justify-content-center mt-3" href="{% url 'login' %}">Volver al Inicio de Sesión</a>
+    <a class="d-flex justify-content-center mt-3" href="{% url 'login' %}">
+        Volver al Inicio de Sesión
+    </a>
 </div>
 {% endblock %}
