@@ -32,6 +32,9 @@ class Rol(models.Model):
     puede_gestionar_productos = models.BooleanField(default=False)
     puede_gestionar_proveedores = models.BooleanField(default=False)
     puede_gestionar_inventario = models.BooleanField(default=False)
+    puede_ver_usuarios = models.BooleanField(default=False)
+    puede_ver_productos = models.BooleanField(default=False)
+    puede_ver_proveedores = models.BooleanField(default=False)
     puede_ver_reportes = models.BooleanField(default=False)
 
     def __str__(self):
@@ -75,6 +78,7 @@ class Usuario(AbstractUser):
     #Metadatos
     area = models.ForeignKey(Area, on_delete=models.SET_NULL, blank=True, null=True)
     observaciones = models.TextField(max_length=500, verbose_name="Observaciones", blank=True)
+    primer_acceso = models.BooleanField(default=False)
     class Meta:
         db_table = "usuario" #Nombre de la tabla cuando se cree
         verbose_name = "Usuario" #Nombre de la tabla en el panel Admin

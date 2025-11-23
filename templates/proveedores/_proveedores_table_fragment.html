@@ -33,8 +33,12 @@
             {% endif %}
           </td>
           <td class="d-flex gap-2">
+            {% if request.user.rol.puede_gestionar_proveedores %}
             <a class="btn-outline-gold btn-sm" href="{% url 'editar_proveedor' p.id %}">Editar</a>
+            {% endif %}
+            {% if request.user.rol.puede_gestionar_proveedores %}
             <a class="btn-red btn-sm" href="{% url 'eliminar_proveedor' p.id %}">Eliminar</a>
+            {% endif %}
           </td>
         </tr>
       {% empty %}

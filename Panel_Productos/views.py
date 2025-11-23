@@ -37,7 +37,7 @@ def productosAdd(request):
 
 
 @login_required(login_url='login')
-@role_required(gestionar_productos=True)
+@role_required(gestionar_productos=True, ver_productos=True)
 def mostrarProductos(request):
     def clean_param(param):
         if param is None:

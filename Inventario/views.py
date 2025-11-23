@@ -34,6 +34,10 @@ def movimientoAdd(request):
 
                     if movimiento.tipo == "I":  # Ingreso
                         producto.stock_actual += cantidad
+                        if producto.stock_actual > producto.stock_maximo:
+                            messages.error(request, "No puede superar el stock maximo del producto")
+                            return render(request, 'Inventario/inventarioUpdate.html', {'form': form})
+                            
 
                     elif movimiento.tipo == "S":  # Salida
                         if producto.stock_actual < cantidad:
@@ -43,10 +47,16 @@ def movimientoAdd(request):
 
                     elif movimiento.tipo == "D":  # Devolución
                         producto.stock_actual += cantidad
+                        if producto.stock_actual > producto.stock_maximo:
+                            messages.error(request, "No puede superar el stock maximo del producto")
+                            return render(request, 'Inventario/inventarioUpdate.html', {'form': form})
 
                     elif movimiento.tipo == "A":  # Ajuste
                         # Puedes decidir aquí si permites negativo o no
                         producto.stock_actual += cantidad  # Si permites ajustar con signos positivos/negativos
+                        if producto.stock_actual > producto.stock_maximo:
+                            messages.error(request, "No puede superar el stock maximo del producto")
+                            return render(request, 'Inventario/inventarioUpdate.html', {'form': form})
 
                     # 6. Guardamos stock actualizado
                     producto.save()
@@ -156,6 +166,9 @@ def movimientoUpdate(request, id):
             # === 3) APLICAR NUEVO EFECTO EN STOCK ===
             if nuevo_tipo == "I":
                 producto_nuevo.stock_actual += nueva_cantidad
+                if producto_nuevo.stock_actual > producto_nuevo.stock_maximo:
+                    messages.error(request, "No puede superar el stock maximo del producto")
+                    return render(request, 'Inventario/inventarioUpdate.html', {'form': form})
             elif nuevo_tipo == "S":
                 if producto_nuevo.stock_actual < nueva_cantidad:
                     messages.error(request, "Stock insuficiente para aplicar la salida.")
@@ -163,8 +176,14 @@ def movimientoUpdate(request, id):
                 producto_nuevo.stock_actual -= nueva_cantidad
             elif nuevo_tipo == "D":
                 producto_nuevo.stock_actual += nueva_cantidad
+                if producto.stock_actual > producto.stock_maximo:
+                            messages.error(request, "No puede superar el stock maximo del producto")
+                            return render(request, 'Inventario/inventarioUpdate.html', {'form': form})
             elif nuevo_tipo == "A":
                 producto_nuevo.stock_actual += nueva_cantidad  # Si manejas ajustes +/-
+                if producto.stock_actual > producto.stock_maximo:
+                            messages.error(request, "No puede superar el stock maximo del producto")
+                            return render(request, 'Inventario/inventarioUpdate.html', {'form': form})
             # T = Transferencia pendiente
 
             producto_nuevo.save()
@@ -187,51 +206,49 @@ def movimientoDelete(request, id):
     return redirect('inventarioLista')
 
 def exportar_movimientos_excel(request):
-    tipo = request.GET.get("tipo", "").strip()
-    producto = request.GET.get("producto", "").strip()
-    proveedor = request.GET.get("proveedor", "").strip()
-    bodega = request.GET.get("bodega", "").strip()
-    fecha_desde = request.GET.get("desde", "").strip()
-    fecha_hasta = request.GET.get("hasta", "").strip()
+    # ----------------------------------------------------------------------
+    # 1) CAPTURAR FILTROS DESDE LA URL (GET)
+    # ----------------------------------------------------------------------
+    tipo = request.GET.get("tipo", "").strip()              # Obtiene el tipo (I, S, A, D)
+    fecha_desde = request.GET.get("fecha_desde", "").strip() # Fecha inicial
+    fecha_hasta = request.GET.get("fecha_hasta", "").strip() # Fecha final
 
+    # ----------------------------------------------------------------------
+    # 2) CONSULTA BASE: TRAE TODOS LOS MOVIMIENTOS CON SUS RELACIONES
+    # ----------------------------------------------------------------------
     movimientos = Movimiento.objects.select_related(
         "producto", "proveedor", "bodega"
     ).all()
 
-    # ----------------------------
-    # FILTROS
-    # ----------------------------
+    # ----------------------------------------------------------------------
+    # 3) FILTRO POR TIPO DE MOVIMIENTO
+    # ----------------------------------------------------------------------
     if tipo:
-        movimientos = movimientos.filter(tipo__iexact=tipo)
+        movimientos = movimientos.filter(tipo__iexact=tipo)  
+        # Si viene "I", filtra solo Ingresos; si viene "S", solo Salidas, etc.
 
-    if producto:
-        movimientos = movimientos.filter(
-            Q(producto__nombre__icontains=producto) |
-            Q(producto__id__icontains=producto)
-        )
-
-    if proveedor:
-        movimientos = movimientos.filter(
-            Q(proveedor__rut_nif__icontains=proveedor) |
-            Q(proveedor__razon_social__icontains=proveedor)
-        )
-
-    if bodega:
-        movimientos = movimientos.filter(bodega__nombre__icontains=bodega)
-
+    # ----------------------------------------------------------------------
+    # 4) FILTRO POR FECHA DESDE
+    # ----------------------------------------------------------------------
     if fecha_desde:
         movimientos = movimientos.filter(fecha__date__gte=fecha_desde)
+        # Trae movimientos cuya fecha sea >= fecha_desde
 
+    # ----------------------------------------------------------------------
+    # 5) FILTRO POR FECHA HASTA
+    # ----------------------------------------------------------------------
     if fecha_hasta:
         movimientos = movimientos.filter(fecha__date__lte=fecha_hasta)
+        # Trae movimientos cuya fecha sea <= fecha_hasta
 
-    # ----------------------------
-    # CREAR EXCEL
-    # ----------------------------
-    wb = openpyxl.Workbook()
-    ws = wb.active
-    ws.title = "Movimientos"
+    # ----------------------------------------------------------------------
+    # 6) CREAR ARCHIVO EXCEL
+    # ----------------------------------------------------------------------
+    wb = openpyxl.Workbook()   # Crea libro
+    ws = wb.active             # Hoja activa
+    ws.title = "Movimientos"   # Nombre de la hoja
 
+    # Encabezados del Excel
     headers = [
         "Fecha",
         "Tipo",
@@ -246,33 +263,34 @@ def exportar_movimientos_excel(request):
         "Motivo",
         "Observaciones",
     ]
-    ws.append(headers)
+    ws.append(headers)  # Coloca la fila de encabezados
 
-    # ----------------------------
-    # LLENAR DATOS
-    # ----------------------------
+    # ----------------------------------------------------------------------
+    # 7) LLENAR EXCEL FILA POR FILA
+    # ----------------------------------------------------------------------
     for m in movimientos:
         ws.append([
-            m.fecha.strftime("%Y-%m-%d %H:%M"),
-            dict(m._meta.get_field("tipo").choices).get(m.tipo, m.tipo),
-            m.cantidad,
-            m.producto.nombre if m.producto else "—",
-            m.proveedor.razon_social if m.proveedor else "—",
-            m.bodega.nombre if m.bodega else "—",
-            m.lote or "",
-            m.serie or "",
+            m.fecha.strftime("%Y-%m-%d %H:%M"),                       # Fecha formateada
+            dict(m._meta.get_field("tipo").choices).get(m.tipo, m.tipo),  # Traduce I,S,A,D a palabras
+            m.cantidad,                                               # Cantidad movida
+            m.producto.nombre if m.producto else "—",                 # Producto
+            m.proveedor.razon_social if m.proveedor else "—",         # Proveedor
+            m.bodega.nombre if m.bodega else "—",                     # Bodega
+            m.lote or "",                                             # Lote si existe
+            m.serie or "",                                            # Serie si existe
             m.fechaVencimiento.strftime("%Y-%m-%d") if m.fechaVencimiento else "",
-            m.doc_referencia,
-            m.motivo,
-            m.observaciones or "",
+            m.doc_referencia,                                         # Documento referencia
+            m.motivo,                                                 # Motivo
+            m.observaciones or "",                                    # Observaciones
         ])
 
-    # ----------------------------
-    # RESPUESTA HTTP
-    # ----------------------------
+    # ----------------------------------------------------------------------
+    # 8) RESPUESTA HTTP PARA DESCARGAR EXCEL
+    # ----------------------------------------------------------------------
     response = HttpResponse(
         content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
-    response["Content-Disposition"] = 'attachment; filename="movimientos_inventario.xlsx"'
-    wb.save(response)
-    return response
+    response["Content-Disposition"] = 'attachment; filename="movimientos_filtrados.xlsx"'
+
+    wb.save(response)  # Guarda el archivo en la respuesta
+    return response    # Devuelve el Excel

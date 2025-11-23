@@ -36,7 +36,7 @@ def usuarioAdd(request):
             usuario.save()
             send_mail(
                 "Bienvenido a Dulceria Lilis",
-                f"Hola {usuario.first_name} {usuario.last_name}, tu contraseña temporal es: {contrasenia}\nPor favor cámbiala en la opción 'Recuperar contraseña'.",
+                f"Hola {usuario.first_name} {usuario.last_name}, tu contraseña temporal es: {contrasenia}",
                 settings.DEFAULT_FROM_EMAIL,
                 [usuario.email],
                 fail_silently=False,
@@ -52,7 +52,7 @@ def usuarioAdd(request):
     return render(request, 'Usuarios/usuarioAdd.html', {'form':form})
 
 @login_required(login_url='login')
-@role_required(gestionar_usuarios=True)
+@role_required(gestionar_usuarios=True, ver_usuarios=True)
 def usuarioLista(request):
     def clean_param(param):
         if param is None:

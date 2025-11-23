@@ -128,10 +128,11 @@
         <option value="USD" {% if moneda == "USD" %}selected{% endif %}>USD</option>
         <option value="EUR" {% if moneda == "EUR" %}selected{% endif %}>EUR</option>
       </select>
-
+      {% if request.user.rol.puede_gestionar_proveedores %}
       <a href="{% url 'agregar_proveedor' %}" class="btn-outline-gold">
         Añadir Proveedor
       </a>
+      {% endif %}
 
       <!-- Exportar Excel respetando filtros actuales -->
       <a href="{% url 'exportar_proveedores_excel' %}?q={{ q }}&estado={{ estado }}&moneda={{ moneda }}"

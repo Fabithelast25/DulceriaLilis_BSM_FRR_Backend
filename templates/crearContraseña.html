@@ -20,8 +20,11 @@
     <form method="POST" action="{% url 'crearContraseña' %}">
         {% csrf_token %}
         <p class="mt-4">Ingrese su nueva contraseña:</p>
-        <input type="password" name="password" class="form-control mb-3" placeholder="Nueva contraseña" minlength="8" required>
-        <input type="password" name="confirmar" class="form-control" placeholder="Confirmar contraseña" minlength="8" required>
+        <input type="password" name="password" class="form-control mb-3"
+            placeholder="Nueva contraseña(Min: 12 carácteres. Mayusculas, simbolo)" minlength="12" required>
+
+        <input type="password" name="confirmar" class="form-control"
+            placeholder="Confirmar contraseña" minlength="12" required>
         <div class="d-flex mt-4">
             <button type="submit" class="btn btn-success flex-fill">Actualizar contraseña</button>
         </div>

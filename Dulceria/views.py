@@ -9,16 +9,18 @@ from django.contrib.auth.hashers import make_password
 from .models import Usuario, CodigoRecuperacion
 from django.conf import settings
 from django.http import JsonResponse, HttpResponse
-from django.db.models import Count, Sum
+from django.db.models import Count
 from django.utils.timezone import now
 from django.contrib.auth.models import User
-from datetime import datetime, timedelta
+from datetime import datetime
 from django.http import JsonResponse, HttpResponse
 import csv
 import io
-from Panel_Productos.models import Producto, Categoria
+from Panel_Productos.models import Producto
 from Panel_Proveedores.models import Proveedor
 from django.contrib.auth.decorators import login_required
+import re
+from django.contrib.sessions.models import Session
 
 User = get_user_model()
 
@@ -48,25 +50,32 @@ def rrss(request):
     return render(request, 'InfoEmpresa/rrss.html')
 
 User = get_user_model()
+
 def login(request):
     if request.method == 'POST':
         username_or_email = request.POST.get('username')
         password = request.POST.get('password')
 
-        # Intentar autenticación por username directo
         user = authenticate(request, username=username_or_email, password=password)
 
         if user is None:
             try:
-                # Si no encuentra por username, buscar por email
                 user_obj = User.objects.get(email=username_or_email)
                 user = authenticate(request, username=user_obj.username, password=password)
             except User.DoesNotExist:
                 user = None
 
         if user is not None:
+
+            # 🔥 VALIDAR PRIMER ACCESO
+            if not user.primer_acceso:
+                request.session['primer_acceso_email'] = user.email
+                return redirect('recuperarContraseña')
+
+            # Si ya tiene primer acceso habilitado → entra normal
             auth_login(request, user)
-            return redirect('dashboard')  # redirige donde quieras
+            return redirect('dashboard')
+
         else:
             messages.error(request, 'Usuario o contraseña incorrectos.')
 
@@ -74,22 +83,35 @@ def login(request):
 
 
 def logout_view(request):
+    # Cerrar sesión actual
     logout(request)
+
+    # Borrar todas las sesiones del usuario (impide que Django lo mantenga “recordado”)
+    request.session.flush()
+
     return redirect('login')
 
 
-#Views para recuperar contraseña
 def recuperarContraseña(request):
+    if request.user.is_authenticated:
+        logout(request)
+        request.session.flush()
+        
+    email_session = request.session.get('primer_acceso_email')
+    ocultar_email = False
+
+    if email_session:
+        ocultar_email = True
+
     if request.method == "POST":
-        email = request.POST.get('email')
+        email = email_session if email_session else request.POST.get('email')
+
         try:
             usuario = Usuario.objects.get(email=email)
             codigo = get_random_string(length=6, allowed_chars='0123456789')
 
-            # Guardar código en la BD
             CodigoRecuperacion.objects.create(usuario=usuario, codigo=codigo)
 
-            # Enviar correo
             send_mail(
                 'Código de recuperación',
                 f'Tu código de recuperación es: {codigo}',
@@ -98,11 +120,16 @@ def recuperarContraseña(request):
                 fail_silently=False,
             )
 
-            messages.success(request, "Se ha enviado un código de recuperación a tu correo.")
+            messages.success(request, "Se ha enviado un código a tu correo.")
             return redirect('verificarCodigo')
+
         except Usuario.DoesNotExist:
             messages.error(request, "No existe una cuenta con ese correo.")
-    return render(request, 'recuperarContraseña.html')
+
+    return render(request, 'recuperarContraseña.html', {
+        'ocultar_email': ocultar_email,
+        'email_session': email_session
+    })
 
 def verificarCodigo(request):
     if request.method == "POST":
@@ -124,23 +151,57 @@ def verificarCodigo(request):
     return render(request, 'verificarCodigo.html')
 
 def crearContraseña(request):
+    # Obtiene el email guardado en la sesión
     email = request.session.get('email_recuperacion')
+
+    # Si no hay email, redirige a recuperar contraseña
     if not email:
-        messages.error(request, "Sesión inválida.")
         return redirect('recuperarContraseña')
 
+    # Obtiene al usuario asociado al email
+    usuario = Usuario.objects.get(email=email)
+
+    # Si se envió el formulario por POST
     if request.method == "POST":
-        password = request.POST.get('password')
+        # Captura de valores del formulario
+        nueva = request.POST.get('password')
         confirmar = request.POST.get('confirmar')
-        if password == confirmar:
-            usuario = Usuario.objects.get(email=email)
-            usuario.password = make_password(password)
-            usuario.save()
-            del request.session['email_recuperacion']
-            messages.success(request, "Contraseña actualizada correctamente.")
-            return redirect('login')
-        else:
+
+        # Compara que ambas contraseñas sean iguales
+        if nueva != confirmar:
             messages.error(request, "Las contraseñas no coinciden.")
+            return render(request, 'crearContraseña.html')
+
+        # ----------- VALIDACIÓN ROBUSTA -----------
+        # Expresión regular para validar fortaleza
+        patron = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{12,}$'
+
+        # Verifica si la contraseña NO cumple el patrón
+        if not re.match(patron, nueva):
+            messages.error(request,
+                "La contraseña debe tener al menos 12 caracteres, una mayúscula, una minúscula y un símbolo."
+            )
+            return render(request, 'crearContraseña.html')
+        # -------------------------------------------
+
+        # Asigna la nueva contraseña usando hashing
+        usuario.set_password(nueva)
+
+        # Marca primer acceso como habilitado
+        usuario.primer_acceso = True
+
+        # Guarda los cambios en el usuario
+        usuario.save()
+
+        # Limpia los datos de recuperación en sesión
+        request.session.pop('email_recuperacion', None)
+        request.session.pop('primer_acceso_email', None)
+
+        # Mensaje de éxito
+        messages.success(request, "Contraseña actualizada. Ahora puedes iniciar sesión.")
+        return redirect('login')
+
+    # Si es GET, simplemente muestra el formulario
     return render(request, 'crearContraseña.html')
 
 

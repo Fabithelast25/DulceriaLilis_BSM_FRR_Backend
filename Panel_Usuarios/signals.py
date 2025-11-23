@@ -19,7 +19,7 @@ def crear_superusuario(sender, **kwargs):
         return
 
     # Crear o buscar Rol
-    rol_admin, _ = Rol.objects.get_or_create(nombre="Administrador")
+    rol_admin, _ = Rol.objects.get_or_create(nombre="Administrador", puede_gestionar_usuarios=True, puede_gestionar_productos=True, puede_gestionar_proveedores=True, puede_gestionar_inventario=True, puede_ver_reportes=True)
 
     # Crear o buscar un área
     area_default, _ = Area.objects.get_or_create(nombre="Administración")
@@ -36,5 +36,6 @@ def crear_superusuario(sender, **kwargs):
         estado = "A",
         is_superuser = True,
         is_staff = True,
+        primer_acceso = True,
         password = make_password(password_default),
     )

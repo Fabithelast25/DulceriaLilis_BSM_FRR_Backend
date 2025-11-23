@@ -133,13 +133,13 @@ def _filtrar_proveedores(request):
     }
 
 @login_required(login_url='login')
-@role_required(gestionar_proveedores=True)
+@role_required(gestionar_proveedores=True, ver_proveedores=True)
 def lista_proveedores(request):
     ctx = _filtrar_proveedores(request)
     return render(request, 'proveedores/lista.html', ctx)  # nombre del template ok
 
 @login_required(login_url='login')
-@role_required(gestionar_proveedores=True)
+@role_required(gestionar_proveedores=True, ver_proveedores=True)
 def lista_proveedores_fragment(request):
     ctx = _filtrar_proveedores(request)
     return render(request, 'proveedores/_proveedores_table_fragment.html', ctx)
