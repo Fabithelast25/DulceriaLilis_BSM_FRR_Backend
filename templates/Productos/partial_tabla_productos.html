@@ -22,3 +22,32 @@
     <td colspan="4" class="text-center py-4 text-muted">No hay productos para mostrar.</td>
 </tr>
 {% endfor %}
+
+<!-- Aquí está la lógica para ocultar el paginador si no hay más de una página -->
+{% if productos.paginator.num_pages > 1 and not hide_pagination %}
+    <nav aria-label="Paginación">
+        <ul class="pagination">
+            {% if productos.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ productos.previous_page_number }}&nombres={{ nombres }}&categoria={{ categoria }}&unidad_medida={{ unidad_medida }}&per_page={{ per_page }}">
+                    Anterior
+                </a>
+            </li>
+            {% endif %}
+            {% for num in productos.paginator.page_range %}
+            <li class="page-item {% if productos.number == num %}active{% endif %}">
+                <a class="page-link" href="?page={{ num }}&nombres={{ nombres }}&categoria={{ categoria }}&unidad_medida={{ unidad_medida }}&per_page={{ per_page }}">
+                    {{ num }}
+                </a>
+            </li>
+            {% endfor %}
+            {% if productos.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ productos.next_page_number }}&nombres={{ nombres }}&categoria={{ categoria }}&unidad_medida={{ unidad_medida }}&per_page={{ per_page }}">
+                    Siguiente
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+{% endif %}

@@ -126,13 +126,13 @@
             <label for="id_nombre_completo" class="form-label">Nombre completo</label>
             {{ form.nombre_completo }}
             <div class="form-text">
-              3–60 caracteres. Permite letras con tilde, números y “/ - , .”.
-              <span id="count_nombre" class="counter ms-1">0/60</span>
+              3–20 caracteres. Permite letras con tilde, números y “/ - , .”.
+              <span id="count_nombre" class="counter ms-1">0/20</span>
             </div>
             {% if form.nombre_completo.errors %}
               <div class="invalid-feedback d-block">{{ form.nombre_completo.errors|striptags }}</div>
             {% endif %}
-            <div class="invalid-feedback">Ingresa un nombre válido (3–60 caracteres).</div>
+            <div class="invalid-feedback">Ingresa un nombre válido (3–20 caracteres).</div>
           </div>
 
           <!-- Descripción -->
@@ -189,7 +189,7 @@
           nombre.classList.add('form-control');
           nombre.setAttribute('required','');
           nombre.setAttribute('minlength','3');
-          nombre.setAttribute('maxlength','60');
+          nombre.setAttribute('maxlength','20');
           nombre.setAttribute('pattern','^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ0-9 /,.-]{3,60}$');
           nombre.setAttribute('inputmode','text');
           nombre.setAttribute('placeholder','Ej.: Confites y Dulces Artesanales');
@@ -237,7 +237,7 @@
 
         if (nombre){
           nombre.addEventListener('input', ()=>{
-            updateCounter(nombre, cNombre, 60);
+            updateCounter(nombre, cNombre, 20);
             const val = normalizeSpaces(nombre.value);
             if (val.length < 3){
               nombre.setCustomValidity('Debe tener al menos 3 caracteres.');
@@ -247,8 +247,8 @@
               nombre.setCustomValidity('');
             }
           });
-          nombre.addEventListener('blur', ()=>{ nombre.value = normalizeSpaces(nombre.value); updateCounter(nombre,cNombre,60); });
-          updateCounter(nombre, cNombre, 60);
+          nombre.addEventListener('blur', ()=>{ nombre.value = normalizeSpaces(nombre.value); updateCounter(nombre,cNombre,20); });
+          updateCounter(nombre, cNombre, 20);
         }
 
         if (desc){
@@ -270,34 +270,46 @@
       // Previene doble envío y aplica Bootstrap validation
       let submitting = false;
       form.addEventListener('submit', function(e){
-        // Normaliza antes de validar
-        if (abrev) abrev.value = normalizeSpaces(abrev.value.toUpperCase());
-        if (nombre) nombre.value = normalizeSpaces(nombre.value);
-        if (desc)   desc.value   = normalizeSpaces(desc.value);
+      // Normaliza antes de validar
+      if (abrev) abrev.value = normalizeSpaces(abrev.value.toUpperCase());
+      if (nombre) nombre.value = normalizeSpaces(nombre.value);
+      if (desc)   desc.value   = normalizeSpaces(desc.value);
 
-        // Chequea HTML5
-        if (!form.checkValidity()){
-          e.preventDefault();
-          e.stopPropagation();
-          // Marca invalidos para mostrar feedback
-          [abrev, nombre, desc].forEach(el=>{
-            if (el){
-              el.classList.toggle('is-invalid', !el.checkValidity());
-              el.addEventListener('input', ()=> el.classList.remove('is-invalid'), {once:true});
-            }
-          });
-          return;
-        }
+      // Chequea HTML5
+      if (!form.checkValidity()){
+        e.preventDefault();
+        e.stopPropagation();
 
-        if (submitting){
-          e.preventDefault();
-          e.stopPropagation();
-          return;
-        }
-        submitting = true;
-        btnSubmit.disabled = true;
-        btnSubmit.textContent = 'Guardando...';
-      });
+        // Marca invalidos
+        [abrev, nombre, desc].forEach(el=>{
+          if (el){
+            el.classList.toggle('is-invalid', !el.checkValidity());
+            el.addEventListener('input', ()=> el.classList.remove('is-invalid'), {once:true});
+          }
+        });
+
+        // ❌ SweetAlert de error
+        Swal.fire({
+          icon: 'error',
+          title: 'Formulario incompleto',
+          text: 'Revisa los campos señalados.',
+          confirmButtonColor: '#c8102e'
+        });
+
+        return;
+      }
+
+      if (submitting){
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+
+      submitting = true;
+      btnSubmit.disabled = true;
+      btnSubmit.textContent = 'Guardando...';
+
+    });
 
       // Limpiar formulario
       btnClear.addEventListener('click', ()=>{
@@ -305,11 +317,41 @@
         [abrev,nombre,desc].forEach(el=>{
           if (el) { el.classList.remove('is-invalid'); }
         });
-        updateCounter(abrev,cAbrev,20);
-        updateCounter(nombre,cNombre,60);
+        updateCounter(abrev,cAbrev,3);
+        updateCounter(nombre,cNombre,20);
         updateCounter(desc,cDesc,240);
       });
     })();
   </script>
+  
+  {% if messages %}
+  <script>
+    {% for message in messages %}
+      {% if message.tags == "success" %}
+        Swal.fire({
+          icon: "success",
+          title: "{{ message }}",
+          showConfirmButton: false,
+          timer: 1500
+        }).then(() => {
+          window.location.href = "{% url 'categorias' %}";
+        });
+      {% endif %}
+    {% endfor %}
+  </script>
+  {% endif %}
+  
+  {% if form.errors %}
+  <script>
+    Swal.fire({
+      icon: "error",
+      title: "Datos inválidos",
+      text: "Por favor revisa los campos del formulario.",
+      confirmButtonColor: "#c8102e"
+    });
+  </script>
+  {% endif %}
+
+
 </body>
 </html>

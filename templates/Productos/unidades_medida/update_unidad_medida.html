@@ -10,6 +10,7 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <style>
+    /* ===== Paleta corporativa y estilos similares a categoría ===== */
     :root{
       --brand-red:#c8102e; --brand-red-700:#a40d25; --brand-red-50:#fff5f7;
       --brand-gold:#d4af37; --brand-gold-700:#b89617; --brand-gold-100:#fcf6e6;
@@ -83,13 +84,13 @@
             <label for="id_nombre_abreviado" class="form-label">Nombre abreviado</label>
             {{ form.nombre_abreviado }}
             <div class="form-text">
-              1–10 caracteres. Solo letras, números, espacios y punto/guion (ej.: <b>kg</b>, <b>u.</b>, <b>cm</b>, <b>kg.</b>).
-              <span id="count_abrev" class="counter ms-1">0/10</span>
+              1–4 caracteres. Solo letras, números, espacios y punto/guion (ej.: kg, u., cm).
+              <span id="count_abrev" class="counter ms-1">0/4</span>
             </div>
             {% if form.nombre_abreviado.errors %}
               <div class="invalid-feedback d-block">{{ form.nombre_abreviado.errors|striptags }}</div>
             {% endif %}
-            <div class="invalid-feedback">Formato inválido. Usa 1–10 caracteres permitidos.</div>
+            <div class="invalid-feedback">Formato inválido. Usa 1–4 caracteres permitidos.</div>
           </div>
 
           <!-- Nombre completo -->
@@ -97,13 +98,13 @@
             <label for="id_nombre_completo" class="form-label">Nombre completo</label>
             {{ form.nombre_completo }}
             <div class="form-text">
-              3–60 caracteres. Permite tildes, números y “/ - , .”.
-              <span id="count_nombre" class="counter ms-1">0/60</span>
+              3–20 caracteres. Permite tildes, números y “/ - , .”.
+              <span id="count_nombre" class="counter ms-1">0/20</span>
             </div>
             {% if form.nombre_completo.errors %}
               <div class="invalid-feedback d-block">{{ form.nombre_completo.errors|striptags }}</div>
             {% endif %}
-            <div class="invalid-feedback">Ingresa un nombre válido (3–60 caracteres).</div>
+            <div class="invalid-feedback">Ingresa un nombre válido (3–20 caracteres).</div>
           </div>
 
           <!-- Descripción -->
@@ -128,114 +129,76 @@
 
   <script>
     (function(){
-      const form   = document.getElementById('form_editar_unidad');
-      const btn    = document.getElementById('btn-guardar');
+      const form = document.getElementById('form_editar_unidad');
+      const btn = document.getElementById('btn-guardar');
 
-      const abrev  = document.getElementById('id_nombre_abreviado');
+      const abrev = document.getElementById('id_nombre_abreviado');
       const nombre = document.getElementById('id_nombre_completo');
-      const desc   = document.getElementById('id_descripcion');
+      const desc = document.getElementById('id_descripcion');
 
-      const cAbrev  = document.getElementById('count_abrev');
+      const cAbrev = document.getElementById('count_abrev');
       const cNombre = document.getElementById('count_nombre');
-      const cDesc   = document.getElementById('count_desc');
+      const cDesc = document.getElementById('count_desc');
 
-      // Atributos por si el form no los trae
       function ensureAttrs(){
         if (abrev){
           abrev.classList.add('form-control');
           abrev.setAttribute('required','');
           abrev.setAttribute('minlength','1');
-          abrev.setAttribute('maxlength','10');
-          abrev.setAttribute('pattern','^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ0-9 .-]{1,10}$'); // permite punto y guion
-          abrev.setAttribute('placeholder','Ej.: kg, u., cm');
-          abrev.style.textTransform = 'lowercase'; // estándar abreviaturas minúsculas
+          abrev.setAttribute('maxlength','4');
+          abrev.setAttribute('pattern','^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ0-9 .-]{1,4}$');
+          abrev.style.textTransform = 'lowercase';
         }
         if (nombre){
           nombre.classList.add('form-control');
           nombre.setAttribute('required','');
           nombre.setAttribute('minlength','3');
-          nombre.setAttribute('maxlength','60');
-          nombre.setAttribute('pattern','^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ0-9 /,.-]{3,60}$');
-          nombre.setAttribute('placeholder','Ej.: Kilogramo');
+          nombre.setAttribute('maxlength','20');
+          nombre.setAttribute('pattern','^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ0-9 /,.-]{3,20}$');
         }
         if (desc){
           desc.classList.add('form-control');
           desc.setAttribute('maxlength','240');
-          desc.setAttribute('placeholder','Descripción breve (opcional)');
         }
       }
       ensureAttrs();
 
-      // Helpers
-      const normalizeSpaces = v => (v || '').replace(/\s+/g,' ').trim();
-      const updateCounter = (el, target, max) => { if(el && target){ target.textContent = `${(el.value||'').length}/${max}`; } };
+      const normalizeSpaces = v => (v||'').replace(/\s+/g,' ').trim();
+      function updateCounter(el, target, max){ if(el && target){ target.textContent = `${(el.value||'').length}/${max}`; } }
 
-      // Bind validación + contadores (considera valores precargados)
       function bindValidation(){
         if (abrev){
-          updateCounter(abrev,cAbrev,10);
-          abrev.addEventListener('input', ()=>{
-            abrev.value = abrev.value.toLowerCase();
-            updateCounter(abrev,cAbrev,10);
-            const v = normalizeSpaces(abrev.value);
-            if (v.length < 1){
-              abrev.setCustomValidity('Debe tener al menos 1 carácter.');
-            } else if(!/^[a-záéíóúüñ0-9 .-]+$/.test(v)){
-              abrev.setCustomValidity('Solo letras, números, espacio, punto y guion.');
-            } else {
-              abrev.setCustomValidity('');
-            }
-          });
-          abrev.addEventListener('blur', ()=>{ abrev.value = normalizeSpaces(abrev.value.toLowerCase()); updateCounter(abrev,cAbrev,10); });
+          updateCounter(abrev,cAbrev,4);
+          abrev.addEventListener('input', ()=>{ abrev.value = abrev.value.toLowerCase(); updateCounter(abrev,cAbrev,4); const v = normalizeSpaces(abrev.value); abrev.setCustomValidity(v.length < 1 || !/^[a-záéíóúüñ0-9 .-]+$/.test(v) ? 'Inválido' : ''); });
+          abrev.addEventListener('blur', ()=>{ abrev.value = normalizeSpaces(abrev.value.toLowerCase()); updateCounter(abrev,cAbrev,4); });
         }
-
         if (nombre){
-          updateCounter(nombre,cNombre,60);
-          nombre.addEventListener('input', ()=>{
-            updateCounter(nombre,cNombre,60);
-            const v = normalizeSpaces(nombre.value);
-            if (v.length < 3){
-              nombre.setCustomValidity('Debe tener al menos 3 caracteres.');
-            } else if(!/^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ0-9 /,.-]+$/.test(v)){
-              nombre.setCustomValidity('Se permiten letras con tilde, números y / , . -');
-            } else {
-              nombre.setCustomValidity('');
-            }
-          });
-          nombre.addEventListener('blur', ()=>{ nombre.value = normalizeSpaces(nombre.value); updateCounter(nombre,cNombre,60); });
+          updateCounter(nombre,cNombre,20);
+          nombre.addEventListener('input', ()=>{ updateCounter(nombre,cNombre,20); const v = normalizeSpaces(nombre.value); nombre.setCustomValidity(v.length < 3 || !/^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ0-9 /,.-]+$/.test(v) ? 'Inválido' : ''); });
+          nombre.addEventListener('blur', ()=>{ nombre.value = normalizeSpaces(nombre.value); updateCounter(nombre,cNombre,20); });
         }
-
         if (desc){
           updateCounter(desc,cDesc,240);
-          desc.addEventListener('input', ()=>{
-            updateCounter(desc,cDesc,240);
-            if ((desc.value||'').length > 240){
-              desc.setCustomValidity('Máximo 240 caracteres.');
-            } else { desc.setCustomValidity(''); }
-          });
+          desc.addEventListener('input', ()=>{ updateCounter(desc,cDesc,240); desc.setCustomValidity((desc.value||'').length>240?'Inválido':''); });
           desc.addEventListener('blur', ()=>{ desc.value = normalizeSpaces(desc.value); updateCounter(desc,cDesc,240); });
         }
       }
       bindValidation();
 
-      // Confirmación + validación + antirebote
-      let confirmed = false, submitting = false;
+      let confirmed = false;
+      let submitting = false;
 
       form.addEventListener('submit', function(e){
-        if (abrev)  abrev.value  = normalizeSpaces(abrev.value.toLowerCase());
+        if (abrev) abrev.value = normalizeSpaces(abrev.value.toLowerCase());
         if (nombre) nombre.value = normalizeSpaces(nombre.value);
-        if (desc)   desc.value   = normalizeSpaces(desc.value);
+        if (desc) desc.value = normalizeSpaces(desc.value);
 
         if (!confirmed){
           e.preventDefault(); e.stopPropagation();
 
           if (!form.checkValidity()){
-            [abrev, nombre, desc].forEach(el=>{
-              if (el){
-                el.classList.toggle('is-invalid', !el.checkValidity());
-                el.addEventListener('input', ()=> el.classList.remove('is-invalid'), {once:true});
-              }
-            });
+            [abrev,nombre,desc].forEach(el=>{ if(el){ el.classList.toggle('is-invalid', !el.checkValidity()); el.addEventListener('input',()=>el.classList.remove('is-invalid'), {once:true}); } });
+            Swal.fire({ icon:"error", title:"Revisa los campos", text:"Hay errores en el formulario.", confirmButtonText:"Entendido" });
             return;
           }
 
@@ -248,27 +211,36 @@
             cancelButtonColor: "#d33",
             confirmButtonText: "Sí, guardar",
             cancelButtonText: "Cancelar"
-          }).then((result) => {
-            if (result.isConfirmed) {
-              confirmed = true;
-              if (!submitting){
-                submitting = true;
-                btn.disabled = true;
-                btn.textContent = 'Guardando...';
-                form.submit();
-              }
+          }).then((result)=>{
+            if(result.isConfirmed){
+              confirmed=true;
+              if(!submitting){ submitting=true; btn.disabled=true; btn.textContent='Guardando...'; form.submit(); }
             }
           });
           return;
         }
 
-        if (!form.checkValidity()){ e.preventDefault(); e.stopPropagation(); return; }
-        if (submitting){ e.preventDefault(); e.stopPropagation(); return; }
-        submitting = true;
-        btn.disabled = true;
-        btn.textContent = 'Guardando...';
+        if (!form.checkValidity() || submitting){ e.preventDefault(); e.stopPropagation(); return; }
+        submitting=true;
+        btn.disabled=true;
+        btn.textContent='Guardando...';
       });
     })();
+  </script>
+
+  <script>
+    // Mensajes de Django
+    {% if messages %}
+      {% for message in messages %}
+        Swal.fire({ icon:"error", title:"{{ message|escapejs }}", confirmButtonText:"Entendido" });
+      {% endfor %}
+    {% endif %}
+
+    // Éxito
+    {% if mensaje_exito %}
+      Swal.fire({ icon:"success", title:"Unidad de medida actualizada correctamente", showConfirmButton:false, timer:1500 })
+      .then(()=>{ window.location.href="{% url 'unidades-medida' %}"; });
+    {% endif %}
   </script>
 
 </body>

@@ -115,19 +115,30 @@
       background:#fff3cd; color:#7a5b00; border:1px solid #ffe08a; border-left:4px solid var(--brand-red);
       padding:10px 12px; border-radius:10px; margin-top:6px;
     }
-    select, option {
-      color: black !important;
-      background-color: white !important;
+    /* Normalizar apariencia de los select para que vuelvan a verse correctamente */
+    select.form-select {
+        appearance: auto !important;
+        -webkit-appearance: auto !important;
+        background-color: #fff !important;
+        color: #000 !important;
+        padding: 10px 12px !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 10px !important;
+        height: auto !important;
     }
 
-    select.form-select,
     select.form-select option {
-      color: #000 !important;
-      background: #fff !important;
-      opacity: 1 !important;
-      text-indent: 0 !important;
-      font-size: 15px !important;
-      line-height: 1.4 !important;
+        background: #fff !important;
+        color: #000 !important;
+    }
+
+
+    .boton-exportar {
+    font-weight: 700;              /* Más grueso */
+    color: #ffffff !important;     /* Blanco */
+    font-size: 17px;               /* Igual al del otro */
+    text-shadow: 0px 1px 2px rgba(0,0,0,0.25); /* Más contraste */
+    letter-spacing: 0.3px;         /* Similar al estilo del otro botón */
     }
 
     /* Protección extra: si algún contenedor aplica mezcla de colores */
@@ -149,94 +160,125 @@
 
   <div class="page-wrap">
     <div class="card">
-      <div class="card-header">
-        <div class="d-flex align-items-center">
-          <span class="mark"></span>
-          <span>Productos</span>
+        <div class="card-header">
+            <div class="d-flex align-items-center">
+                <span class="mark"></span>
+                <span>Productos</span>
+            </div>
+            <div class="d-flex gap-2">
+                <a class="btn btn-gold" href="{% url 'gestion-producto' %}">Añadir Producto</a>
+                <a 
+                   id="exportar-excel-btn" 
+                   href="{% url 'exportar_productos_excel' %}?nombres={{ request.GET.nombres }}&categoria={{ request.GET.categoria }}&unidad_medida={{ request.GET.unidad_medida }}"
+                   class="btn btn-success btn-exportar-excel"
+                >
+                    Exportar Excel
+                </a>
+            </div>
         </div>
-        <div class="d-flex gap-2">
-          <a class="btn btn-gold" href="{% url 'gestion-producto' %}">Añadir Producto</a>
-          <a 
-            href="{% url 'exportar_productos_excel' %}?nombres={{ request.GET.nombres }}&categoria={{ request.GET.categoria }}&unidad_medida={{ request.GET.unidad_medida }}"
-            class="btn btn-success"
-            >
-            Exportar Excel
-          </a>
-        </div>
-      </div>
 
-      <div class="body">
-        <!-- 🔹 FORMULARIO DE FILTROS -->
-        <form method="get" class="toolbar">
-          <input type="text" id="buscador" name="nombres" class="form-control" placeholder="Buscar por SKU o nombre" value="{{ nombres }}"/>
+        <div class="body">
+            <!-- 🔹 FORMULARIO DE FILTROS -->
+            <form method="get" class="toolbar">
+            <input type="text" id="buscador" name="nombres" class="form-control" placeholder="Buscar por SKU o nombre" value="{{ nombres }}"/>
 
-          <select id="filtro-categoria" name="categoria" class="form-select" style="color: #000;">
-              <option value="" style="color:#000;">Todas las categorías</option>
-              {% for c in categorias %}
-                  <option value="{{ c.id }}" style="color:#000;"
-                      {% if c.id|stringformat:"s" == categoria %}selected{% endif %}>
-                      {{ c.nombre_completo }}
-                  </option>
-              {% endfor %}
-          </select>
+            <select id="filtro-categoria" name="categoria" class="form-select" style="color: #000;">
+                <option value="">Todas las categorías</option>
+                {% for c in categorias %}
+                    <option value="{{ c.id }}" {% if c.id|stringformat:"s" == categoria %}selected{% endif %}>
+                        {{ c.nombre_completo }}
+                    </option>
+                {% endfor %}
+            </select>
 
-          <select id="filtro-unidad" name="unidad_medida" class="form-select" style="color: #000;">
-              <option value="" style="color:#000;">Todas las unidades de medida</option>
-              {% for u in unidades_medida %}
-                  <option value="{{ u.id }}" style="color:#000;"
-                      {% if u.id|stringformat:"s" == unidad_medida %}selected{% endif %}>
-                      {{ u.nombre_completo }}
-                  </option>
-              {% endfor %}
-          </select>
+            <select id="filtro-unidad" name="unidad_medida" class="form-select" style="color: #000;">
+                <option value="">Todas las unidades de medida</option>
+                {% for u in unidades_medida %}
+                    <option value="{{ u.id }}" {% if u.id|stringformat:"s" == unidad_medida %}selected{% endif %}>
+                        {{ u.nombre_completo }}
+                    </option>
+                {% endfor %}
+            </select>
 
-          <button type="submit" class="btn btn-outline">Filtrar</button>
+            <!-- Siempre pasa per_page en la URL -->
+            <select name="per_page" class="form-select" onchange="this.form.submit()">
+                <option value="10" {% if per_page_actual == "10" %}selected{% endif %}>10</option>
+                <option value="20" {% if per_page_actual == "20" %}selected{% endif %}>20</option>
+                <option value="30" {% if per_page_actual == "30" %}selected{% endif %}>30</option>
+                <option value="all" {% if per_page_actual == "all" %}selected{% endif %}>Todos</option>
+            </select>
         </form>
 
-        <!-- Tabla -->
-        <div class="table-wrap">
-          <table class="table mb-0">
-            <thead>
-              <tr>
-                <th>SKU</th>
-                <th>Nombre</th>
-                <th class="text-end">Stock</th>
-                <th class="text-center" style="width:220px">Acciones</th>
-              </tr>
-            </thead>
-            <tbody id="tabla-productos">
-              {% for p in productos %}
-              <tr>
-                <td>{{ p.sku }}</td>
-                <td>
-                  <div class="fw-semibold">{{ p.nombre }}</div>
-                  {% if p.bajo_stock %}
+            <!-- Tabla -->
+            <div class="table-wrap">
+            <table class="table mb-0">
+              <thead>
+                <tr>
+                  <th>SKU</th>
+                  <th>Nombre</th>
+                  <th class="text-end">Stock</th>
+                  <th class="text-center" style="width:220px">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="tabla-productos">
+                {% for p in productos %}
+                <tr>
+                  <td>{{ p.sku }}</td>
+                  <td>
+                    <div class="fw-semibold">{{ p.nombre }}</div>
+                    {% if p.bajo_stock %}
                     <div class="low-stock mt-2"><strong>¡Atención!</strong> Stock bajo para <em>{{ p.nombre }}</em>.</div>
-                  {% endif %}
-                </td>
-                <td class="text-end">{{ p.stock_actual }}</td>
-                <td class="text-center">
-                  <div class="d-inline-flex gap-2">
-                    <a href="{% url 'producto-modificado' p.id %}" class="btn btn-sm btn-edit">Editar</a>
-                    <a href="{% url 'producto-eliminado' p.id %}" 
-                       class="btn btn-sm btn-delete"
-                       data-url="{% url 'producto-eliminado' p.id %}"
-                       onclick="confirmarEliminacion(event, this)">Eliminar</a>
-                  </div>
-                </td>
-              </tr>
-              {% empty %}
-              <tr>
-                <td colspan="4" class="text-center py-4 text-muted">No hay productos para mostrar.</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
+                    {% endif %}
+                  </td>
+                  <td class="text-end">{{ p.stock_actual }}</td>
+                  <td class="text-center">
+                    <div class="d-inline-flex gap-2">
+                      <a href="{% url 'producto-modificado' p.id %}" class="btn btn-sm btn-edit">Editar</a>
+                      <a href="{% url 'producto-eliminado' p.id %}" class="btn btn-sm btn-delete" onclick="confirmarEliminacion(event, this)">Eliminar</a>
+                    </div>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="4" class="text-center py-4 text-muted">No hay productos para mostrar.</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            {% if productos.paginator.num_pages > 1 and not hide_pagination %}
+            <nav aria-label="Paginación">
+                <ul class="pagination">
+                    {% if productos.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ productos.previous_page_number }}&nombres={{ nombres }}&categoria={{ categoria }}&unidad_medida={{ unidad_medida }}&per_page={{ per_page }}">
+                            Anterior
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% for num in productos.paginator.page_range %}
+                    <li class="page-item {% if productos.number == num %}active{% endif %}">
+                        <a class="page-link" href="?page={{ num }}&nombres={{ nombres }}&categoria={{ categoria }}&unidad_medida={{ unidad_medida }}&per_page={{ per_page }}">
+                            {{ num }}
+                        </a>
+                    </li>
+                    {% endfor %}
+                    {% if productos.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ productos.next_page_number }}&nombres={{ nombres }}&categoria={{ categoria }}&unidad_medida={{ unidad_medida }}&per_page={{ per_page }}">
+                            Siguiente
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
 
-      </div>
+          </div>
+            </div>
+        </div>
     </div>
-  </div>
+</div>
+
 
   <script>
     function confirmarEliminacion(event, btn) {
@@ -378,5 +420,34 @@
         actualizarHrefYUrl();
     });
     </script>
+    <script>
+  // Delay para evitar que el input dispare miles de requests
+  let typingTimer;
+  function delayedSubmit() {
+    clearTimeout(typingTimer);
+    typingTimer = setTimeout(() => {
+      document.getElementById("filterForm").submit();
+    }, 500); // medio segundo
+  }
+</script>
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Pasamos hide_pagination como una cadena de texto 'true' o 'false'
+    var hidePagination = "{{ hide_pagination|yesno:'true,false' }}";
+    
+    // Si hidePagination es 'true', ocultamos el paginador
+    if (hidePagination === 'true') {
+        var pagination = document.querySelector('.pagination');
+        if (pagination) {
+            pagination.style.display = 'none';  // Ocultamos el paginador
+        }
+    }
+  });
+</script>
+
+
+
+
+
 </body>
 </html>

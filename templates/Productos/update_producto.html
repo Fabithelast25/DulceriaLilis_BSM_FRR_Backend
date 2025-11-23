@@ -10,76 +10,256 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <style>
-    :root{
-      --brand-red:#c8102e; --brand-red-700:#a40d25; --brand-red-50:#fff5f7;
-      --brand-gold:#d4af37; --brand-gold-700:#b89617; --brand-gold-100:#fcf6e6;
-      --ink:#1c1d22; --muted:#6b7280; --border:#e8e8e8; --bg:#fff; --page:#fafafa;
-      --shadow:0 10px 24px rgba(0,0,0,.08); --radius:14px;
-    }
-    html,body{height:100%}
-    body{ background:linear-gradient(180deg,var(--page),#fff); margin:0; font-family:system-ui, Segoe UI, Roboto, Arial, sans-serif; color:var(--ink); }
+    :root{--brand-red:#c8102e;--brand-red-700:#a40d25;--brand-red-50:#fff5f7;--brand-gold:#d4af37;--brand-gold-700:#b89617;--brand-gold-100:#fcf6e6;--ink:#1c1d22;--muted:#6b7280;--border:#e8e8e8;--bg:#fff;--page:#fafafa;--shadow:0 10px 24px rgba(0,0,0,.08);--radius:14px;}
+    html,body{height:100%;margin:0;font-family:system-ui, Segoe UI, Roboto, Arial, sans-serif;color:var(--ink);background:linear-gradient(180deg,var(--page),#fff);}
+    .navbar{background:var(--brand-red)!important;box-shadow:0 8px 18px rgba(200,16,46,.18);}
+    .navbar-brand{color:#fff!important;font-weight:800;}
+    .nav-link{color:#fff!important;opacity:.95;}
+    .nav-link:hover{opacity:1;text-decoration:underline;text-underline-offset:4px;}
+    .page-wrap{padding:24px 12px;}
+    .card{max-width:900px;margin:0 auto;background:var(--bg);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--border);}
+    .card-header{display:flex;align-items:center;justify-content:space-between;gap:10px;background:linear-gradient(180deg,#fff,var(--brand-gold-100));border-bottom:2px solid var(--brand-gold);padding:14px 18px;font-weight:800;font-size:1.1rem;color:var(--ink);}
+    .card-header .mark{width:10px;height:22px;border-radius:8px;margin-right:6px;background:linear-gradient(180deg,var(--brand-gold),var(--brand-gold-700));box-shadow:0 4px 10px rgba(212,175,55,.25);}
+    .body{padding:18px;}
+    .form-label{font-weight:700;}
+    .form-text{color:var(--muted)!important;}
+    .is-invalid + .invalid-feedback{display:block;}
+    .btn-gold{background:linear-gradient(180deg,var(--brand-gold),var(--brand-gold-700));color:#1a1a1a;border:none;border-radius:10px;padding:10px 14px;font-weight:800;}
+    .btn-gold:hover{filter:brightness(.95);color:#111;}
+    .btn-outline{background:#fff;color:var(--brand-red);border:2px solid var(--brand-red);border-radius:10px;padding:9px 14px;font-weight:800;}
+    .btn-outline:hover{background:var(--brand-red-50);}
+    
+    .form-group, .form-check { margin-bottom: 1rem; }
+    .form-check { display: flex; align-items: center; }
+    .form-check label { margin-left: 0.5rem; margin-bottom: 0; }
 
-    .navbar{ background:var(--brand-red)!important; box-shadow:0 8px 18px rgba(200,16,46,.18); }
-    .navbar-brand{ color:#fff!important; font-weight:800; letter-spacing:.3px; }
-    .nav-link{ color:#fff!important; opacity:.95; }
-    .nav-link:hover{ opacity:1; text-decoration:underline; text-underline-offset:4px; }
+    /* Mensajes de error rojos */
+    .error-msg {
+      color: red;
+      font-size: 0.9em;
+      margin-top: 0.2rem;
+      display: block;
+    }
 
-    .page-wrap{ padding:24px 12px; }
-    .card{
-      max-width:900px; margin:0 auto; background:var(--bg); border-radius:var(--radius);
-      box-shadow:var(--shadow); border:1px solid var(--border); overflow:hidden;
-    }
-    .card-header{
-      display:flex; align-items:center; justify-content:space-between; gap:10px;
-      background:linear-gradient(180deg,#fff,var(--brand-gold-100));
-      border-bottom:2px solid var(--brand-gold);
-      padding:14px 18px; font-weight:800; font-size:1.1rem; color:var(--ink);
-    }
-    .card-header .mark{
-      width:10px; height:22px; border-radius:8px; margin-right:6px;
-      background:linear-gradient(180deg,var(--brand-gold),var(--brand-gold-700));
-      box-shadow:0 4px 10px rgba(212,175,55,.25);
-    }
-    .body{ padding:18px; }
-
-    .form-label{ font-weight:700; }
-    .form-text{ color:var(--muted)!important; }
-    .counter{ font-size:.85rem; color:var(--muted); }
-    .is-invalid + .invalid-feedback{ display:block; }
-
-    .btn-gold{
-      background:linear-gradient(180deg,var(--brand-gold),var(--brand-gold-700));
-      color:#1a1a1a; border:none; border-radius:10px; padding:10px 14px; font-weight:800;
-    }
-    .btn-gold:hover{ filter:brightness(.95); color:#111; }
-    .btn-outline{
-      background:#fff; color:var(--brand-red); border:2px solid var(--brand-red); border-radius:10px; padding:9px 14px; font-weight:800;
-    }
-    .btn-outline:hover{ background:var(--brand-red-50); }
-
-    /* mejorar {{ form.as_p }} visualmente */
-    form p{ margin-bottom:1rem; }
-    form p > label{ display:block; font-weight:700; margin-bottom:.25rem; }
-    form p > input, form p > select, form p > textarea{ width:100%; }
+    /* Contenedor de cada campo para errores */
+    .field-wrapper { margin-bottom: 1rem; }
   </style>
 </head>
 <body>
-
   {% include 'Productos/navbar_productos.html' %}
 
   <div class="page-wrap">
     <div class="card">
       <div class="card-header">
-        <div class="d-flex align-items-center">
-          <span class="mark"></span>
-          <span>Editar Producto</span>
-        </div>
+        <span>Editar Producto</span>
       </div>
-
       <div class="body">
-        <form method="POST" id="form_editar_producto" novalidate>
+        <form method="POST" id="form_editar_producto" action="{% url 'producto-modificado' producto.id %}" novalidate>
           {% csrf_token %}
-          {{ form.as_p }}
+          {% if form.non_field_errors %}
+            <ul class="text-danger mb-3">
+              {% for error in form.non_field_errors %}
+                <li>{{ error }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+          <!-- Identificación -->
+          <div class="field-wrapper">
+            <label for="id_sku">SKU</label>
+            {{ form.sku }}
+            {% if form.sku.errors %}
+              <div class="text-danger">{{ form.sku.errors }}</div>
+            {% endif %}
+          </div>
+          <div class="field-wrapper">
+            <label for="id_nombre">Nombre</label>
+            {{ form.nombre }}
+            {% if form.nombre.errors %}
+              <div class="text-danger">{{ form.nombre.errors }}</div>
+            {% endif %}
+          </div>
+          <div class="field-wrapper">
+            <label for="id_descripcion">Descripción</label>
+            {{ form.descripcion }}
+            {% if form.descripcion.errors %}
+              <div class="text-danger">{{ form.descripcion.errors }}</div>
+            {% endif %}
+          </div>
+          <div class="field-wrapper">
+            <label for="id_ean_upc">EAN/UPC</label>
+            {{ form.ean_upc }}
+            {% if form.ean_upc.errors %}
+              <div class="text-danger">{{ form.ean_upc.errors }}</div>
+            {% endif %}
+          </div>
+          <div class="field-wrapper">
+            <label for="id_categoria">Categoría</label>
+            {{ form.categoria }}
+            {% if form.categoria.errors %}
+              <div class="text-danger">{{ form.categoria.errors }}</div>
+            {% endif %}
+          </div>
+          <div class="field-wrapper">
+            <label for="id_marca">Marca</label>
+            {{ form.marca }}
+            {% if form.marca.errors %}
+              <div class="text-danger">{{ form.marca.errors }}</div>
+            {% endif %}
+          </div>
+          <div class="field-wrapper">
+            <label for="id_modelo">Modelo</label>
+            {{ form.modelo }}
+            {% if form.modelo.errors %}
+              <div class="text-danger">{{ form.modelo.errors }}</div>
+            {% endif %}
+          </div>
+
+          <!-- Unidades y precios -->
+          <div class="field-wrapper">
+            <label for="id_uom_compra">Unidad de compra</label>
+            {{ form.uom_compra }}
+            {% if form.uom_compra.errors %}
+              <div class="text-danger">{{ form.uom_compra.errors }}</div>
+            {% endif %}
+          </div>
+          <div class="field-wrapper">
+            <label for="id_uom_venta">Unidad de venta</label>
+            {{ form.uom_venta }}
+            {% if form.uom_venta.errors %}
+              <div class="text-danger">{{ form.uom_venta.errors }}</div>
+            {% endif %}
+          </div>
+          <div class="field-wrapper">
+            <label for="id_factor_conversion">Factor de conversión</label>
+            {{ form.factor_conversion }}
+            {% if form.factor_conversion.errors %}
+              <div class="text-danger">{{ form.factor_conversion.errors }}</div>
+            {% endif %}
+          </div>
+          <div class="field-wrapper">
+            <label for="id_costo_estandar">Costo estándar</label>
+            {{ form.costo_estandar }}
+            {% if form.costo_estandar.errors %}
+              <div class="text-danger">{{ form.costo_estandar.errors }}</div>
+            {% endif %}
+          </div>
+          <div class="field-wrapper">
+            <label for="id_costo_promedio">Costo promedio</label>
+            {{ form.costo_promedio }}
+            {% if form.costo_promedio.errors %}
+              <div class="text-danger">{{ form.costo_promedio.errors }}</div>
+            {% endif %}
+          </div>
+          <div class="field-wrapper">
+            <label for="id_precio_venta">Precio de venta</label>
+            {{ form.precio_venta }}
+            {% if form.precio_venta.errors %}
+              <div class="text-danger">{{ form.precio_venta.errors }}</div>
+            {% endif %}
+          </div>
+          <div class="field-wrapper">
+            <label for="id_impuesto_iva">IVA (%)</label>
+            {{ form.impuesto_iva }}
+            {% if form.impuesto_iva.errors %}
+              <div class="text-danger">{{ form.impuesto_iva.errors }}</div>
+            {% endif %}
+          </div>
+
+          <!-- Stock y control -->
+          <div class="field-wrapper">
+              {{ form.stock_minimo.label_tag }}
+              {{ form.stock_minimo }}
+              {% if form.stock_minimo.errors %}
+                  <div class="text-danger">
+                      {{ form.stock_minimo.errors }}
+                  </div>
+              {% endif %}
+          </div>
+
+          <div class="field-wrapper">
+              {{ form.stock_maximo.label_tag }}
+              {{ form.stock_maximo }}
+              {% if form.stock_maximo.errors %}
+                  <div class="text-danger">
+                      {{ form.stock_maximo.errors }}
+                  </div>
+              {% endif %}
+          </div>
+
+          <div class="field-wrapper">
+              {{ form.punto_reorden.label_tag }}
+              {{ form.punto_reorden }}
+              {% if form.punto_reorden.errors %}
+                  <div class="text-danger">
+                      {{ form.punto_reorden.errors }}
+                  </div>
+              {% endif %}
+          </div>
+
+          <div class="form-check field-wrapper">
+            {{ form.perishable }} <label for="id_perishable">Perecible</label>
+            {% if form.perishable.errors %}
+              <div class="text-danger">{{ form.perishable.errors }}</div>
+            {% endif %}
+          </div>
+          <div class="form-check field-wrapper">
+            {{ form.control_por_lote }} <label for="id_control_por_lote">Control por lote</label>
+            {% if form.control_por_lote.errors %}
+              <div class="text-danger">{{ form.control_por_lote.errors }}</div>
+            {% endif %}
+          </div>
+          <div class="form-check field-wrapper">
+            {{ form.control_por_serie }} <label for="id_control_por_serie">Control por serie</label>
+            {% if form.control_por_serie.errors %}
+              <div class="text-danger">{{ form.control_por_serie.errors }}</div>
+            {% endif %}
+          </div>
+
+          <!-- Relaciones y soporte -->
+          <div class="field-wrapper">
+              {{ form.imagen_url.label_tag }}
+              {{ form.imagen_url }}
+              {% if form.imagen_url.errors %}
+                  <div class="text-danger">
+                      {{ form.imagen_url.errors }}
+                  </div>
+              {% endif %}
+          </div>
+
+          <div class="field-wrapper">
+              {{ form.ficha_tecnica_url.label_tag }}
+              {{ form.ficha_tecnica_url }}
+              {% if form.ficha_tecnica_url.errors %}
+                  <div class="text-danger">
+                      {{ form.ficha_tecnica_url.errors }}
+                  </div>
+              {% endif %}
+          </div>
+
+
+          <!-- Derivados / solo lectura -->
+          <div class="field-wrapper">
+            <label for="id_stock_actual">Stock actual</label>
+            {{ form.stock_actual }}
+            {% if form.stock_actual.errors %}
+              <div class="text-danger">{{ form.stock_actual.errors }}</div>
+            {% endif %}
+          </div>
+          <div class="field-wrapper">
+            <label for="id_alerta_bajo_stock">Alerta bajo stock</label>
+            {{ form.alerta_bajo_stock }}
+            {% if form.alerta_bajo_stock.errors %}
+              <div class="text-danger">{{ form.alerta_bajo_stock.errors }}</div>
+            {% endif %}
+          </div>
+          <div class="field-wrapper">
+            <label for="id_alerta_por_vencer">Alerta por vencer</label>
+            {{ form.alerta_por_vencer }}
+            {% if form.alerta_por_vencer.errors %}
+              <div class="text-danger">{{ form.alerta_por_vencer.errors }}</div>
+            {% endif %}
+          </div>
+
 
           <div class="d-flex gap-2 justify-content-end mt-2">
             <a href="{% url 'productos' %}" class="btn btn-outline">Cancelar</a>
@@ -91,275 +271,219 @@
   </div>
 
   <script>
-    (function(){
-      const form = document.getElementById('form_editar_producto');
-      const btn  = document.getElementById('btn-guardar');
+(function(){
+  const form = document.getElementById('form_editar_producto');
+  const btn  = document.getElementById('btn-guardar');
 
-      // Detecta campos comunes si existen (ids estándar de Django)
-      const sku         = document.getElementById('id_sku');
-      const nombre      = document.getElementById('id_nombre');
-      const categoria   = document.getElementById('id_categoria');
-      const unidad      = document.getElementById('id_unidad_medida') || document.getElementById('id_unidad');
-      const stock       = document.getElementById('id_stock_actual') || document.getElementById('id_stock');
-      const stockMin    = document.getElementById('id_stock_minimo') || document.getElementById('id_minimo');
-      const precio      = document.getElementById('id_precio') || document.getElementById('id_precio_unitario') || document.getElementById('id_precio_venta');
-      const ean         = document.getElementById('id_ean_upc') || document.getElementById('id_ean');
-      const modelo      = document.getElementById('id_modelo');
-      const descripcion = document.getElementById('id_descripcion');
+  const normSpaces = v => (v||'').replace(/\s+/g,' ').trim();
 
-      // Añade clases/attrs útiles si no vienen del forms.py
-      function ensureAttrs(){
-        if (sku){
-          sku.classList.add('form-control');
-          sku.setAttribute('required','');
-          sku.setAttribute('minlength','3');
-          sku.setAttribute('maxlength','30');
-          sku.setAttribute('pattern','^[A-Za-z0-9_.-]{3,30}$');
-          sku.setAttribute('placeholder','Ej.: ABC-001');
-          sku.style.textTransform = 'uppercase';
-        }
-        if (nombre){
-          nombre.classList.add('form-control');
-          nombre.setAttribute('required','');
-          nombre.setAttribute('minlength','3');
-          nombre.setAttribute('maxlength','80');
-          nombre.setAttribute('pattern','^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ0-9 /,.-]{3,80}$');
-          nombre.setAttribute('placeholder','Ej.: Chocolate Bitter 60% 90g');
-        }
-        if (categoria){
-          categoria.classList.add('form-select');
-          categoria.setAttribute('required','');
-        }
-        if (unidad){
-          unidad.classList.add('form-select');
-          unidad.setAttribute('required','');
-        }
-        if (stock){
-          stock.classList.add('form-control');
-          stock.setAttribute('required','');
-          stock.setAttribute('inputmode','numeric');
-          stock.setAttribute('min','0');
-          stock.setAttribute('step','1');
-          stock.setAttribute('placeholder','0');
-        }
-        if (stockMin){
-          stockMin.classList.add('form-control');
-          stockMin.setAttribute('inputmode','numeric');
-          stockMin.setAttribute('min','0');
-          stockMin.setAttribute('step','1');
-          stockMin.setAttribute('placeholder','0');
-        }
-        if (precio){
-          precio.classList.add('form-control');
-          precio.setAttribute('inputmode','decimal');
-          precio.setAttribute('min','0');
-          precio.setAttribute('step','0.01');
-          precio.setAttribute('placeholder','0.00');
-        }
-        if (ean){
-          ean.classList.add('form-control');
-          ean.setAttribute('pattern','^\\d{12,14}$'); // 12–14 dígitos
-          ean.setAttribute('inputmode','numeric');
-          ean.setAttribute('maxlength','14');
-          ean.setAttribute('placeholder','EAN/UPC (12–14 dígitos)');
-        }
-        if (modelo){
-          modelo.classList.add('form-control');
-          modelo.setAttribute('maxlength','60');
-          modelo.setAttribute('placeholder','Modelo/variante (opcional)');
-        }
-        if (descripcion){
-          descripcion.classList.add('form-control');
-          descripcion.setAttribute('maxlength','240');
-          if (descripcion.tagName.toLowerCase()==='textarea'){
-            descripcion.setAttribute('rows','3');
-          }
-        }
-      }
-      ensureAttrs();
+  // Mostrar error debajo del campo
+  const showError = (fieldEl, msg) => {
+    const wrapper = fieldEl.closest('.field-wrapper') || fieldEl.parentNode;
+    let prev = wrapper.querySelector('.error-msg');
+    if(prev) prev.remove();
+    const span = document.createElement('span');
+    span.className = 'error-msg';
+    span.textContent = msg;
+    wrapper.appendChild(span);
+    fieldEl.classList.add('is-invalid');
+  };
 
-      // Helpers
-      const normSpaces = v => (v || '').replace(/\s+/g,' ').trim();
-      const toMoney = (n) => {
-        if (n==='' || isNaN(n)) return '';
-        const x = Number(n);
-        return x.toFixed(2);
-      };
+  const clearErrors = () => {
+    document.querySelectorAll('.error-msg').forEach(el=>el.remove());
+    document.querySelectorAll('.is-invalid').forEach(el=>el.classList.remove('is-invalid'));
+  };
 
-      // Validación live básica
-      if (sku){
-        sku.addEventListener('input', ()=>{
-          sku.value = sku.value.toUpperCase();
-          if(!/^[A-Z0-9_.-]{3,30}$/.test(sku.value)){
-            sku.setCustomValidity('SKU inválido: 3–30, solo letras/números/._-');
-          }else{ sku.setCustomValidity(''); }
-        });
-        sku.addEventListener('blur', ()=>{ sku.value = normSpaces(sku.value.toUpperCase()); });
-      }
+  form.addEventListener('submit', async function(e){
+    e.preventDefault();
+    clearErrors();
 
-      if (nombre){
-        nombre.addEventListener('input', ()=>{
-          const v = normSpaces(nombre.value);
-          if (v.length < 3){
-            nombre.setCustomValidity('Debe tener al menos 3 caracteres.');
-          } else if(!/^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ0-9 /,.-]+$/.test(v)){
-            nombre.setCustomValidity('Se permiten letras con tilde, números y / , . -');
-          } else { nombre.setCustomValidity(''); }
-        });
-        nombre.addEventListener('blur', ()=>{ nombre.value = normSpaces(nombre.value); });
-      }
+    const errors = [];
 
-      if (stock){
-        stock.addEventListener('input', ()=>{
-          const n = Number(stock.value);
-          if (isNaN(n) || n < 0 || !Number.isInteger(n)){
-            stock.setCustomValidity('Ingresa un número entero ≥ 0.');
-          }else{ stock.setCustomValidity(''); }
-        });
-      }
-
-      if (stockMin){
-        stockMin.addEventListener('input', ()=>{
-          const n = Number(stockMin.value);
-          if (isNaN(n) || n < 0 || !Number.isInteger(n)){
-            stockMin.setCustomValidity('Ingresa un entero ≥ 0.');
-          }else{ stockMin.setCustomValidity(''); }
-        });
-      }
-
-      if (precio){
-        precio.addEventListener('input', ()=>{
-          const n = Number(precio.value.replace(',', '.'));
-          if (isNaN(n) || n < 0){ precio.setCustomValidity('Precio ≥ 0. Usa punto decimal.'); }
-          else { precio.setCustomValidity(''); }
-        });
-        precio.addEventListener('blur', ()=>{
-          const n = Number(precio.value.replace(',', '.'));
-          if (!isNaN(n) && n >= 0){ precio.value = toMoney(n); }
-        });
-      }
-
-      if (ean){
-        ean.addEventListener('input', ()=>{
-          ean.value = ean.value.replace(/\D+/g,''); // solo dígitos
-          if (!/^\d{12,14}$/.test(ean.value) && ean.value!==''){
-            ean.setCustomValidity('EAN/UPC debe tener 12 a 14 dígitos.');
-          }else{ ean.setCustomValidity(''); }
-        });
-      }
-
-      if (descripcion){
-        descripcion.addEventListener('input', ()=>{
-          if ((descripcion.value||'').length > 240){
-            descripcion.setCustomValidity('Máximo 240 caracteres.');
-          }else{ descripcion.setCustomValidity(''); }
-        });
-        descripcion.addEventListener('blur', ()=>{ descripcion.value = normSpaces(descripcion.value); });
-      }
-
-      // Confirmación + validación + antirebote
-      let confirmed = false, submitting = false;
-
-      form.addEventListener('submit', function(e){
-      e.preventDefault(); 
-      e.stopPropagation();
-
-      // Normalizar valores
-      if (sku)  sku.value  = normSpaces(sku.value.toUpperCase());
-      if (nombre) nombre.value = normSpaces(nombre.value);
-      if (descripcion) descripcion.value = normSpaces(descripcion.value);
-      if (precio && precio.value!==''){
-        const n = Number(precio.value.replace(',', '.'));
-        if (!isNaN(n) && n >= 0) precio.value = toMoney(n);
-      }
-
-      // Validación básica
-      if (!form.checkValidity()){
-        Array.from(form.elements).forEach(el=>{
-          if (el.tagName && /INPUT|SELECT|TEXTAREA/.test(el.tagName)){
-            el.classList.toggle('is-invalid', !el.checkValidity());
-            el.addEventListener('input', ()=> el.classList.remove('is-invalid'), {once:true});
-          }
-        });
-        return;
-      }
-
-      // Confirmación
-      Swal.fire({
-        icon: "warning",
-        title: "¿Guardar cambios?",
-        text: "Se actualizará la información del producto.",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Sí, guardar",
-        cancelButtonText: "Cancelar"
-      }).then((result) => {
-        if (result.isConfirmed && !submitting) {
-          submitting = true;
-          btn.disabled = true;
-          btn.textContent = 'Guardando...';
-
-          // Loading
-          Swal.fire({
-            title: 'Modificando producto…',
-            text: 'Por favor espera',
-            allowOutsideClick: false,
-            didOpen: () => Swal.showLoading()
-          });
-          setTimeout(() => {
-            const formData = new FormData(form);
-
-            fetch(form.action, {
-              method: 'POST',
-              body: formData,
-              headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-              }
-            })
-            .then(response => response.json())
-            .then(data => {
-              Swal.close();
-              if (data.success){
-                Swal.fire({
-                  icon: 'success',
-                  title: '¡Producto modificado!',
-                  text: 'Se actualizó correctamente.',
-                  confirmButtonText: 'Aceptar'
-                }).then(() => {
-                  window.location.href = "{% url 'productos' %}";
-                });
-              } else {
-                let errMsg = 'Hubo un error al actualizar.';
-                if (data.errors){
-                  errMsg = Object.values(data.errors).flat().join('\n');
-                }
-                Swal.fire({
-                  icon: 'error',
-                  title: 'Error',
-                  text: errMsg
-                });
-                submitting = false;
-                btn.disabled = false;
-                btn.textContent = 'Guardar cambios';
-              }
-            })
-            .catch(err => {
-              Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Hubo un problema al enviar el formulario.'
-              });
-              submitting = false;
-              btn.disabled = false;
-              btn.textContent = 'Guardar cambios';
-            });
-          }, 150);
-        }
-      });
+    // Normalizar campos
+    ['id_sku','id_nombre','id_descripcion'].forEach(id=>{
+      const el = document.getElementById(id);
+      if(!el) return;
+      el.value = normSpaces(el.value);
+      if(id==='id_sku') el.value = el.value.toUpperCase();
     });
-    })();
-  </script>
+
+    const sku = form.querySelector('[name="sku"]');
+    const nombre = form.querySelector('[name="nombre"]');
+    const ean_upc = form.querySelector('[name="ean_upc"]');
+    const precio = form.querySelector('[name="precio_venta"]');
+    const stock_min = form.querySelector('[name="stock_minimo"]');
+    const stock_max = form.querySelector('[name="stock_maximo"]');
+
+    // --- Validaciones ---
+    if(!sku.value) errors.push({el:sku,msg:'No puede estar vacío.'});
+    else if(!/^[A-Z0-9\-]+$/.test(sku.value)) errors.push({el:sku,msg:'Solo letras mayúsculas, números y guiones.'});
+    else if(sku.value.length >= 15) errors.push({el:sku,msg:'Debe tener menos de 15 caracteres.'});
+
+    if(!nombre.value) errors.push({el:nombre,msg:'No puede estar vacío.'});
+    else if(!/^[A-Za-z0-9\s]+$/.test(nombre.value)) errors.push({el:nombre,msg:'Solo letras, números y espacios.'});
+    else if(nombre.value.length > 70) errors.push({el:nombre,msg:'Debe tener menos de 70 caracteres.'});
+
+    if(ean_upc.value){
+      if(!/^\d+$/.test(ean_upc.value)) errors.push({el:ean_upc,msg:'Solo números.'});
+      else if(ean_upc.value.length < 12 || ean_upc.value.length > 13) errors.push({el:ean_upc,msg:'Debe tener entre 12 y 13 dígitos.'});
+    }
+
+    if(precio.value){
+      const p = Number(precio.value);
+      if(isNaN(p)) errors.push({el:precio,msg:'Debe ser un número.'});
+      else if(p < 0) errors.push({el:precio,msg:'No puede ser negativo.'});
+      else if(p > 999999) errors.push({el:precio,msg:'No puede superar 999.999.'});
+    }
+
+    if(stock_min.value){
+      const smin = Number(stock_min.value);
+      if(isNaN(smin)) errors.push({el:stock_min,msg:'Debe ser un número.'});
+      else if(smin < 0) errors.push({el:stock_min,msg:'No puede ser negativo.'});
+      if(stock_max.value){
+        const smax = Number(stock_max.value);
+        if(isNaN(smax)) errors.push({el:stock_max,msg:'Debe ser un número.'});
+        else if(smin > smax) errors.push({el:stock_min,msg:'El mínimo no puede ser mayor que el máximo.'});
+      }
+    }
+
+    // --- Si hay errores, mostrar SweetAlert y errores debajo ---
+    if(errors.length){
+      errors.forEach(e=>showError(e.el, e.msg));
+      const first = errors[0].el;
+      if(first) first.focus();
+      return Swal.fire({
+        icon:'error',
+        title:'Verifica los campos',
+        text:'Corrige los errores antes de continuar.',
+        confirmButtonColor:'#c8102e'
+      });
+    }
+
+    // --- Confirmación antes de enviar ---
+    const result = await Swal.fire({
+      icon:'warning',
+      title:'¿Guardar cambios?',
+      text:'Se actualizará la información del producto.',
+      showCancelButton:true,
+      confirmButtonText:'Sí, guardar',
+      cancelButtonText:'Cancelar'
+    });
+
+    if(result.isConfirmed){
+      btn.disabled = true;
+      btn.textContent = 'Guardando...';
+      const formData = new FormData(form);
+
+      try {
+        const response = await fetch(form.action, {
+          method:'POST',
+          body: formData,
+          headers:{'X-Requested-With':'XMLHttpRequest'}
+        });
+
+        let data;
+        try { data = await response.json(); }
+        catch(e){
+          throw new Error('Respuesta inválida del servidor');
+        }
+
+        if(data.success){
+          return Swal.fire({
+            icon:'success',
+            title:'¡Producto modificado!',
+            text:'Se actualizó correctamente.'
+          }).then(()=> window.location.href="{% url 'productos' %}");
+        } else {
+          if(data.errors){
+            Object.entries(data.errors).forEach(([f,msgs])=>{
+              const field = form.querySelector(`[name="${f}"]`);
+              if(field) showError(field,msgs.join(', '));
+            });
+          }
+          btn.disabled = false;
+          btn.textContent = 'Guardar cambios';
+          return Swal.fire({
+            icon:'error',
+            title:'Error',
+            text:'Hubo un error al actualizar.'
+          });
+        }
+      } catch(err){
+        console.error(err);
+        btn.disabled = false;
+        btn.textContent = 'Guardar cambios';
+        return Swal.fire({
+          icon:'error',
+          title:'Error',
+          text:'Hubo un problema al enviar el formulario.'
+        });
+      }
+    }
+
+  });
+})();
+</script>
+<script>
+(function(){
+  // Campos a controlar
+  const campos6Digitos = [
+    'factor_conversion',
+    'costo_estandar',
+    'costo_promedio',
+    'precio_venta',
+    'stock_minimo',
+    'stock_maximo',
+    'punto_reorden',
+    'stock_actual'
+  ];
+
+  campos6Digitos.forEach(name => {
+    const field = document.querySelector(`[name="${name}"]`);
+    if(!field) return;
+
+    field.addEventListener('input', (e) => {
+      let val = field.value;
+
+      // Quitar cualquier carácter que no sea número
+      val = val.replace(/[^0-9]/g, '');
+
+      // Limitar a 6 dígitos
+      if(val.length > 6) val = val.slice(0,6);
+
+      // No permitir negativo
+      if(Number(val) < 0) val = '0';
+
+      field.value = val;
+    });
+  });
+
+  // Campo IVA (%)
+  const ivaField = document.querySelector('[name="impuesto_iva"]');
+  if(ivaField){
+    ivaField.addEventListener('input', () => {
+      let val = ivaField.value.replace(/[^0-9]/g,''); // solo números
+      if(Number(val) > 100) val = '100';
+      ivaField.value = val;
+    });
+  }
+})();
+</script>
+
+
+{% if form.errors %}
+<script>
+Swal.fire({
+  icon: 'error',
+  title: 'Error en el formulario',
+  text: 'Por favor revisa los campos marcados en rojo.',
+  confirmButtonColor: '#d33'
+});
+</script>
+{% endif %}
 
 </body>
 </html>
+
+
+

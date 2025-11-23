@@ -132,7 +132,6 @@
                 <th>Nombre Abreviado</th>
                 <th>Nombre Completo</th>
                 <th>Descripción</th>
-                <th>Creado</th>
                 <th class="text-center" style="width:220px">Acciones</th>
               </tr>
             </thead>
@@ -142,7 +141,6 @@
                 <td class="fw-semibold">{{ c.nombre_abreviado }}</td>
                 <td>{{ c.nombre_completo }}</td>
                 <td class="text-muted">{{ c.descripcion }}</td>
-                <td>{{ c.creado }}</td>
                 <td class="text-center">
                   <div class="d-inline-flex gap-2">
                     <a href="{% url 'categoria-modificada' c.id %}" class="btn btn-sm btn-edit">Editar</a>
@@ -194,6 +192,8 @@
       });
     }
   </script>
+  
+
 
 </body>
 </html>

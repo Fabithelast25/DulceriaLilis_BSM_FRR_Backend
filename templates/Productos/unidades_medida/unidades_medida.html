@@ -124,7 +124,6 @@
                 <th>Nombre Abreviado</th>
                 <th>Nombre Completo</th>
                 <th>Descripción</th>
-                <th>Creado</th>
                 <th class="text-center" style="width:220px">Acciones</th>
               </tr>
             </thead>
@@ -134,7 +133,6 @@
                 <td class="fw-semibold">{{ u.nombre_abreviado }}</td>
                 <td>{{ u.nombre_completo }}</td>
                 <td class="text-muted">{{ u.descripcion }}</td>
-                <td>{{ u.creado }}</td>
                 <td class="text-center">
                   <div class="d-inline-flex gap-2">
                     <a href="{% url 'unidad-medida-modificada' u.id %}" class="btn btn-sm btn-edit">Editar</a>

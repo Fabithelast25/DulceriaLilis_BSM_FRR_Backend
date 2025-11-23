@@ -86,13 +86,13 @@
             <label for="id_nombre_abreviado" class="form-label">Nombre abreviado</label>
             {{ form.nombre_abreviado }}
             <div class="form-text">
-              1–10 caracteres. Solo letras, números, espacio, punto o guion (ej.: <b>kg</b>, <b>u.</b>, <b>cm</b>, <b>kg.</b>).
-              <span id="count_abrev" class="counter ms-1">0/10</span>
+              1–4 caracteres. Solo letras, números, espacio, punto o guion (ej.: <b>kg</b>, <b>u.</b>, <b>cm</b>, <b>kg.</b>).
+              <span id="count_abrev" class="counter ms-1">0/4</span>
             </div>
             {% if form.nombre_abreviado.errors %}
               <div class="invalid-feedback d-block">{{ form.nombre_abreviado.errors|striptags }}</div>
             {% endif %}
-            <div class="invalid-feedback">Formato inválido. Usa 1–10 caracteres permitidos.</div>
+            <div class="invalid-feedback">Formato inválido. Usa 1–4 caracteres permitidos.</div>
           </div>
 
           <!-- Nombre completo -->
@@ -100,13 +100,13 @@
             <label for="id_nombre_completo" class="form-label">Nombre completo</label>
             {{ form.nombre_completo }}
             <div class="form-text">
-              3–60 caracteres. Permite tildes, números y “/ - , .”.
-              <span id="count_nombre" class="counter ms-1">0/60</span>
+              3–20 caracteres. Permite tildes, números y “/ - , .”.
+              <span id="count_nombre" class="counter ms-1">0/20</span>
             </div>
             {% if form.nombre_completo.errors %}
               <div class="invalid-feedback d-block">{{ form.nombre_completo.errors|striptags }}</div>
             {% endif %}
-            <div class="invalid-feedback">Ingresa un nombre válido (3–60 caracteres).</div>
+            <div class="invalid-feedback">Ingresa un nombre válido (3–20 caracteres).</div>
           </div>
 
           <!-- Descripción -->
@@ -130,151 +130,177 @@
   </div>
 
   <script>
-    (function(){
-      const form   = document.getElementById('form_unidades');
-      const btnOk  = document.getElementById('btn-guardar');
-      const btnClr = document.getElementById('btn-limpiar');
+  (function(){
+    const form = document.getElementById('form_unidades');
+    const btnSubmit = document.getElementById('btn-guardar');
+    const btnClear = document.getElementById('btn-limpiar');
 
-      const abrev  = document.getElementById('id_nombre_abreviado');
-      const nombre = document.getElementById('id_nombre_completo');
-      const desc   = document.getElementById('id_descripcion');
+    const abrev  = document.getElementById('id_nombre_abreviado');
+    const nombre = document.getElementById('id_nombre_completo');
+    const desc   = document.getElementById('id_descripcion');
 
-      const cAbrev  = document.getElementById('count_abrev');
-      const cNombre = document.getElementById('count_nombre');
-      const cDesc   = document.getElementById('count_desc');
+    const cAbrev  = document.getElementById('count_abrev');
+    const cNombre = document.getElementById('count_nombre');
+    const cDesc   = document.getElementById('count_desc');
 
-      // Atributos mínimos si no vienen desde forms.py
-      function ensureAttrs(){
-        if (abrev){
-          abrev.classList.add('form-control');
-          abrev.setAttribute('required','');
-          abrev.setAttribute('minlength','1');
-          abrev.setAttribute('maxlength','10');
-          abrev.setAttribute('pattern','^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ0-9 .-]{1,10}$');
-          abrev.setAttribute('placeholder','Ej.: kg, u., cm');
-          abrev.style.textTransform = 'lowercase';
-        }
-        if (nombre){
-          nombre.classList.add('form-control');
-          nombre.setAttribute('required','');
-          nombre.setAttribute('minlength','3');
-          nombre.setAttribute('maxlength','60');
-          nombre.setAttribute('pattern','^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ0-9 /,.-]{3,60}$');
-          nombre.setAttribute('placeholder','Ej.: Kilogramo');
-        }
-        if (desc){
-          desc.classList.add('form-control');
-          desc.setAttribute('maxlength','240');
-          if (desc.tagName.toLowerCase()==='textarea'){ desc.setAttribute('rows','3'); }
-        }
+    // Asignar atributos si no vienen del form Django
+    function ensureAttrs(){
+      if (abrev){
+        abrev.classList.add('form-control');
+        abrev.setAttribute('required','');
+        abrev.setAttribute('minlength','1');
+        abrev.setAttribute('maxlength','4');
+        abrev.setAttribute('pattern','^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ0-9 .-]{1,4}$');
+        abrev.setAttribute('placeholder','Ej.: kg, u., cm');
+        abrev.style.textTransform = 'lowercase';
       }
-      ensureAttrs();
-
-      // Helpers
-      const normalizeSpaces = v => (v || '').replace(/\s+/g,' ').trim();
-      const updateCounter = (el, elCounter, max) => { if(el && elCounter){ elCounter.textContent = `${(el.value||'').length}/${max}`; } };
-
-      // Validación live + contadores
-      function bindValidation(){
-        if (abrev){
-          updateCounter(abrev, cAbrev, 10);
-          abrev.addEventListener('input', ()=>{
-            abrev.value = abrev.value.toLowerCase();
-            updateCounter(abrev, cAbrev, 10);
-            const v = normalizeSpaces(abrev.value);
-            if (v.length < 1){
-              abrev.setCustomValidity('Debe tener al menos 1 carácter.');
-            } else if(!/^[a-záéíóúüñ0-9 .-]+$/.test(v)){
-              abrev.setCustomValidity('Solo letras, números, espacio, punto y guion.');
-            } else { abrev.setCustomValidity(''); }
-          });
-          abrev.addEventListener('blur', ()=>{ abrev.value = normalizeSpaces(abrev.value.toLowerCase()); updateCounter(abrev,cAbrev,10); });
-        }
-
-        if (nombre){
-          updateCounter(nombre, cNombre, 60);
-          nombre.addEventListener('input', ()=>{
-            updateCounter(nombre, cNombre, 60);
-            const v = normalizeSpaces(nombre.value);
-            if (v.length < 3){
-              nombre.setCustomValidity('Debe tener al menos 3 caracteres.');
-            } else if(!/^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ0-9 /,.-]+$/.test(v)){
-              nombre.setCustomValidity('Se permiten letras con tilde, números y / , . -');
-            } else { nombre.setCustomValidity(''); }
-          });
-          nombre.addEventListener('blur', ()=>{ nombre.value = normalizeSpaces(nombre.value); updateCounter(nombre,cNombre,60); });
-        }
-
-        if (desc){
-          updateCounter(desc, cDesc, 240);
-          desc.addEventListener('input', ()=>{
-            updateCounter(desc, cDesc, 240);
-            if ((desc.value||'').length > 240){
-              desc.setCustomValidity('Máximo 240 caracteres.');
-            } else { desc.setCustomValidity(''); }
-          });
-          desc.addEventListener('blur', ()=>{ desc.value = normalizeSpaces(desc.value); updateCounter(desc,cDesc,240); });
-        }
+      if (nombre){
+        nombre.classList.add('form-control');
+        nombre.setAttribute('required','');
+        nombre.setAttribute('minlength','3');
+        nombre.setAttribute('maxlength','20');
+        nombre.setAttribute('pattern','^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ0-9 /,.-]{3,20}$');
+        nombre.setAttribute('placeholder','Ej.: Kilogramo');
       }
-      bindValidation();
+      if (desc){
+        desc.classList.add('form-control');
+        desc.setAttribute('maxlength','240');
+        desc.setAttribute('placeholder','Describe brevemente la unidad (opcional)');
+      }
+    }
+    ensureAttrs();
 
-      // Limpiar
-      btnClr.addEventListener('click', ()=>{
-        form.reset();
-        [abrev, nombre, desc].forEach(el=> el && el.classList.remove('is-invalid'));
-        updateCounter(abrev,cAbrev,10);
-        updateCounter(nombre,cNombre,60);
-        updateCounter(desc,cDesc,240);
-      });
+    function normalizeSpaces(v){ return v.replace(/\s+/g,' ').trim(); }
 
-      // Submit: normaliza, valida, confirma y evita doble envío
-      let confirmed = false, submitting = false;
-      form.addEventListener('submit', function(e){
-        if (abrev)  abrev.value  = normalizeSpaces(abrev.value.toLowerCase());
-        if (nombre) nombre.value = normalizeSpaces(nombre.value);
-        if (desc)   desc.value   = normalizeSpaces(desc.value);
+    function updateCounter(el, counter, max){
+      if(el && counter){ counter.textContent = `${(el.value || '').length}/${max}`; }
+    }
 
-        if (!confirmed){
-          e.preventDefault(); e.stopPropagation();
-
-          if (!form.checkValidity()){
-            [abrev, nombre, desc].forEach(el=>{
-              if (el){
-                el.classList.toggle('is-invalid', !el.checkValidity());
-                el.addEventListener('input', ()=> el.classList.remove('is-invalid'), {once:true});
-              }
-            });
-            return;
+    function setValidations(){
+      if (abrev){
+        updateCounter(abrev, cAbrev, 4);
+        abrev.addEventListener('input', ()=>{
+          abrev.value = abrev.value.toLowerCase();
+          updateCounter(abrev, cAbrev, 4);
+          const v = normalizeSpaces(abrev.value);
+          if (v.length < 1){
+            abrev.setCustomValidity('Debe tener al menos 1 carácter.');
+          }else if(!/^[a-záéíóúüñ0-9 .-]+$/.test(v)){
+            abrev.setCustomValidity('Solo letras, números, espacios, punto y guion.');
+          }else{
+            abrev.setCustomValidity('');
           }
+        });
+        abrev.addEventListener('blur', ()=>{ abrev.value = normalizeSpaces(abrev.value); updateCounter(abrev,cAbrev,4); });
+      }
 
-          Swal.fire({
-            icon: "question",
-            title: "¿Guardar unidad de medida?",
-            showCancelButton: true,
-            confirmButtonText: "Sí, guardar",
-            cancelButtonText: "Cancelar"
-          }).then((result)=>{
-            if (result.isConfirmed){
-              confirmed = true;
-              if (!submitting){
-                submitting = true;
-                btnOk.disabled = true;
-                btnOk.textContent = 'Guardando...';
-                form.submit();
-              }
-            }
-          });
-          return;
-        }
+      if (nombre){
+        updateCounter(nombre, cNombre, 20);
+        nombre.addEventListener('input', ()=>{
+          updateCounter(nombre, cNombre, 20);
+          const v = normalizeSpaces(nombre.value);
+          if (v.length < 3){
+            nombre.setCustomValidity('Debe tener al menos 3 caracteres.');
+          }else if(!/^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ0-9 /,.-]+$/.test(v)){
+            nombre.setCustomValidity('Caracteres inválidos.');
+          }else{
+            nombre.setCustomValidity('');
+          }
+        });
+        nombre.addEventListener('blur', ()=>{ nombre.value = normalizeSpaces(nombre.value); updateCounter(nombre,cNombre,20); });
+      }
 
-        if (!form.checkValidity()){ e.preventDefault(); e.stopPropagation(); return; }
-        if (submitting){ e.preventDefault(); e.stopPropagation(); return; }
-        submitting = true;
-        btnOk.disabled = true;
-        btnOk.textContent = 'Guardando...';
-      });
-    })();
+      if (desc){
+        updateCounter(desc, cDesc, 240);
+        desc.addEventListener('input', ()=>{
+          updateCounter(desc, cDesc, 240);
+          if ((desc.value || '').length > 240){
+            desc.setCustomValidity('Máximo 240 caracteres.');
+          }else{
+            desc.setCustomValidity('');
+          }
+        });
+        desc.addEventListener('blur', ()=>{ desc.value = normalizeSpaces(desc.value); updateCounter(desc,cDesc,240); });
+      }
+    }
+    setValidations();
+
+    let submitting = false;
+
+    form.addEventListener('submit', function(e){
+      if (abrev)  abrev.value  = normalizeSpaces(abrev.value.toLowerCase());
+      if (nombre) nombre.value = normalizeSpaces(nombre.value);
+      if (desc)   desc.value   = normalizeSpaces(desc.value);
+
+      if (!form.checkValidity()){
+        e.preventDefault();
+        e.stopPropagation();
+
+        [abrev, nombre, desc].forEach(el=>{
+          if(el){
+            el.classList.toggle('is-invalid', !el.checkValidity());
+            el.addEventListener('input', ()=> el.classList.remove('is-invalid'), {once:true});
+          }
+        });
+
+        Swal.fire({
+          icon: 'error',
+          title: 'Formulario incompleto',
+          text: 'Revisa los campos señalados.',
+          confirmButtonColor: '#c8102e'
+        });
+
+        return;
+      }
+
+      if (submitting){
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+
+      submitting = true;
+      btnSubmit.disabled = true;
+      btnSubmit.textContent = 'Guardando...';
+    });
+
+    btnClear.addEventListener('click', ()=>{
+      form.reset();
+      [abrev,nombre,desc].forEach(el=> el?.classList.remove('is-invalid'));
+      updateCounter(abrev,cAbrev,10);
+      updateCounter(nombre,cNombre,60);
+      updateCounter(desc,cDesc,240);
+    });
+  })();
   </script>
+
+  {% if messages %}
+  <script>
+    {% for message in messages %}
+      {% if message.tags == "success" %}
+        Swal.fire({
+          icon: "success",
+          title: "{{ message }}",
+          showConfirmButton: false,
+          timer: 1500
+        }).then(() => {
+          window.location.href = "{% url 'unidades-medida' %}";
+        });
+      {% endif %}
+    {% endfor %}
+  </script>
+  {% endif %}
+
+    {% if form.errors %}
+    <script>
+      Swal.fire({
+        icon: "error",
+        title: "Datos inválidos",
+        text: "Por favor revisa los campos del formulario.",
+        confirmButtonColor: "#c8102e"
+      });
+    </script>
+    {% endif %}
 
 </body>
 </html>

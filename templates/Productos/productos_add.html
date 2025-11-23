@@ -139,7 +139,7 @@
             <h5 class="mb-3">Identificación</h5>
             <div class="row g-3">
               <div class="col-md-4">
-                <label for="{{ form.sku.id_for_label }}">SKU</label>
+                <label for="{{ form.sku.id_for_label }}">SKU*</label>
                 {{ form.sku }}
                 <div class="field-error" id="err-sku">Formato inválido (3–32: letras/números/._-)</div>
                 {% if form.sku.errors %}
@@ -159,7 +159,7 @@
                 {% endif %}
               </div>
               <div class="col-md-4">
-                <label for="{{ form.nombre.id_for_label }}">Nombre</label>
+                <label for="{{ form.nombre.id_for_label }}">Nombre*</label>
                 {{ form.nombre }}
                 <div class="field-error" id="err-nombre">Entre 3 y 70 caracteres.</div>
               </div>
@@ -171,7 +171,7 @@
               </div>
 
               <div class="col-md-6">
-                <label for="{{ form.categoria.id_for_label }}">Categoría</label>
+                <label for="{{ form.categoria.id_for_label }}">Categoría*</label>
                 {{ form.categoria }}
                 <div class="field-error" id="err-categoria">Selecciona una categoría válida.</div>
               </div>
@@ -179,23 +179,33 @@
                 <label for="{{ form.marca.id_for_label }}">Marca</label>
                 {{ form.marca }}
                 <div class="field-error" id="err-marca">Máx. 50 caracteres.</div>
+                {% if form.marca.errors %}
+                    <div class="text-danger">
+                        {{ form.marca.errors }}
+                    </div>
+                {% endif %}
               </div>
               <div class="col-md-6">
                 <label for="{{ form.modelo.id_for_label }}">Modelo</label>
                 {{ form.modelo }}
                 <div class="field-error" id="err-modelo">Máx. 50 caracteres.</div>
+                {% if form.modelo.errors %}
+                    <div class="text-danger">
+                        {{ form.modelo.errors }}
+                    </div>
+                {% endif %}
               </div>
             </div>
 
             <h5 class="mt-4 mb-3">Unidades y precios</h5>
             <div class="row g-3">
               <div class="col-md-4">
-                <label for="{{ form.uom_compra.id_for_label }}">Unidad de Medida (Compra)</label>
+                <label for="{{ form.uom_compra.id_for_label }}">Unidad de Medida (Compra)*</label>
                 {{ form.uom_compra }}
                 <div class="field-error" id="err-uomc">Obligatorio.</div>
               </div>
               <div class="col-md-4">
-                <label for="{{ form.uom_venta.id_for_label }}">Unidad de Medida (Venta)</label>
+                <label for="{{ form.uom_venta.id_for_label }}">Unidad de Medida (Venta)*</label>
                 {{ form.uom_venta }}
                 <div class="field-error" id="err-uomv">Obligatorio.</div>
               </div>
@@ -203,25 +213,44 @@
                 <label for="{{ form.factor_conversion.id_for_label }}">Factor de Conversión</label>
                 {{ form.factor_conversion }}
                 <div class="field-error" id="err-factor">Entero &gt; 0.</div>
+                {% if form.factor_conversion.errors %}
+                    <div class="text-danger">
+                        {{ form.factor_conversion.errors }}
+                    </div>
+                {% endif %}
               </div>
-
               <div class="col-md-3">
                 <label for="{{ form.costo_estandar.id_for_label }}">Costo Estándar</label>
                 {{ form.costo_estandar }}
                 <div class="field-error" id="err-costo-std">Entero ≥ 0 (opcional).</div>
+                {% if form.costo_estandar.errors %}
+                    <div class="text-danger">
+                        {{ form.costo_estandar.errors }}
+                    </div>
+                {% endif %}
               </div>
               <div class="col-md-3">
                 <label for="{{ form.costo_promedio.id_for_label }}">Costo Promedio</label>
                 {{ form.costo_promedio }}
                 <div class="field-error" id="err-costo-prom">Entero ≥ 0 (opcional).</div>
+                {% if form.costo_promedio.errors %}
+                    <div class="text-danger">
+                        {{ form.costo_promedio.errors }}
+                    </div>
+                {% endif %}
               </div>
               <div class="col-md-3">
                 <label for="{{ form.precio_venta.id_for_label }}">Precio de Venta</label>
                 {{ form.precio_venta }}
                 <div class="field-error" id="err-precio">Entero ≥ 0 (opcional).</div>
+                {% if form.precio_venta.errors %}
+                    <div class="text-danger">
+                        {{ form.precio_venta.errors }}
+                    </div>
+                {% endif %}
               </div>
               <div class="col-md-3">
-                <label for="{{ form.impuesto_iva.id_for_label }}">IVA (%)</label>
+                <label for="{{ form.impuesto_iva.id_for_label }}">IVA (%)*</label>
                 {{ form.impuesto_iva }}
                 <div class="field-error" id="err-iva">0 a 100.</div>
               </div>
@@ -233,31 +262,46 @@
             <h5 class="mb-3">Stock y control</h5>
             <div class="row g-3">
               <div class="col-md-4">
-                <label for="{{ form.stock_minimo.id_for_label }}">Stock Mínimo</label>
+                <label for="{{ form.stock_minimo.id_for_label }}">Stock Mínimo*</label>
                 {{ form.stock_minimo }}
                 <div class="field-error" id="err-smin">Entero ≥ 0.</div>
+                {% if form.stock_minimo.errors %}
+                    <div class="text-danger">
+                        {{ form.stock_minimo.errors }}
+                    </div>
+                {% endif %}
               </div>
               <div class="col-md-4">
                 <label for="{{ form.stock_maximo.id_for_label }}">Stock Máximo</label>
                 {{ form.stock_maximo }}
                 <div class="field-error" id="err-smax">El stock máximo no puede ser menor que el stock mínimo.</div>
+                {% if form.stock_maximo.errors %}
+                    <div class="text-danger">
+                        {{ form.stock_maximo.errors }}
+                    </div>
+                {% endif %}
               </div>
               <div class="col-md-4">
                 <label for="{{ form.punto_reorden.id_for_label }}">Punto de Reorden</label>
                 {{ form.punto_reorden }}
                 <div class="field-error" id="err-reorden"> El punto de reorden debe estar entre el stock mínimo y el stock máximo.</div>
+                {% if form.punto_reorden.errors %}
+                    <div class="text-danger">
+                        {{ form.punto_reorden.errors }}
+                    </div>
+                {% endif %}
               </div>
 
               <div class="col-md-4">
-                <label for="{{ form.perishable.id_for_label }}">Perecible</label>
+                <label for="{{ form.perishable.id_for_label }}">Perecible*</label>
                 {{ form.perishable }}
               </div>
               <div class="col-md-4">
-                <label for="{{ form.control_por_lote.id_for_label }}">Control por Lote</label>
+                <label for="{{ form.control_por_lote.id_for_label }}">Control por Lote*</label>
                 {{ form.control_por_lote }}
               </div>
               <div class="col-md-4">
-                <label for="{{ form.control_por_serie.id_for_label }}">Control por Serie</label>
+                <label for="{{ form.control_por_serie.id_for_label }}">Control por Serie*</label>
                 {{ form.control_por_serie }}
               </div>
             </div>
@@ -279,18 +323,23 @@
               </div>
             </div>
 
-            <h5 class="mt-4 mb-2">Derivados (solo lectura)</h5>
+            <h5 class="mt-4 mb-2">Derivados</h5>
             <div class="row g-3">
               <div class="col-md-4">
-                <label for="{{ form.stock_actual.id_for_label }}">Stock Actual</label>
+                <label for="{{ form.stock_actual.id_for_label }}">Stock Actual*</label>
                 {{ form.stock_actual }}
+                {% if form.stock_actual.errors %}
+                    <div class="text-danger">
+                        {{ form.stock_actual.errors }}
+                    </div>
+                {% endif %}
               </div>
               <div class="col-md-4">
-                <label for="{{ form.alerta_bajo_stock.id_for_label }}">Alerta de Bajo Stock</label>
+                <label for="{{ form.alerta_bajo_stock.id_for_label }}">Alerta de Bajo Stock*</label>
                 {{ form.alerta_bajo_stock }}
               </div>
               <div class="col-md-4">
-                <label for="{{ form.alerta_por_vencer.id_for_label }}">Alerta de Vencimiento</label>
+                <label for="{{ form.alerta_por_vencer.id_for_label }}">Alerta de Vencimiento*</label>
                 {{ form.alerta_por_vencer }}
               </div>
             </div>
@@ -498,8 +547,62 @@
         });
     }
   });
-
   </script>
+
+  <script>
+      document.addEventListener("DOMContentLoaded", function () {
+
+          // Campos a validar (según sus IDs generados por Django)
+          const campos = [
+              "id_costo_promedio",
+              "id_costo_estandar",
+              "id_precio_venta",
+              "id_stock_minimo",
+              "id_stock_maximo",
+              "id_stock_actual",
+              "id_punto_reorden"
+          ];
+
+          campos.forEach(campoId => {
+              const input = document.getElementById(campoId);
+
+              if (input) {
+                  // Permite solo números y máximo 6 dígitos
+                  input.setAttribute("maxlength", "6");
+
+                  input.addEventListener("input", function () {
+                      // Eliminar cualquier cosa que no sea número
+                      input.value = input.value.replace(/[^0-9]/g, "");
+
+                      // Limitar a 6 dígitos estrictos
+                      if (input.value.length > 6) {
+                          input.value = input.value.slice(0, 6);
+                      }
+                  });
+              }
+          });
+
+      });
+      </script>
+
+      <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const iva = document.getElementById("id_impuesto_iva");
+
+            iva.addEventListener("input", function () {
+                // Solo permitir números
+                this.value = this.value.replace(/[^\d]/g, "");
+
+                // Bloquear valores mayores a 100
+                if (Number(this.value) > 100) {
+                    this.value = "100";
+                }
+            });
+        });
+      </script>
+
+
+
       {% if messages %}
   <script>
       {% for message in messages %}
@@ -515,5 +618,6 @@
       {% endfor %}
   </script>
   {% endif %}
+  
 </body>
 </html>
