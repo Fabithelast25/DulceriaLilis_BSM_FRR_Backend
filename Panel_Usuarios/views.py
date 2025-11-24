@@ -9,7 +9,7 @@ from django.http import JsonResponse, HttpResponse
 from openpyxl import Workbook
 from django.db.models import Q
 from Panel_Usuarios.middleware import role_required
-
+from django.db import IntegrityError
 #Importaciones para que cuando se cree un usuario se envie un email y contraseña automatica
 from django.core.mail import send_mail
 from django.contrib.auth.hashers import make_password
@@ -33,23 +33,27 @@ def usuarioAdd(request):
             usuario = form.save(commit=False)
             contrasenia = generar_contrasenia()
             usuario.password = make_password(contrasenia)  # Encripta la contraseña
-            usuario.save()
-            send_mail(
-                "Bienvenido a Dulceria Lilis",
-                f"Hola {usuario.first_name} {usuario.last_name}, tu contraseña temporal es: {contrasenia}",
-                settings.DEFAULT_FROM_EMAIL,
-                [usuario.email],
-                fail_silently=False,
-            )
 
-            messages.success(request, "Usuario creado correctamente")
-        else:
-            messages.error(request, "Error al crear el usuario. Verifique que todos los campos se hayan ingresado correctamente")
-            print(form.errors)
+            try:
+                usuario.save()
+                send_mail(
+                    "Bienvenido a Dulceria Lilis",
+                    f"Hola {usuario.first_name} {usuario.last_name}, tu contraseña temporal es: {contrasenia}",
+                    settings.DEFAULT_FROM_EMAIL,
+                    [usuario.email],
+                    fail_silently=False,
+                )
+                messages.success(request, "Usuario creado correctamente")
+            except IntegrityError as e:
+                if 'Duplicate entry' in str(e):
+                    # Agrega error al campo email
+                    form.add_error('email', 'Este correo ya está registrado.')
+                else:
+                    messages.error(request, 'Error al crear el usuario. Verifique que todos los campos se hayan ingresado correctamente.')
     else:
         form = UsuarioForm()
-    
-    return render(request, 'Usuarios/usuarioAdd.html', {'form':form})
+
+    return render(request, 'Usuarios/usuarioAdd.html', {'form': form})
 
 @login_required(login_url='login')
 @role_required(gestionar_usuarios=True, ver_usuarios=True)
@@ -113,19 +117,25 @@ def usuarioDelete(request, id):
 @role_required(gestionar_usuarios=True)
 def usuarioUpdate(request, id):
     usuario = get_object_or_404(Usuario, id=id)
+
     if request.method == 'POST':
-       
         form = UsuarioForm(request.POST, instance=usuario)
         if form.is_valid():
-            form.save()
-            messages.success(request, "Usuario actualizado correctamente.")
+            try:
+                form.save()
+                messages.success(request, "Usuario actualizado correctamente.")
+            except IntegrityError as e:
+                if 'Duplicate entry' in str(e):
+                    form.add_error('email', 'Este correo ya está registrado.')
+                else:
+                    form.add_error(None, 'Error inesperado, contacte al administrador.')
         else:
             messages.error(request, "Hubo un error al actualizar, verifique que los campos se hayan ingresado correctamente")
             print(form.errors)
     else:
         form = UsuarioForm(instance=usuario)
-    return render(request, 'Usuarios/usuarioUpdate.html', {'form': form})
 
+    return render(request, 'Usuarios/usuarioUpdate.html', {'form': form})
 def exportar_usuarios_excel(request):
 
     # --------- CAPTURAR FILTROS SI EXISTEN ---------

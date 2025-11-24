@@ -53,29 +53,47 @@
             <div class="d-flex">
                  <div class="d-flex">
                 <div class="card-text me-2"><strong>Email/Username: </strong>Admin954@dulcerialilis.cl /<span id="usernameCopy">Administrador</span></div>
-                <button onclick="copyUsername()" class="bi bi-copy"style="background-color:none; border-color:rgb(255,0,0); color:rgba(255,0,0,0.651);"></button>
+		<button onclick="copyUsername()" class="bi bi-copy"style="background-color:none; border-color:rgb(255,0,0); color:rgba(255,0,0,0.651);"></button>
             </div>
             </div>
             <div class="d-flex">
                 <div class="card-text me-2"><strong>Contraseña: </strong><span id="passwordCopy">DuLc3R!aL1l!s</span></div>
-                <button onclick="copyPassword()" class="bi bi-copy" style="background-color:none; border-color:rgb(255,0,0); color:rgba(255,17,0,0.651);"></button>
-            </div>
+		<button onclick="copyPassword()" class="bi bi-copy" style="background-color:none; border-color:rgb(255,0,0); color:rgba(255,17,0,0.651);"></button>
+	    </div>
         </div>
     </div>
 </div>
 
 <script>
 function copyUsername() {
-    // Obtiene el span donde está solo el username
-    const text = document.getElementById("usernameCopy").textContent;
+    const text = document.getElementById("usernameCopy").innerText;
 
-    // Copia el username al portapapeles
-    navigator.clipboard.writeText(text);
+    // Crear input temporal
+    const tempInput = document.createElement("input");
+    tempInput.value = text;
+    document.body.appendChild(tempInput);
+    tempInput.select();
+
+    // Ejecutar comando de copiado
+    document.execCommand("copy");
+
+    // Eliminar input temporal
+    document.body.removeChild(tempInput);
+
 }
 
 function copyPassword() {
-    const text = document.getElementById("passwordCopy").textContent;
-    navigator.clipboard.writeText(text);
+    const text = document.getElementById("passwordCopy").innerText;
+
+    const tempInput = document.createElement("input");
+    tempInput.value = text;
+    document.body.appendChild(tempInput);
+    tempInput.select();
+
+    document.execCommand("copy");
+
+    document.body.removeChild(tempInput);
+
 }
 </script>
 
