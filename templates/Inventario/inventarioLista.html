@@ -258,7 +258,7 @@
         </div>
       <!-- PAGINADOR -->
       {% with u_s=request.GET.s u_tipo=request.GET.tipo u_fdesde=request.GET.fdesde u_fhasta=request.GET.fhasta u_per_page=request.GET.per_page|default:'10' %}
-      <nav aria-label="Paginación" class="mt-4">
+      <div class="pagination-wrapper"  style="overflow-x:auto; white-space:nowrap; padding:0.5rem;">
         <ul class="pagination">
 
           {% if movimientos.has_previous %}
@@ -303,7 +303,7 @@
           {% endif %}
 
         </ul>
-      </nav>
+      </div>
 
       {% endwith %}
       </div>

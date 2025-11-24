@@ -36,7 +36,7 @@ def movimientoAdd(request):
                         producto.stock_actual += cantidad
                         if producto.stock_actual > producto.stock_maximo:
                             messages.error(request, "No puede superar el stock maximo del producto")
-                            return render(request, 'Inventario/inventarioUpdate.html', {'form': form})
+                            return render(request, 'Inventario/inventarioAdd.html', {'form': form})
                             
 
                     elif movimiento.tipo == "S":  # Salida
@@ -49,14 +49,14 @@ def movimientoAdd(request):
                         producto.stock_actual += cantidad
                         if producto.stock_actual > producto.stock_maximo:
                             messages.error(request, "No puede superar el stock maximo del producto")
-                            return render(request, 'Inventario/inventarioUpdate.html', {'form': form})
+                            return render(request, 'Inventario/inventarioAdd.html', {'form': form})
 
                     elif movimiento.tipo == "A":  # Ajuste
                         # Puedes decidir aquí si permites negativo o no
                         producto.stock_actual += cantidad  # Si permites ajustar con signos positivos/negativos
                         if producto.stock_actual > producto.stock_maximo:
                             messages.error(request, "No puede superar el stock maximo del producto")
-                            return render(request, 'Inventario/inventarioUpdate.html', {'form': form})
+                            return render(request, 'Inventario/inventarioAdd.html', {'form': form})
 
                     # 6. Guardamos stock actualizado
                     producto.save()
@@ -110,21 +110,23 @@ def inventarioLista(request):
             pass  # ignorar si la fecha está mal escrita
 
     # 5️⃣ Paginación
-    per_page = request.GET.get('per_page', 10)
-    paginator = Paginator(movimientos, per_page)
-    page_number = request.GET.get('page')
-    movimientos = paginator.get_page(page_number)
+    per_page = request.GET.get('per_page', '10')  # traer como string para comparar
+    if per_page == '1000':  # opción "Todos"
+        movimientos_paginados = list(movimientos)  # no paginar
+    else:
+        paginator = Paginator(movimientos, int(per_page))
+        page_number = request.GET.get('page')
+        movimientos_paginados = paginator.get_page(page_number)
 
     # 6️⃣ Pasar variables al template
     context = {
-        'movimientos': movimientos,
+        'movimientos': movimientos_paginados,
         'busqueda_actual': busqueda,
         'tipo_actual': tipo,
         'fecha_desde_actual': fecha_desde_str,
         'fecha_hasta_actual': fecha_hasta_str,
-        'per_page_actual': str(per_page),  # siempre como string porque en template comparas con "10", "20", etc.
+        'per_page_actual': per_page,  # siempre como string
     }
-
 
     return render(request, 'Inventario/inventarioLista.html', context)
 

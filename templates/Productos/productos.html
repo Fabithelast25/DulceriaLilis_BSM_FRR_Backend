@@ -252,7 +252,7 @@
               </tbody>
             </table>
             {% if productos.paginator.num_pages > 1 and not hide_pagination %}
-            <nav aria-label="Paginación">
+            <div class="pagination-wrapper" style="overflow-x:auto; white-space:nowrap; padding:0.5rem;">
                 <ul class="pagination">
                     {% if productos.has_previous %}
                     <li class="page-item">
@@ -276,7 +276,7 @@
                     </li>
                     {% endif %}
                 </ul>
-            </nav>
+            </div>
         {% endif %}
 
           </div>

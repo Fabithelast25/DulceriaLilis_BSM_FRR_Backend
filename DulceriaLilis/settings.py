@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-!6pl%7oxu2hqfymig4tmt!u#gs^_#3d6euks=4fj=k-jhm3(ab
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['44.208.106.28', 'localhost', '127.0.0.1']
 
 #Modelo personalizado para el login
 AUTH_USER_MODEL = 'Panel_Usuarios.Usuario'
@@ -37,8 +37,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'benjitasilvamarquez2020@gmail.com'
-EMAIL_HOST_PASSWORD = 'fjaj laxb vpgu ugif'
+EMAIL_HOST_USER = 'dulcerialilis123@gmail.com'
+EMAIL_HOST_PASSWORD = 'tpjj psns hzni lufp'
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 #Configuración de Login y Logout
@@ -98,7 +98,7 @@ WSGI_APPLICATION = 'DulceriaLilis.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'dulcerialilis',
+        'NAME': 'dulceria',
         'USER': 'user_dulceria',
         'PASSWORD': 'user123',
         'HOST': 'localhost',
@@ -145,8 +145,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
