@@ -60,7 +60,19 @@ INSTALLED_APPS = [
     'Panel_Productos',
     'Panel_Proveedores',
     'Inventario',
+    'UsuarioApi',
+    'rest_framework',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -98,7 +110,7 @@ WSGI_APPLICATION = 'DulceriaLilis.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'dulceria',
+        'NAME': 'dulcerialilis',
         'USER': 'user_dulceria',
         'PASSWORD': 'user123',
         'HOST': 'localhost',

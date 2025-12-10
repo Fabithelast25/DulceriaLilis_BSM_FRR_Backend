@@ -4,6 +4,7 @@ from Dulceria import views
 from Panel_Productos.views import productosAdd,categoriasAdd,unidadesAdd,mostrarCategorias,cargarCategorias,modificarCategorias,mostrarUnidades,cargarUnidades,modificarUnidades,mostrarProductos,cargarProductos,modificarProductos,productoDelete,categoriaDelete,unidadesDelete, exportar_productos_excel
 from django.contrib import admin
 from django.urls import path, include
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 # Importaciones Usuario
 from Panel_Usuarios import views as vista
 
@@ -12,6 +13,8 @@ from Panel_Proveedores import views as vista_proveedores
 
 #Importaciones Inventario
 from Inventario import views as vista_inventario
+
+from UsuarioApi import views as vistaUsuarioApi
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -27,12 +30,22 @@ urlpatterns = [
     path('verificarCodigo/', views.verificarCodigo, name="verificarCodigo"),
     path('crearContraseña/', views.crearContraseña, name="crearContraseña"),
     
+    #Rutas token
+    path('api/token/', TokenObtainPairView.as_view(), name='obtener_token'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api-auth/', include('rest_framework.urls')),
+    
     # Rutas Usuario
     path('usuarioAdd/', vista.usuarioAdd, name="usuarioAdd"),
     path('usuarioLista/', vista.usuarioLista, name='usuarioLista'),
     path('usuarioLista/delete/<int:id>/', vista.usuarioDelete, name='usuarioDelete'),
     path('usuarioUpdate/<int:id>/', vista.usuarioUpdate, name='usuarioUpdate'),
     path("usuarios/exportar-excel/", vista.exportar_usuarios_excel, name="exportar_usuarios_excel"),
+    
+    #Rutas Usuario API
+    path('usuariosApi/', vistaUsuarioApi.usuariosApi, name='usuariosApi'),
+    path('usuariosListApi/', vistaUsuarioApi.usuario_lista, name='usuariosListApi'),
+    path('usuariosListApi/<int:pk>', vistaUsuarioApi.usuario_detalle, name='usuariosDetalleApi'),
     
     # Rutas Areas
     path('areaLista/', vista.areaLista, name="areaLista"),
