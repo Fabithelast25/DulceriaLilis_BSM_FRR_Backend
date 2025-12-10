@@ -61,7 +61,8 @@ INSTALLED_APPS = [
     'Panel_Proveedores',
     'Inventario',
     'UsuarioApi',
-    'ProveedoresApi',
+    'productoApi',
+    'ProveedoresApi'
     'rest_framework',
 ]
 
