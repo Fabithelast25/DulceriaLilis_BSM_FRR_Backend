@@ -2,6 +2,6 @@ django
 mysqlclient
 pillow
 openpyxl
-
-
+djangorestframework
+djangorestframework-simplejwt
 
