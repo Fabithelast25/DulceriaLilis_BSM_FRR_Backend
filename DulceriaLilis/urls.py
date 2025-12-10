@@ -5,6 +5,7 @@ from Panel_Productos.views import productosAdd,categoriasAdd,unidadesAdd,mostrar
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from ProveedoresApi import views as proveedores_api_views
 # Importaciones Usuario
 from Panel_Usuarios import views as vista
 
@@ -61,6 +62,9 @@ urlpatterns = [
     path('proveedores/', include('Panel_Proveedores.urls')),
     path("proveedores/exportar-excel/", vista_proveedores.exportar_proveedores_excel, name="exportar_proveedores_excel"),
 
+    # Rutas Proveedores API
+    path('api/proveedores/', proveedores_api_views.proveedor_lista, name='proveedor_lista'),
+    path('api/proveedores/<int:pk>/', proveedores_api_views.proveedor_detalle, name='proveedor_detalle'),
 
     # Rutas Ofertas de Proveedores
     path('ofertas/', vista_proveedores.lista_ofertas, name='lista_ofertas'),
