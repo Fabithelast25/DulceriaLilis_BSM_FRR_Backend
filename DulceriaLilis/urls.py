@@ -15,6 +15,7 @@ from Panel_Proveedores import views as vista_proveedores
 from Inventario import views as vista_inventario
 
 from UsuarioApi import views as vistaUsuarioApi
+from productoApi import views as vistaProductoApi
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -77,6 +78,10 @@ urlpatterns = [
     path('producto-eliminado/<int:producto_id>', productoDelete, name='producto-eliminado'),
     path('producto-modificado/<int:id>/',modificarProductos,name='producto-modificado'),
     path("productos/exportar-excel/", exportar_productos_excel, name="exportar_productos_excel"),
+    #Ruta de la Api RestFul
+    path('productosApi/',vistaProductoApi.productosApi,name='productosApi'),
+    path('productosListApi/',vistaProductoApi.producto_listado,name='productosListApi'),
+    path('productosListApi/<int:pk>',vistaProductoApi.producto_detalle,name='productoDetalleApi'),
 
 
     #Rutas Categorías
