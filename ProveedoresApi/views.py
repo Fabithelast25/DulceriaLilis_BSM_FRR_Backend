@@ -19,11 +19,11 @@ def proveedor_lista(request):
     # ------- GET LISTA -------
     if request.method == 'GET':
         # Si tu modelo Rol tiene permisos específicos, descomenta y adapta:
-        # if not getattr(request.user.rol, 'puede_ver_proveedores', False):
-        #     return Response(
-        #         {'error': 'No tienes permiso para ver proveedores'},
-        #         status=status.HTTP_403_FORBIDDEN
-        #     )
+        if not getattr(request.user.rol, 'puede_ver_proveedores', False):
+            return Response(
+                    {'error': 'No tienes permiso para ver proveedores'},
+                    status=status.HTTP_403_FORBIDDEN
+            )
 
         proveedores = Proveedor.objects.all()
         serializer = ProveedorSerializer(proveedores, many=True)
@@ -31,11 +31,11 @@ def proveedor_lista(request):
 
     # ------- POST CREAR -------
     if request.method == 'POST':
-        # if not getattr(request.user.rol, 'puede_gestionar_proveedores', False):
-        #     return Response(
-        #         {'error': 'No tienes permiso para crear proveedores'},
-        #         status=status.HTTP_403_FORBIDDEN
-        #     )
+        if not getattr(request.user.rol, 'puede_gestionar_proveedores', False):
+             return Response(
+                {'error': 'No tienes permiso para crear proveedores'},
+                status=status.HTTP_403_FORBIDDEN
+            )
 
         serializer = ProveedorSerializer(data=request.data)
         if serializer.is_valid():
@@ -63,22 +63,22 @@ def proveedor_detalle(request, pk):
 
     # ------- GET DETALLE -------
     if request.method == 'GET':
-        # if not getattr(request.user.rol, 'puede_ver_proveedores', False):
-        #     return Response(
-        #         {'error': 'No tienes permiso para ver este proveedor'},
-        #         status=status.HTTP_403_FORBIDDEN
-        #     )
+        if not getattr(request.user.rol, 'puede_ver_proveedores', False):
+            return Response(
+                {'error': 'No tienes permiso para ver este proveedor'},
+                status=status.HTTP_403_FORBIDDEN
+            )
 
         serializer = ProveedorSerializer(proveedor)
         return Response(serializer.data)
 
     # ------- PUT EDITAR -------
     if request.method == 'PUT':
-        # if not getattr(request.user.rol, 'puede_gestionar_proveedores', False):
-        #     return Response(
-        #         {'error': 'No tienes permiso para editar proveedores'},
-        #         status=status.HTTP_403_FORBIDDEN
-        #     )
+        if not getattr(request.user.rol, 'puede_gestionar_proveedores', False):
+            return Response(
+                {'error': 'No tienes permiso para editar proveedores'},
+                status=status.HTTP_403_FORBIDDEN
+            )
 
         serializer = ProveedorSerializer(proveedor, data=request.data)
         if serializer.is_valid():
@@ -89,11 +89,11 @@ def proveedor_detalle(request, pk):
 
     # ------- DELETE ELIMINAR -------
     if request.method == 'DELETE':
-        # if not getattr(request.user.rol, 'puede_gestionar_proveedores', False):
-        #     return Response(
-        #         {'error': 'No tienes permiso para eliminar proveedores'},
-        #         status=status.HTTP_403_FORBIDDEN
-        #     )
+        if not getattr(request.user.rol, 'puede_gestionar_proveedores', False):
+            return Response(
+                {'error': 'No tienes permiso para eliminar proveedores'},
+                status=status.HTTP_403_FORBIDDEN
+            )
 
         proveedor.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
