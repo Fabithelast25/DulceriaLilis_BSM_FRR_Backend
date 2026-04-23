@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-!6pl%7oxu2hqfymig4tmt!u#gs^_#3d6euks=4fj=k-jhm3(ab
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['44.208.106.28', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['*']
 
 #Modelo personalizado para el login
 AUTH_USER_MODEL = 'Panel_Usuarios.Usuario'
@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     'UsuarioApi',
     'productoApi',
     'ProveedoresApi',
+    'gallery',
     'rest_framework',
 ]
 

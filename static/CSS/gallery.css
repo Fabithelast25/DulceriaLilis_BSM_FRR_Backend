@@ -1,0 +1,38 @@
+body {
+    text-align: center;
+    font-family: Arial;
+}
+
+.carousel {
+    position: relative;
+    width: 500px;
+    margin: auto;
+}
+
+.slide {
+    width: 100%;
+    display: none;
+}
+
+.prev, .next {
+    position: absolute;
+    top: 50%;
+    background: pink;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+}
+
+.prev { left: 0; }
+.next { right: 0; }
+
+form {
+    margin-top: 20px;
+}
+
+#botonImagen{
+    background-color: #c8102e;
+    color: white;
+    font: bolder;
+    font-weight: 800;
+}

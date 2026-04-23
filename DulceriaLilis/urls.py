@@ -18,6 +18,11 @@ from Inventario import views as vista_inventario
 from UsuarioApi import views as vistaUsuarioApi
 from productoApi import views as vistaProductoApi
 
+#Imagenes
+from django.conf import settings
+from django.conf.urls.static import static
+
+
 urlpatterns = [
     path('admin/', admin.site.urls),
 
@@ -104,6 +109,9 @@ urlpatterns = [
 
     #Rutas Dashboard
     path('dashboard/', views.dashboard, name='dashboard'),
+    
+    #Imagenes
+    path('galeria/', include('gallery.urls')),
 
     # APIs para gráficas y tablas
     path('api/stats/summary/', views.api_summary, name='api_summary'),
@@ -125,5 +133,5 @@ urlpatterns = [
     path("inventario/exportar-excel/", vista_inventario.exportar_movimientos_excel, name="exportar_movimientos_excel"),
 
     path("no_autorizado/", views.no_autorizado, name='no_autorizado'),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
